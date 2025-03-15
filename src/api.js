@@ -1,4 +1,3 @@
-
 const BASE_URL = "http://localhost:8000";
 
 async function testMongoConnection(testInput) {
@@ -39,6 +38,12 @@ async function testMongoConnection(testInput) {
 async function registerUser(userData) {
   try {
     console.log("Registrando usuario:", userData.username);
+    
+    // Eliminar la contraseña duplicada en información general
+    if (userData.informacion_general && userData.informacion_general.contrasena) {
+      delete userData.informacion_general.contrasena;
+    }
+    
     const response = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
@@ -77,12 +82,13 @@ async function loginUser(username, password) {
       body: formData,
     });
 
-    const responseData = await response.json();
-    
     if (!response.ok) {
-      console.error("Error en login:", responseData);
-      throw new Error(responseData.detail || 'Credenciales incorrectas');
+      const errorData = await response.json();
+      console.error("Error en login:", errorData);
+      throw new Error(errorData.detail || 'Credenciales incorrectas');
     }
+    
+    const responseData = await response.json();
     
     // Guardar el token en localStorage
     localStorage.setItem('token', responseData.access_token);
@@ -156,7 +162,6 @@ async function uploadDataset(formData) {
     throw error;
   }
 }
-
 
 export default {
   testMongoConnection,

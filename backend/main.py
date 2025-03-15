@@ -86,9 +86,8 @@ async def register(user_data: UserCreate):
         user_dict["password"] = hashed_password
         
         # Evitar duplicar la contraseña en informacion_general
-        # Para compatibilidad, mantenemos el campo pero lo guardamos vacío o con un placeholder
         if "informacion_general" in user_dict and "contrasena" in user_dict["informacion_general"]:
-            user_dict["informacion_general"]["contrasena"] = "********"
+            del user_dict["informacion_general"]["contrasena"]
         
         # Insertar el usuario en la base de datos
         result = user_collection.insert_one(user_dict)
@@ -102,8 +101,10 @@ async def register(user_data: UserCreate):
 @app.post("/api/auth/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
+        print(f"Intento de login: {form_data.username}")
         user = auth.authenticate_user(form_data.username, form_data.password)
         if not user:
+            print(f"Autenticación fallida para {form_data.username}")
             raise HTTPException(
                 status_code=401,
                 detail="Credenciales incorrectas",
@@ -115,10 +116,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             data={"sub": user["username"]}
         )
         
+        print(f"Login exitoso para {form_data.username}")
         return {"access_token": access_token, "token_type": "bearer"}
     except HTTPException as he:
+        print(f"Error HTTP en login: {he.detail}")
         raise he
     except Exception as e:
+        print(f"Error desconocido en login: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error de autenticación: {str(e)}")
 
 @app.get("/api/auth/me")

@@ -13,7 +13,8 @@ from models import UserCreate, UserLogin
 load_dotenv()
 
 # Configuración de seguridad
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Usar un esquema más compatible con la versión de bcrypt
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 # Conectar a MongoDB
@@ -28,10 +29,18 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception as e:
+        print(f"Error verificando contraseña: {e}")
+        return False
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    try:
+        return pwd_context.hash(password)
+    except Exception as e:
+        print(f"Error hasheando contraseña: {e}")
+        raise e
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -41,14 +50,19 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 def get_user_by_username(username: str):
-    return users_collection.find_one({"username": username})
+    user = users_collection.find_one({"username": username})
+    print(f"Usuario encontrado: {user is not None}")
+    return user
 
 def authenticate_user(username: str, password: str):
     user = get_user_by_username(username)
     if not user:
+        print(f"Usuario {username} no encontrado")
         return False
     if not verify_password(password, user["password"]):
+        print(f"Contraseña incorrecta para {username}")
         return False
+    print(f"Autenticación exitosa para {username}")
     return user
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
