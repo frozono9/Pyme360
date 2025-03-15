@@ -43,7 +43,7 @@ const FinancingModule = () => {
                 icon={<Award className="h-10 w-10 text-pyme-blue" />}
                 title="AI Credit Score"
                 description="Evaluación crediticia basada en datos reales de tu empresa"
-                linkTo="/credit-score"
+                linkTo="/financiamiento/credito"
                 metrics={[
                   { label: "Puntuación Media", value: "720" },
                   { label: "Mejora Potencial", value: "+85 pts" }
@@ -54,7 +54,7 @@ const FinancingModule = () => {
                 icon={<Building className="h-10 w-10 text-pyme-success" />}
                 title="Marketplace Financiero"
                 description="Opciones de financiamiento personalizadas"
-                linkTo="/marketplace-financiamiento"
+                linkTo="/financiamiento/marketplace"
                 metrics={[
                   { label: "Opciones Disponibles", value: "12+" },
                   { label: "Tasa Promedio", value: "9.4%" }
@@ -65,7 +65,7 @@ const FinancingModule = () => {
                 icon={<FileText className="h-10 w-10 text-pyme-warning" />}
                 title="Preparación de Documentos"
                 description="Documentación asistida para solicitudes"
-                linkTo="/preparacion-financiamiento"
+                linkTo="/financiamiento/preparacion"
                 metrics={[
                   { label: "Tiempo de Preparación", value: "-60%" },
                   { label: "Tasa de Aprobación", value: "+35%" }
