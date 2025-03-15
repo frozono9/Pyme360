@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -369,7 +370,7 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Tareas completadas:</span>
                   <span className="text-sm font-bold text-blue-600">
-                    {creditScoreValue >= 80 ? "9" : creditScoreValue >= 65 ? "7" : creditScoreValue >= 50 ? "5" : "3}/10"
+                    {creditScoreValue >= 80 ? "9" : creditScoreValue >= 65 ? "7" : creditScoreValue >= 50 ? "5" : "3"}/10
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -526,7 +527,7 @@ const Dashboard = () => {
               <div className="space-y-2">
                 <div className="flex items-center">
                   <span className="text-sm font-medium mr-2">Puntuación actual:</span>
-                  <span className="text-sm font-bold text-indigo-600">{trustScoreValue}/100</span>
+                  <span className="text-sm font-bold text-indigo-600">{trustScore.score}/100</span>
                 </div>
                 <div className="flex items-center">
                   <span className="text-sm font-medium mr-2">Nivel actual:</span>
