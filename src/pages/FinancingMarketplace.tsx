@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bank, Building, Users, CreditCard, BriefcaseBusiness, HandCoins, LandPlot } from "lucide-react";
+import { Building, Users, CreditCard, BriefcaseBusiness, HandCoins, LandPlot, BuildingIcon } from "lucide-react";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,7 +18,7 @@ const FinancingMarketplace = () => {
   const mockFinancingOptions = [
     {
       type: "Bancos Tradicionales",
-      icon: <Bank className="h-10 w-10 text-blue-600" />,
+      icon: <BuildingIcon className="h-10 w-10 text-blue-600" />,
       color: "blue",
       entities: [
         { name: "Banco Nacional", rate: "12-15%", amount: "Hasta $2,000,000", term: "1-5 años" },
