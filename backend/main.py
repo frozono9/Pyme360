@@ -251,7 +251,7 @@ async def query_financing_assistant(
         user_data = json.dumps(serialize_mongo_document(current_user))
         
         # Enviar la consulta al asistente IA
-        response = query(question.get("question", ""), user_data)
+        response = query(user_data, question.get("question", ""))
         
         # Extraer solo el texto de la respuesta
         response_text = response.get("text", "")
