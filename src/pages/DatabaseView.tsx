@@ -532,15 +532,29 @@ const DatabaseView = () => {
     // Count payments from credit accounts
     const cuentasCredito = historialCrediticio.cuentas_credito || [];
     for (const cuenta of cuentasCredito) {
-      totalPayments += cuenta.total_pagos || 0;
-      latePayments += (cuenta.pagos_tardios || []).reduce((sum: number, item: any) => sum + (item.cantidad || 0), 0);
+      const historialPagos = cuenta.historial_pagos || [];
+      totalPayments += historialPagos.length;
+      
+      // Count late payments
+      for (const pago of historialPagos) {
+        if (pago.estado && pago.estado.toLowerCase().includes('atrasado')) {
+          latePayments++;
+        }
+      }
     }
     
     // Count payments from supplier accounts
     const creditoProveedores = historialCrediticio.credito_proveedores || [];
     for (const proveedor of creditoProveedores) {
-      totalPayments += proveedor.total_pagos || 0;
-      latePayments += (proveedor.pagos_tardios || []).reduce((sum: number, item: any) => sum + (item.cantidad || 0), 0);
+      const historialPagos = proveedor.historial_pagos || [];
+      totalPayments += historialPagos.length;
+      
+      // Count late payments
+      for (const pago of historialPagos) {
+        if (pago.estado && pago.estado.toLowerCase().includes('atrasado')) {
+          latePayments++;
+        }
+      }
     }
     
     // If no payment data, return default
@@ -584,6 +598,13 @@ const DatabaseView = () => {
     for (const cuenta of cuentasCredito) {
       totalDebt += cuenta.saldo_actual || 0;
       totalAvailable += cuenta.limite_credito || 0;
+    }
+    
+    // Add supplier credits
+    const creditoProveedores = historialCrediticio.credito_proveedores || [];
+    for (const proveedor of creditoProveedores) {
+      totalDebt += proveedor.saldo_actual || 0;
+      totalAvailable += proveedor.limite_credito || 0;
     }
     
     // If no credit available, return default
@@ -667,8 +688,8 @@ const DatabaseView = () => {
     // Identify unique credit types
     const cuentasCredito = historialCrediticio.cuentas_credito || [];
     for (const cuenta of cuentasCredito) {
-      if (cuenta.tipo_credito) {
-        creditTypes.add(cuenta.tipo_credito);
+      if (cuenta.tipo) {
+        creditTypes.add(cuenta.tipo);
       }
     }
     
@@ -778,10 +799,10 @@ const DatabaseView = () => {
     }
     
     // Get the most recent month
-    const lastMonth = datosMensuales[datosMensuales.length - 1];
+    const lastMonth = datosMensuales[0];
     
     // Get previous month if available
-    const prevMonth = datosMensuales.length > 1 ? datosMensuales[datosMensuales.length - 2] : null;
+    const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
     
     const totalSales = lastMonth.total || 0;
     const onlineSales = lastMonth.online || 0;
@@ -828,29 +849,36 @@ const DatabaseView = () => {
     }
     
     // Get the most recent month
-    const lastMonth = datosMensuales[datosMensuales.length - 1];
+    const lastMonth = datosMensuales[0];
     
     // Get previous month if available
-    const prevMonth = datosMensuales.length > 1 ? datosMensuales[datosMensuales.length - 2] : null;
+    const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
     
     const revenue = lastMonth.ingresos || 0;
     const cogs = lastMonth.costo_ventas || 0;
     const opExpenses = lastMonth.gastos_operativos || 0;
     
-    // Calculate margins
-    const grossMargin = revenue > 0 ? ((revenue - cogs) / revenue) * 100 : 0;
-    const netMargin = revenue > 0 ? ((revenue - cogs - opExpenses) / revenue) * 100 : 0;
+    // Calculate margins (either use the existing values or calculate them)
+    let grossMargin = lastMonth.margen_bruto !== undefined ? 
+      (typeof lastMonth.margen_bruto === 'number' ? lastMonth.margen_bruto * 100 : parseFloat(lastMonth.margen_bruto) * 100) :
+      (revenue > 0 ? ((revenue - cogs) / revenue) * 100 : 0);
+    
+    let netMargin = lastMonth.margen_neto !== undefined ? 
+      (typeof lastMonth.margen_neto === 'number' ? lastMonth.margen_neto * 100 : parseFloat(lastMonth.margen_neto) * 100) :
+      (revenue > 0 ? ((revenue - cogs - opExpenses) / revenue) * 100 : 0);
     
     // Calculate month-over-month changes
     let grossMarginChange = 0;
     let netMarginChange = 0;
     
     if (prevMonth) {
-      const prevGrossMargin = prevMonth.ingresos > 0 ? 
-        ((prevMonth.ingresos - prevMonth.costo_ventas) / prevMonth.ingresos) * 100 : 0;
+      const prevGrossMargin = prevMonth.margen_bruto !== undefined ? 
+        (typeof prevMonth.margen_bruto === 'number' ? prevMonth.margen_bruto * 100 : parseFloat(prevMonth.margen_bruto) * 100) :
+        (prevMonth.ingresos > 0 ? ((prevMonth.ingresos - prevMonth.costo_ventas) / prevMonth.ingresos) * 100 : 0);
       
-      const prevNetMargin = prevMonth.ingresos > 0 ? 
-        ((prevMonth.ingresos - prevMonth.costo_ventas - prevMonth.gastos_operativos) / prevMonth.ingresos) * 100 : 0;
+      const prevNetMargin = prevMonth.margen_neto !== undefined ? 
+        (typeof prevMonth.margen_neto === 'number' ? prevMonth.margen_neto * 100 : parseFloat(prevMonth.margen_neto) * 100) :
+        (prevMonth.ingresos > 0 ? ((prevMonth.ingresos - prevMonth.costo_ventas - prevMonth.gastos_operativos) / prevMonth.ingresos) * 100 : 0);
       
       grossMarginChange = grossMargin - prevGrossMargin;
       netMarginChange = netMargin - prevNetMargin;
@@ -887,10 +915,10 @@ const DatabaseView = () => {
     }
     
     // Get the most recent month
-    const lastMonth = datosMensuales[datosMensuales.length - 1];
+    const lastMonth = datosMensuales[0];
     
     // Get previous month if available
-    const prevMonth = datosMensuales.length > 1 ? datosMensuales[datosMensuales.length - 2] : null;
+    const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
     
     const totalExpenses = lastMonth.total || 0;
     const fixedExpenses = lastMonth.fijos || 0;
@@ -938,10 +966,7 @@ const DatabaseView = () => {
     }
     
     // Get the most recent month
-    const lastMonth = datosMensuales[datosMensuales.length - 1];
-    
-    // Get previous month if available
-    const prevMonth = datosMensuales.length > 1 ? datosMensuales[datosMensuales.length - 2] : null;
+    const lastMonth = datosMensuales[0];
     
     const beginningCash = lastMonth.saldo_inicial || 0;
     const cashReceipts = lastMonth.ingresos || 0;
@@ -978,16 +1003,12 @@ const DatabaseView = () => {
       return defaultResult;
     }
     
-    // Calculate total revenue
-    const totalRevenue = porProducto.reduce((sum: number, item: any) => sum + (item.ingresos || 0), 0);
-    
-    // Calculate percentages for each category
+    // Map the product data to the categories
     const categories = porProducto.map((item: any) => {
-      const percentage = totalRevenue > 0 ? (item.ingresos / totalRevenue) * 100 : 0;
       return {
-        name: item.categoria || 'Sin nombre',
-        revenue: item.ingresos || 0,
-        percentage
+        name: item.producto || 'Sin nombre',
+        revenue: item.ingresos_anuales || 0,
+        percentage: item.porcentaje || 0
       };
     });
     
