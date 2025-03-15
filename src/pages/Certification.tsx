@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -67,6 +66,7 @@ const Certification = () => {
       label: "Score",
       theme: {
         light: "#7E69AB",
+        dark: "#9b87f5"
       },
     },
   };

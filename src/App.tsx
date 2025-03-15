@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Certification from "./pages/Certification";
+import CreditScore from "./pages/CreditScore";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/acceso" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/certificacion" element={<Certification />} />
+          <Route path="/credit-score" element={<CreditScore />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
