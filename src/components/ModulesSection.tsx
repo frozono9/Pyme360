@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, CreditCard, BarChart2, ShieldCheck, TrendingUp, PieChart } from 'lucide-react';
+import { ArrowRight, CreditCard, BarChart2, ShieldCheck, TrendingUp, Search, FileText, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ModulesSection = () => {
@@ -41,28 +41,60 @@ const ModulesSection = () => {
       title: 'Financiamiento Inteligente',
       icon: <CreditCard className="h-5 w-5" />,
       route: '/financiamiento',
-      description: 'Sistema de evaluación crediticia alternativa basado en el desempeño real de tu negocio. Conexión con fuentes de financiamiento adaptadas a tu perfil.',
+      description: 'Evaluación crediticia alternativa y conexión automatizada con fuentes de financiamiento adaptadas al perfil real de tu empresa.',
       features: [
-        'AI Credit Score que evalúa el desempeño integral',
-        'Marketplace con distintas opciones de financiamiento',
-        'Herramientas para preparar documentación financiera',
-        'Simulación de escenarios de financiamiento'
+        'AI Credit Score con evaluación integral',
+        'Marketplace de financiamiento con diversas opciones',
+        'Preparación para financiamiento con documentación asistida'
       ],
-      image: './assets/financing-module.png'
+      image: './assets/financing-module.png',
+      submodules: [
+        { 
+          name: "Credit Score", 
+          description: "Evaluación crediticia basada en desempeño real de tu negocio", 
+          route: "/credit-score" 
+        },
+        { 
+          name: "Marketplace de Financiamiento", 
+          description: "Conexión con múltiples fuentes de capital", 
+          route: "/marketplace-financiamiento" 
+        },
+        { 
+          name: "Preparación para Financiamiento", 
+          description: "Generación de documentación necesaria", 
+          route: "/preparacion-financiamiento" 
+        }
+      ]
     },
     {
       id: 'gestion',
-      title: 'Gestión Empresarial',
+      title: 'Gestión Empresarial y Financiera',
       icon: <BarChart2 className="h-5 w-5" />,
       route: '/gestion',
       description: 'Plataforma integrada para administrar todos los aspectos de tu negocio con asistencia de IA que te ayuda a tomar mejores decisiones.',
       features: [
-        'ERP simplificado con gestión de ventas e inventario',
-        'Administración de recursos humanos',
-        'Asistente virtual para consultas empresariales',
-        'Dashboard con KPIs críticos y análisis predictivo'
+        'ERP simplificado con IA para control operativo',
+        'Dashboard de inteligencia empresarial con alertas',
+        'Herramientas para búsqueda y gestión de empleados'
       ],
-      image: './assets/management-module.png'
+      image: './assets/management-module.png',
+      submodules: [
+        { 
+          name: "ERP Simplificado con IA", 
+          description: "Gestión integral de recursos empresariales", 
+          route: "/erp" 
+        },
+        { 
+          name: "Dashboard Inteligente", 
+          description: "Visualización de KPIs y análisis de tendencias", 
+          route: "/dashboard-inteligente" 
+        },
+        { 
+          name: "Búsqueda de Empleados", 
+          description: "Herramientas para reclutar y gestionar talento", 
+          route: "/busqueda-empleados" 
+        }
+      ]
     },
     {
       id: 'cumplimiento',
@@ -71,12 +103,28 @@ const ModulesSection = () => {
       route: '/cumplimiento',
       description: 'Automatización del seguimiento y cumplimiento de obligaciones fiscales, laborales y administrativas según la normativa de tu país.',
       features: [
-        'Calendario de obligaciones fiscales y laborales',
-        'Generación automática de documentos legales',
-        'Base de conocimiento de regulaciones por país',
-        'Digitalización de procesos gubernamentales'
+        'Automatización de conformidad regulatoria',
+        'Centro de recursos legales personalizados',
+        'Gestión digital de trámites gubernamentales'
       ],
-      image: './assets/compliance-module.png'
+      image: './assets/compliance-module.png',
+      submodules: [
+        { 
+          name: "Automatización de Conformidad", 
+          description: "Calendario de obligaciones y generación de documentos legales", 
+          route: "/conformidad" 
+        },
+        { 
+          name: "Centro de Recursos Legales", 
+          description: "Base de conocimiento de regulaciones por país", 
+          route: "/recursos-legales" 
+        },
+        { 
+          name: "Gestión de Trámites", 
+          description: "Seguimiento y digitalización de procesos gubernamentales", 
+          route: "/gestion-tramites" 
+        }
+      ]
     },
     {
       id: 'crecimiento',
@@ -85,26 +133,28 @@ const ModulesSection = () => {
       route: '/crecimiento',
       description: 'Herramientas de análisis de mercado y oportunidades de expansión, con capacitación personalizada para potenciar tu crecimiento.',
       features: [
-        'Identificación de oportunidades con IA',
-        'Análisis de competencia y tendencias',
-        'Cursos adaptados al perfil de tu empresa',
-        'Networking con proveedores y clientes potenciales'
+        'Análisis de mercado impulsado por IA',
+        'Estrategias para expansión y nuevos mercados',
+        'Optimización de operaciones y recursos'
       ],
-      image: './assets/growth-module.png'
-    },
-    {
-      id: 'financiera',
-      title: 'Gestión Financiera',
-      icon: <PieChart className="h-5 w-5" />,
-      route: '/financiera',
-      description: 'Control en tiempo real de tus finanzas con proyecciones y alertas que te ayudan a mantener un flujo de caja saludable.',
-      features: [
-        'Seguimiento de ingresos y gastos en tiempo real',
-        'Proyecciones de liquidez y alertas tempranas',
-        'Categorización automática de transacciones',
-        'Planificación financiera con escenarios de simulación'
-      ],
-      image: './assets/financial-module.png'
+      image: './assets/growth-module.png',
+      submodules: [
+        { 
+          name: "Análisis de Mercado con IA", 
+          description: "Identificación de tendencias y oportunidades", 
+          route: "/analisis-mercado" 
+        },
+        { 
+          name: "Estrategias de Expansión", 
+          description: "Análisis de nuevos mercados y viabilidad", 
+          route: "/estrategias-expansion" 
+        },
+        { 
+          name: "Optimización de Operaciones", 
+          description: "Automatización de procesos y gestión eficiente", 
+          route: "/optimizacion-operaciones" 
+        }
+      ]
     }
   ];
 
@@ -123,7 +173,7 @@ const ModulesSection = () => {
           </h2>
           
           <p className="reveal-on-scroll text-pyme-gray-dark text-lg">
-            Explora los cinco módulos especializados de PyME360, diseñados para abordar los desafíos 
+            Explora los cuatro módulos especializados de PyME360, diseñados para abordar los desafíos 
             específicos de las pequeñas y medianas empresas en América Latina.
           </p>
         </div>
@@ -174,16 +224,28 @@ const ModulesSection = () => {
               </Link>
             </div>
             
-            <div className="bg-gradient-to-br from-pyme-blue/10 to-pyme-blue-light/5 rounded-b-xl lg:rounded-r-xl lg:rounded-bl-none p-8 lg:p-12 flex items-center justify-center">
-              <div className="glass-card p-6 max-w-md w-full">
-                <div className="aspect-video bg-pyme-gray-light/50 rounded-lg mb-4 flex items-center justify-center">
-                  <div className="text-pyme-gray">Vista previa del módulo</div>
-                </div>
-                <div className="space-y-3">
-                  <div className="h-2 bg-pyme-gray-light/50 rounded-full w-4/5"></div>
-                  <div className="h-2 bg-pyme-gray-light/50 rounded-full"></div>
-                  <div className="h-2 bg-pyme-gray-light/50 rounded-full w-3/4"></div>
-                </div>
+            <div className="bg-gradient-to-br from-pyme-blue/10 to-pyme-blue-light/5 rounded-b-xl lg:rounded-r-xl lg:rounded-bl-none p-8 lg:p-12">
+              <div className="space-y-6">
+                {modules[activeTab].submodules.map((submodule, index) => (
+                  <Link 
+                    key={index}
+                    to={submodule.route}
+                    className="glass-card p-5 block hover:shadow-elevation transition-all duration-300"
+                  >
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-pyme-blue/10 text-pyme-blue flex items-center justify-center mr-4">
+                        {index === 0 ? <CreditCard className="h-5 w-5" /> : 
+                         index === 1 ? <Building className="h-5 w-5" /> : 
+                         <FileText className="h-5 w-5" />}
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-1">{submodule.name}</h4>
+                        <p className="text-sm text-pyme-gray-dark">{submodule.description}</p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 ml-auto text-pyme-blue" />
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
