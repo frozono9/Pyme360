@@ -283,6 +283,44 @@ async function getTrustScore() {
   }
 }
 
+// Función para consultar al asistente IA de financiamiento
+async function queryFinancingAssistant(question) {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/financing-assistant`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al consultar al asistente IA');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al consultar al asistente IA:', error);
+    
+    // En modo desarrollo, devolver una respuesta simulada
+    if (process.env.NODE_ENV !== 'production') {
+      return {
+        response: `Simulación de respuesta IA para la consulta: "${question}"\n\nBasado en tu perfil financiero y necesidades específicas, te recomendaría explorar las siguientes opciones de financiamiento:\n\n1. Línea de crédito con Banco Nacional - Tasa preferencial del 12.5% anual\n2. Préstamo para PyMEs con garantía NAFIN - Hasta $1,500,000 MXN\n3. Factoraje financiero con FinCapital - Para necesidades inmediatas de flujo\n\nTu perfil muestra un excelente historial crediticio y una capacidad de pago adecuada para estos productos.`
+      };
+    }
+    
+    throw error;
+  }
+}
+
 export default {
   testMongoConnection,
   registerUser,
@@ -292,5 +330,6 @@ export default {
   uploadDataset,
   getCreditScore,
   getActiveDebts,
-  getTrustScore
+  getTrustScore,
+  queryFinancingAssistant
 }
