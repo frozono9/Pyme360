@@ -39,15 +39,32 @@ const CreditScore = () => {
         // También mantenemos la compatibilidad con el getCreditScore para funcionalidad existente
         const data = await api.getCreditScore();
 
-        // Ensure components property exists and has the correct structure
-        if (data && !data.components) {
-          data.components = {
-            payment_history: null,
-            credit_utilization: null,
-            history_length: null,
-            credit_mix: null,
-            new_applications: null
-          };
+        // Ensure components property exists and has the correct structure with all required fields
+        if (data) {
+          if (!data.components) {
+            data.components = {};
+          }
+          
+          // Initialize each component if not present with empty objects
+          if (!data.components.payment_history) {
+            data.components.payment_history = { score: 0, data: { percentage: 0 } };
+          }
+          
+          if (!data.components.credit_utilization) {
+            data.components.credit_utilization = { score: 0, data: { utilization: 0 } };
+          }
+          
+          if (!data.components.history_length) {
+            data.components.history_length = { score: 0, data: { averageAge: 0 } };
+          }
+          
+          if (!data.components.credit_mix) {
+            data.components.credit_mix = { score: 0, data: { numTypes: 0 } };
+          }
+          
+          if (!data.components.new_applications) {
+            data.components.new_applications = { score: 0, data: { numIncidents: 0 } };
+          }
         }
         
         setCreditData(data);
