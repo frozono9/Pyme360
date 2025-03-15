@@ -64,6 +64,9 @@ const Login = () => {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       
+      {/* Spacer div to prevent content from being hidden under the fixed navbar */}
+      <div className="h-16"></div>
+      
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
