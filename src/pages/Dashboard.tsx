@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -10,12 +9,16 @@ import { LogOut, BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, B
 import api from "@/api";
 import { Progress } from "@/components/ui/progress";
 
-// Define interfaces for the data
 interface CreditScoreData {
   score: number;
   maxScore: number;
   level: string;
   percentage: number;
+  nivel?: {
+    nivel: string;
+    color: string;
+    description: string;
+  };
 }
 
 interface TrustScoreData {
@@ -23,6 +26,7 @@ interface TrustScoreData {
   level: string;
   nextLevel: string;
   percentage: number;
+  calificacion_global?: number;
 }
 
 interface ActiveDebtsData {
@@ -35,7 +39,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [creditScore, setCreditScore] = useState<CreditScoreData>({
     score: 0,
-    maxScore: 100,
+    maxScore: 850,
     level: "N/A",
     percentage: 0,
   });
@@ -53,33 +57,57 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Fetch all necessary data
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Fetch credit score data
       const creditScoreData = await api.getCreditScore();
       if (creditScoreData) {
         setCreditScore({
           score: creditScoreData.score || 0,
-          maxScore: creditScoreData.maxScore || 100,
-          level: creditScoreData.level || "N/A",
-          percentage: creditScoreData.percentage || 0,
+          maxScore: 850,
+          level: creditScoreData.nivel?.nivel || "N/A",
+          percentage: creditScoreData.components?.payment_history?.percentage || 0,
+          nivel: creditScoreData.nivel
         });
       }
       
-      // Fetch trust score data
       const trustScoreData = await api.getTrustScore();
       if (trustScoreData) {
+        const currentScore = trustScoreData.calificacion_global || 0;
+        let nextLevel = "Platino";
+        
+        let level = "Bronce";
+        let percentage = 0;
+        
+        if (currentScore >= 90) {
+          level = "Platino";
+          nextLevel = "Máximo";
+          percentage = 100;
+        } else if (currentScore >= 80) {
+          level = "Oro";
+          nextLevel = "Platino";
+          percentage = (currentScore - 80) * 10;
+        } else if (currentScore >= 70) {
+          level = "Plata";
+          nextLevel = "Oro";
+          percentage = (currentScore - 70) * 10;
+        } else if (currentScore >= 60) {
+          level = "Bronce";
+          nextLevel = "Plata";
+          percentage = (currentScore - 60) * 10;
+        } else {
+          percentage = currentScore * 1.66;
+        }
+        
         setTrustScore({
-          score: trustScoreData.score || 0,
-          level: trustScoreData.level || "N/A",
-          nextLevel: trustScoreData.nextLevel || "N/A",
-          percentage: trustScoreData.percentage || 0,
+          score: currentScore,
+          level: level,
+          nextLevel: nextLevel,
+          percentage: percentage,
+          calificacion_global: currentScore
         });
       }
       
-      // Fetch active debts data
       const debtsData = await api.getActiveDebts();
       if (debtsData) {
         setActiveDebts({
@@ -101,7 +129,6 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Check if user is logged in (for demo purposes)
     const userJson = localStorage.getItem("pyme360-user");
     if (!userJson) {
       toast({
@@ -116,7 +143,6 @@ const Dashboard = () => {
     try {
       const user = JSON.parse(userJson);
       setUsername(user.username);
-      // Fetch data after authentication check
       fetchDashboardData();
     } catch (error) {
       localStorage.removeItem("pyme360-user");
@@ -142,7 +168,6 @@ const Dashboard = () => {
     </div>;
   }
 
-  // Helper function to get color based on score
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-800";
     if (score >= 65) return "text-purple-800";
@@ -150,7 +175,6 @@ const Dashboard = () => {
     return "text-red-800";
   };
 
-  // Helper function to get background color based on score
   const getScoreBgColor = (score: number) => {
     if (score >= 80) return "from-green-50 to-green-100 border-green-200";
     if (score >= 65) return "from-purple-50 to-purple-100 border-purple-200";
@@ -158,11 +182,19 @@ const Dashboard = () => {
     return "from-red-50 to-red-100 border-red-200";
   };
 
+  const getTrustLevelColor = (level: string) => {
+    switch(level) {
+      case "Platino": return "bg-purple-200 text-purple-800";
+      case "Oro": return "bg-amber-200 text-amber-800";
+      case "Plata": return "bg-gray-200 text-gray-800";
+      default: return "bg-amber-700 text-white";
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       
-      {/* Añadimos un div espaciador para evitar que el navbar fijo se superponga al contenido */}
       <div className="h-16"></div>
       
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -186,7 +218,6 @@ const Dashboard = () => {
           </ButtonCustom>
         </div>
 
-        {/* Tarjetas de resumen */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <CardHeader className="pb-2">
@@ -217,7 +248,7 @@ const Dashboard = () => {
                 {creditScore.score}/{creditScore.maxScore}
               </p>
               <p className="text-sm text-purple-700 mt-1">
-                AI Credit Score
+                AI Credit Score {creditScore.nivel?.nivel ? `- ${creditScore.nivel.nivel}` : ''}
               </p>
             </CardContent>
           </Card>
@@ -257,7 +288,6 @@ const Dashboard = () => {
           </Card>
         </div>
         
-        {/* Tarjetas de módulos principales */}
         <h2 className="text-xl font-semibold text-gray-800 mb-5">Módulos Principales</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card className="border-l-4 border-l-purple-500 shadow-md hover:shadow-lg transition-shadow">
@@ -281,9 +311,9 @@ const Dashboard = () => {
                   ></div>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
-                  {creditScore.score >= 80 ? "Calificación excelente - Elegible para las mejores tasas" :
-                   creditScore.score >= 65 ? "Calificación buena - Elegible para mejores tasas" :
-                   creditScore.score >= 50 ? "Calificación regular - Opciones de financiamiento limitadas" :
+                  {creditScore.score >= 750 ? "Calificación excelente - Elegible para las mejores tasas" :
+                   creditScore.score >= 670 ? "Calificación buena - Elegible para mejores tasas" :
+                   creditScore.score >= 580 ? "Calificación regular - Opciones de financiamiento limitadas" :
                    "Calificación baja - Recomendamos mejorar antes de solicitar financiamiento"}
                 </p>
               </div>
@@ -300,7 +330,6 @@ const Dashboard = () => {
             </CardFooter>
           </Card>
           
-          {/* Mantener las siguientes tarjetas casi iguales, con pequeñas modificaciones dinámicas */}
           <Card className="border-l-4 border-l-blue-500 shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center">
@@ -470,20 +499,19 @@ const Dashboard = () => {
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center">
+                  <span className="text-sm font-medium mr-2">Puntuación actual:</span>
+                  <span className="text-sm font-bold text-indigo-600">{trustScore.score}/100</span>
+                </div>
+                <div className="flex items-center">
                   <span className="text-sm font-medium mr-2">Nivel actual:</span>
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                    trustScore.level === "Platino" ? "bg-purple-200 text-purple-800" :
-                    trustScore.level === "Oro" ? "bg-amber-200 text-amber-800" :
-                    trustScore.level === "Plata" ? "bg-gray-200 text-gray-800" :
-                    "bg-amber-700 text-white"
-                  }`}>
+                  <span className={`px-2 py-1 rounded text-xs font-semibold ${getTrustLevelColor(trustScore.level)}`}>
                     {trustScore.level}
                   </span>
                 </div>
                 <div className="mt-2">
                   <div className="flex justify-between text-xs mb-1">
                     <span>Progreso hacia {trustScore.nextLevel}:</span>
-                    <span>{trustScore.percentage}%</span>
+                    <span>{Math.round(trustScore.percentage)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 

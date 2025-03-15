@@ -80,7 +80,7 @@ const CreditScore = () => {
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Puntuación Crediticia</h1>
             <p className="text-muted-foreground">
-              Tu puntuación crediticia es calculada con base en tu historial financiero y crediticio. Esta puntuación es utilizada por instituciones financieras para evaluar tu elegibilidad para créditos y préstamos.
+              Tu puntuación crediticia es calculada con base en tu historial financiero y crediticio. Esta puntuación es utilizada por instituciones financieras para evaluar tu elegibilidad para créditos y préstamos. La escala va de 300 a 850, donde una mayor puntuación indica un mejor perfil crediticio.
             </p>
           </div>
           
