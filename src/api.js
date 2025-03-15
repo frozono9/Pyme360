@@ -1,6 +1,4 @@
 
-//import { get } from "http";
-
 const BASE_URL = "http://localhost:8000";
 
 async function testMongoConnection(testInput) {
@@ -9,7 +7,10 @@ async function testMongoConnection(testInput) {
     }
 
     try {
-        const response = await fetch(BASE_URL + "/api/test-connection", {
+        console.log("Sending request to:", `${BASE_URL}/api/test-connection`);
+        console.log("With payload:", { testValue: testInput });
+        
+        const response = await fetch(`${BASE_URL}/api/test-connection`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -17,12 +18,16 @@ async function testMongoConnection(testInput) {
             body: JSON.stringify({ testValue: testInput }),
         });
 
+        console.log("Response status:", response.status);
+        
         if (!response.ok) {
             const errorText = await response.text();
+            console.error("Error response:", errorText);
             throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
+        console.log("Response data:", data);
         return data;
     } catch (error) {
         console.error("Error en testMongoConnection:", error);
@@ -148,5 +153,10 @@ async function uploadDataset(formData) {
 
 
 export default {
-  testMongoConnection
+  testMongoConnection,
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  logoutUser,
+  uploadDataset
 }
