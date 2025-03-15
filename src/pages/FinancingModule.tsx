@@ -43,7 +43,7 @@ const FinancingModule = () => {
                 icon={<Award className="h-10 w-10 text-pyme-blue" />}
                 title="AI Credit Score"
                 description="Evaluación crediticia basada en datos reales de tu empresa"
-                linkTo="/financiamiento/credito"
+                linkTo="/credit-score"
                 metrics={[
                   { label: "Puntuación Media", value: "720" },
                   { label: "Mejora Potencial", value: "+85 pts" }

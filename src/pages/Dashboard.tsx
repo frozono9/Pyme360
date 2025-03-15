@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, Bell } from "lucide-react";
+import { LogOut, BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, Bell, Award, AlertCircle } from "lucide-react";
 import api from "@/api";
 import { Progress } from "@/components/ui/progress";
 
@@ -159,67 +159,81 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  if (!username || loading) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pyme-blue mb-4"></div>
-        <p className="text-pyme-gray-dark">Cargando datos...</p>
-      </div>
-    </div>;
-  }
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-800";
-    if (score >= 65) return "text-purple-800";
-    if (score >= 50) return "text-amber-800";
-    return "text-red-800";
-  };
-
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "from-green-50 to-green-100 border-green-200";
-    if (score >= 65) return "from-purple-50 to-purple-100 border-purple-200";
-    if (score >= 50) return "from-amber-50 to-amber-100 border-amber-200";
-    return "from-red-50 to-red-100 border-red-200";
+    if (score >= 750) return "from-green-100 to-green-200";
+    if (score >= 670) return "from-blue-100 to-blue-200";
+    if (score >= 580) return "from-yellow-100 to-yellow-200";
+    if (score >= 500) return "from-orange-100 to-orange-200";
+    return "from-red-100 to-red-200";
+  };
+  
+  const getScoreColor = (score: number) => {
+    if (score >= 750) return "text-green-600";
+    if (score >= 670) return "text-blue-600";
+    if (score >= 580) return "text-yellow-600";
+    if (score >= 500) return "text-orange-600";
+    return "text-red-600";
+  };
+  
+  const getCertificationLevel = (score: number) => {
+    if (score >= 90) return { name: "Platino", color: "text-slate-600" };
+    if (score >= 80) return { name: "Oro", color: "text-yellow-600" };
+    if (score >= 70) return { name: "Plata", color: "text-gray-500" };
+    if (score >= 60) return { name: "Bronce", color: "text-amber-700" };
+    return { name: "No certificado", color: "text-red-500" };
   };
 
-  const getTrustLevelColor = (level: string) => {
-    switch(level) {
-      case "Platino": return "bg-purple-200 text-purple-800";
-      case "Oro": return "bg-amber-200 text-amber-800";
-      case "Plata": return "bg-gray-200 text-gray-800";
-      default: return "bg-amber-700 text-white";
+  const renderAuthButton = () => {
+    if (!username) {
+      return (
+        <ButtonCustom 
+          variant="outline" 
+          onClick={() => navigate("/acceso")}
+          leftIcon={<LogOut size={18} />}
+          className="self-start md:self-auto"
+        >
+          Iniciar sesión
+        </ButtonCustom>
+      );
     }
+    return (
+      <ButtonCustom 
+        variant="outline" 
+        onClick={handleLogout}
+        leftIcon={<LogOut size={18} />}
+        className="self-start md:self-auto"
+      >
+        Cerrar sesión
+      </ButtonCustom>
+    );
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar />
-      
-      <div className="h-16"></div>
-      
-      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Bienvenido, {username}
-            </h1>
-            <p className="text-gray-600">
-              Resumen de actividades de su negocio
-            </p>
-          </div>
-          
-          <ButtonCustom 
-            variant="outline" 
-            onClick={handleLogout}
-            leftIcon={<LogOut size={18} />}
-            className="self-start md:self-auto"
-          >
-            Cerrar sesión
-          </ButtonCustom>
+  const renderDashboard = () => {
+    if (!creditScore || !trustScore || !activeDebts) {
+      return <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pyme-blue mb-4"></div>
+          <p className="text-pyme-gray-dark">Cargando datos...</p>
         </div>
+      </div>;
+    }
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+    const creditScoreValue = creditScore.score || 0;
+    const maxCreditScore = 850;
+    const trustScoreValue = trustScore.calificacion_global || 0;
+    const certificationLevel = getCertificationLevel(trustScoreValue);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <div>
+            {renderAuthButton()}
+          </div>
+        </div>
+          
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center text-blue-800">
                 <Activity className="mr-2 text-blue-600" size={18} />
@@ -228,58 +242,58 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-blue-800">
-                {creditScore.score >= 700 ? "Bueno" : creditScore.score >= 580 ? "Regular" : "Atención"}
+                {creditScoreValue >= 700 ? "Bueno" : creditScoreValue >= 580 ? "Regular" : "Atención"}
               </p>
               <p className="text-sm text-blue-700 mt-1">
-                {Math.round(creditScore.percentage)}% de indicadores positivos
+                {Math.round((creditScoreValue - 300) / 550 * 100)}% de indicadores positivos
               </p>
             </CardContent>
           </Card>
           
-          <Card className={`bg-gradient-to-br ${getScoreBgColor(creditScore.score / 10)}`}>
+          <Card className={`bg-gradient-to-br ${getScoreBgColor(creditScoreValue)}`}>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center text-purple-800">
                 <CreditCard className="mr-2 text-purple-600" size={18} />
-                Financiamiento
+                AI Credit Score
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${getScoreColor(creditScore.score / 10)}`}>
-                {creditScore.score}/{creditScore.maxScore}
+              <p className={`text-2xl font-bold ${getScoreColor(creditScoreValue)}`}>
+                {creditScoreValue}/{maxCreditScore}
               </p>
               <p className="text-sm text-purple-700 mt-1">
-                AI Credit Score {creditScore.nivel?.nivel ? `- ${creditScore.nivel.nivel}` : ''}
+                Perfil crediticio
               </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <Card className="bg-gradient-to-br from-emerald-100 to-emerald-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center text-green-800">
-                <TrendingUp className="mr-2 text-green-600" size={18} />
-                Crecimiento
+              <CardTitle className="text-lg flex items-center text-emerald-800">
+                <Award className="mr-2 text-emerald-600" size={18} />
+                Certificación
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${activeDebts.growthRate >= 0 ? "text-green-800" : "text-red-800"}`}>
-                {activeDebts.growthRate >= 0 ? "+" : ""}{activeDebts.growthRate}%
+              <p className={`text-2xl font-bold ${certificationLevel.color}`}>
+                {certificationLevel.name}
               </p>
-              <p className="text-sm text-green-700 mt-1">
-                Respecto al mes anterior
+              <p className="text-sm text-emerald-700 mt-1">
+                {trustScoreValue}/100 puntos
               </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center text-amber-800">
-                <Bell className="mr-2 text-amber-600" size={18} />
+                <AlertCircle className="mr-2 text-amber-600" size={18} />
                 Alertas
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-amber-800">
-                {creditScore.score < 600 ? 3 : creditScore.score < 700 ? 2 : creditScore.score < 800 ? 1 : 0}
+                {creditScoreValue < 600 ? 3 : creditScoreValue < 700 ? 2 : creditScoreValue < 800 ? 1 : 0}
               </p>
               <p className="text-sm text-amber-700 mt-1">
                 Requieren atención
@@ -343,7 +357,7 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Tareas completadas:</span>
                   <span className="text-sm font-bold text-blue-600">
-                    {creditScore.score >= 80 ? "9" : creditScore.score >= 65 ? "7" : creditScore.score >= 50 ? "5" : "3"}/10
+                    {creditScore.score >= 80 ? "9" : creditScore.score >= 65 ? "7" : creditScore.score >= 50 ? "5" : "3}/10"
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -537,6 +551,18 @@ const Dashboard = () => {
             </CardFooter>
           </Card>
         </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+      
+      <div className="h-16"></div>
+      
+      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {renderDashboard()}
       </main>
       
       <Footer />
@@ -545,4 +571,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

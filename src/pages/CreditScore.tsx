@@ -32,6 +32,7 @@ const CreditScore = () => {
         // También mantenemos la compatibilidad con el getCreditScore para funcionalidad existente
         const data = await api.getCreditScore();
         setCreditData(data);
+        console.log("Credit data fetched:", data);
       } catch (err) {
         console.error("Error fetching credit score:", err);
         setError("Error al cargar la puntuación crediticia");

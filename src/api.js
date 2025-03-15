@@ -203,7 +203,9 @@ async function getCreditScore() {
       throw new Error(errorData.detail || 'Error al obtener puntuación crediticia');
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log("Credit score data received:", data);
+    return data;
   } catch (error) {
     console.error('Error al obtener puntuación crediticia:', error);
     throw error;
