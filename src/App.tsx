@@ -15,6 +15,8 @@ import ManagementModule from "./pages/ManagementModule";
 import GrowthModule from "./pages/GrowthModule";
 import ComplianceModule from "./pages/ComplianceModule";
 import EmployeeSearchModule from "./pages/EmployeeSearchModule";
+import FinancingMarketplace from "./pages/FinancingMarketplace";
+import FinancingPreparation from "./pages/FinancingPreparation";
 
 const queryClient = new QueryClient();
 
@@ -35,8 +37,8 @@ const App = () => (
           <Route path="/crecimiento" element={<GrowthModule />} />
           <Route path="/cumplimiento" element={<ComplianceModule />} />
           <Route path="/busqueda-empleados" element={<EmployeeSearchModule />} />
-          <Route path="/marketplace-financiamiento" element={<FinancingModule />} />
-          <Route path="/preparacion-financiamiento" element={<FinancingModule />} />
+          <Route path="/marketplace-financiamiento" element={<FinancingMarketplace />} />
+          <Route path="/preparacion-financiamiento" element={<FinancingPreparation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

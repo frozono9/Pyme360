@@ -1,8 +1,8 @@
-
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ButtonCustom } from "@/components/ui/button-custom";
-import { ArrowRight, Wallet, Briefcase, FileText, PieChart } from "lucide-react";
+import { ArrowRight, CreditCard, Building, FileText, PieChart } from "lucide-react";
 
 const FinancingModule = () => {
   return (
@@ -37,30 +37,30 @@ const FinancingModule = () => {
         
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto container-padding">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <FeatureCard 
-                icon={<Wallet />}
-                title="AI Credit Score"
-                description="Evaluación crediticia basada en historial de pagos, cumplimiento fiscal y transacciones reales."
-              />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Link to="/credit-score" className="block">
+                <FeatureCard 
+                  icon={<CreditCard />}
+                  title="AI Credit Score"
+                  description="Evaluación crediticia basada en historial de pagos, cumplimiento fiscal y transacciones reales."
+                />
+              </Link>
               
-              <FeatureCard 
-                icon={<Briefcase />}
-                title="Marketplace Financiero"
-                description="Conexión con bancos, plataformas de crowdfunding, inversionistas y programas gubernamentales."
-              />
+              <Link to="/marketplace-financiamiento" className="block">
+                <FeatureCard 
+                  icon={<Building />}
+                  title="Marketplace Financiero"
+                  description="Conexión con bancos, plataformas de crowdfunding, inversionistas y programas gubernamentales."
+                />
+              </Link>
               
-              <FeatureCard 
-                icon={<FileText />}
-                title="Documentación Asistida"
-                description="Generación automatizada de planes de negocio y documentación financiera necesaria."
-              />
-              
-              <FeatureCard 
-                icon={<PieChart />}
-                title="Simulación de Escenarios"
-                description="Análisis predictivo para evaluar diferentes opciones de financiamiento y sus impactos."
-              />
+              <Link to="/preparacion-financiamiento" className="block">
+                <FeatureCard 
+                  icon={<FileText />}
+                  title="Documentación Asistida"
+                  description="Generación automatizada de planes de negocio y documentación financiera necesaria."
+                />
+              </Link>
             </div>
           </div>
         </section>
@@ -101,14 +101,39 @@ const FinancingModule = () => {
                   description="Utiliza nuestras herramientas para generar la documentación necesaria y aumentar tus probabilidades de aprobación."
                 />
                 
-                <div className="text-center pt-4">
-                  <ButtonCustom 
-                    variant="default" 
-                    size="lg"
-                    rightIcon={<ArrowRight className="h-4 w-4" />}
-                  >
-                    Solicitar Demo
-                  </ButtonCustom>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                  <Link to="/credit-score">
+                    <ButtonCustom 
+                      variant="default" 
+                      size="lg"
+                      className="w-full"
+                      rightIcon={<ArrowRight className="h-4 w-4" />}
+                    >
+                      AI Credit Score
+                    </ButtonCustom>
+                  </Link>
+                  
+                  <Link to="/marketplace-financiamiento">
+                    <ButtonCustom 
+                      variant="outline" 
+                      size="lg"
+                      className="w-full"
+                      rightIcon={<ArrowRight className="h-4 w-4" />}
+                    >
+                      Marketplace Financiero
+                    </ButtonCustom>
+                  </Link>
+                  
+                  <Link to="/preparacion-financiamiento">
+                    <ButtonCustom 
+                      variant="outline" 
+                      size="lg"
+                      className="w-full"
+                      rightIcon={<ArrowRight className="h-4 w-4" />}
+                    >
+                      Preparación Documentos
+                    </ButtonCustom>
+                  </Link>
                 </div>
               </div>
             </div>
