@@ -298,7 +298,7 @@ async function queryFinancingAssistant(question) {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, input_person: "default_person" }),
     });
 
     if (!response.ok) {
