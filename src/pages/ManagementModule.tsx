@@ -9,12 +9,10 @@ import {
   BarChart2, 
   Users, 
   FileSpreadsheet,
-  Package,
   FileText,
   LineChart,
   TrendingUp,
   TrendingDown,
-  AlertTriangle,
   PieChart,
   Maximize2,
   CalendarDays,
@@ -50,8 +48,8 @@ import {
 // Importaciones de componentes
 import { KpiCard } from "@/components/management/KpiCard";
 import { ErpModuleCard } from "@/components/management/ErpModuleCard";
-import { Alert } from "@/components/management/Alert";
 import { EfficiencyCard } from "@/components/management/EfficiencyCard";
+import { FeatureCard } from "@/components/management/FeatureCard";
 
 const ManagementModule = () => {
   return (
@@ -78,7 +76,7 @@ const ManagementModule = () => {
               </h1>
               
               <p className="text-pyme-gray-dark text-lg">
-                Plataforma integrada para administrar todos los aspectos de tu negocio con 
+                Plataforma integrada para administrar todos los aspectos financieros de tu negocio con 
                 herramientas avanzadas que te ayudan a tomar mejores decisiones.
               </p>
             </div>
@@ -230,102 +228,100 @@ const ManagementModule = () => {
               </Card>
             </div>
           </div>
-          
-          {/* Inventory Management */}
+
+          {/* Expanded Sales Section */}
           <div className="mb-10">
-            <h3 className="text-xl font-semibold mb-4">Gestión de Inventario</h3>
+            <h3 className="text-xl font-semibold mb-4">Gestión de Ventas</h3>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
               <KpiCard 
-                title="Total de Inventario" 
-                value="470 unidades" 
-                trend="+15 unidades"
+                title="Ventas Diarias" 
+                value="$4,280" 
+                trend="+5.2%"
                 trendDirection="up"
-                icon={<Package />}
+                icon={<Receipt />}
                 color="blue"
               />
               
               <KpiCard 
-                title="Rotación de Inventario" 
-                value="12.3 días" 
-                trend="-2.1 días"
+                title="Ventas Mensuales" 
+                value="$128,450" 
+                trend="+12%"
                 trendDirection="up"
-                icon={<TrendingUp />}
-                color="green"
+                icon={<BarChart2 />}
+                color="blue"
               />
               
               <KpiCard 
-                title="Productos de Baja Rotación" 
-                value="12 productos" 
-                trend="-3 productos"
+                title="Clientes Nuevos" 
+                value="24" 
+                trend="+5"
                 trendDirection="up"
-                icon={<TrendingDown />}
-                color="amber"
+                icon={<Users />}
+                color="green"
               />
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {/* Inventory Levels */}
+              {/* Sales Performance */}
               <Card className="overflow-hidden border-none shadow-elevation">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Niveles de Inventario</CardTitle>
+                    <CardTitle className="text-lg">Rendimiento de Ventas</CardTitle>
                     <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
                       <Maximize2 className="h-4 w-4" />
                     </ButtonCustom>
                   </div>
-                  <CardDescription>Por categoría</CardDescription>
+                  <CardDescription>Últimos 6 meses</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={inventoryData}>
+                      <RechartsLineChart data={salesPerformanceData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
-                        <Tooltip formatter={(value) => [`${value} unidades`, '']} />
+                        <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
                         <Legend />
-                        <Bar dataKey="value" name="Unidades" fill="#2563eb" />
-                      </BarChart>
+                        <Line type="monotone" dataKey="actual" name="Ventas Reales" stroke="#2563eb" strokeWidth={2} />
+                        <Line type="monotone" dataKey="target" name="Objetivo" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" />
+                      </RechartsLineChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
               
-              {/* Inventory Alerts */}
-              <Card className="border-l-4 border-l-amber-500 bg-amber-50">
+              {/* Top Products */}
+              <Card className="overflow-hidden border-none shadow-elevation">
                 <CardHeader className="pb-2">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-amber-500" />
-                    <CardTitle className="text-lg text-amber-800">Alertas de Inventario</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Productos Más Vendidos</CardTitle>
+                    <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                      <Maximize2 className="h-4 w-4" />
+                    </ButtonCustom>
                   </div>
+                  <CardDescription>Este mes</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <Alert 
-                      title="Inventario bajo" 
-                      description="3 productos por debajo del nivel mínimo establecido"
-                      severity="high"
-                    />
-                    <Alert 
-                      title="Exceso de inventario" 
-                      description="5 productos con más de 60 días sin movimiento"
-                      severity="medium"
-                    />
-                    <Alert 
-                      title="Próximo a vencer" 
-                      description="2 productos con fecha de caducidad en los próximos 15 días"
-                      severity="low"
-                    />
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart layout="vertical" data={topProductsData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" width={150} />
+                        <Tooltip formatter={(value) => [`${value} unidades`, '']} />
+                        <Bar dataKey="value" name="Unidades Vendidas" fill="#2563eb" />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
           
-          {/* Accounting and Finance */}
-          <div className="mb-10">
+          {/* Accounting and Finance - Expanded */}
+          <div>
             <h3 className="text-xl font-semibold mb-4">Contabilidad y Finanzas</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 mb-8">
               <KpiCard 
                 title="Cuentas por Cobrar" 
                 value="$45,780" 
@@ -351,6 +347,15 @@ const ManagementModule = () => {
                 trendDirection="up"
                 icon={<CircleDollarSign />}
                 color="green"
+              />
+
+              <KpiCard 
+                title="Impuestos Pendientes" 
+                value="$12,450" 
+                trend="-3.5%"
+                trendDirection="down"
+                icon={<Calculator />}
+                color="amber"
               />
             </div>
             
@@ -415,69 +420,132 @@ const ManagementModule = () => {
                 </CardContent>
               </Card>
             </div>
-          </div>
-          
-          {/* ERP Quick Access Modules */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Acceso Rápido a Módulos</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              <ErpModuleCard 
-                title="Ventas" 
-                description="Gestión de facturación, pedidos y seguimiento de clientes"
-                icon={<Receipt className="h-5 w-5" />}
-                color="blue"
-              />
+
+            {/* Expense Analysis */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Expense Categories */}
+              <Card className="overflow-hidden border-none shadow-elevation">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Análisis de Gastos</CardTitle>
+                    <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                      <Maximize2 className="h-4 w-4" />
+                    </ButtonCustom>
+                  </div>
+                  <CardDescription>Distribución por categoría</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPieChart>
+                        <Pie
+                          data={expenseData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                          nameKey="name"
+                          label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {expenseData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={EXPENSE_COLORS[index % EXPENSE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Legend />
+                        <Tooltip formatter={(value, name) => [`$${value.toLocaleString()}`, name]} />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
               
-              <ErpModuleCard 
-                title="Inventario" 
-                description="Control de stock, alertas y gestión de proveedores"
-                icon={<Package className="h-5 w-5" />}
-                color="indigo"
-              />
-              
-              <ErpModuleCard 
-                title="Contabilidad" 
-                description="Registros contables, impuestos y balances"
-                icon={<FileText className="h-5 w-5" />}
-                color="violet"
-              />
-              
-              <ErpModuleCard 
-                title="Presupuestos" 
-                description="Planificación financiera y seguimiento de gastos"
-                icon={<DollarSign className="h-5 w-5" />}
-                color="amber"
-              />
+              {/* Expense Trend */}
+              <Card className="overflow-hidden border-none shadow-elevation">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Tendencia de Gastos</CardTitle>
+                    <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                      <Maximize2 className="h-4 w-4" />
+                    </ButtonCustom>
+                  </div>
+                  <CardDescription>Últimos 12 meses</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsLineChart data={expenseTrendData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                        <Legend />
+                        <Line type="monotone" dataKey="operativos" name="Gastos Operativos" stroke="#f59e0b" strokeWidth={2} />
+                        <Line type="monotone" dataKey="administrativos" name="Gastos Administrativos" stroke="#2563eb" strokeWidth={2} />
+                        <Line type="monotone" dataKey="marketing" name="Marketing" stroke="#059669" strokeWidth={2} />
+                      </RechartsLineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <ErpModuleCard 
-                title="Informes" 
-                description="Informes personalizados y analítica avanzada"
-                icon={<BarChart3 className="h-5 w-5" />}
-                color="blue"
-              />
-              
-              <ErpModuleCard 
-                title="Impuestos" 
-                description="Gestión de impuestos y declaraciones fiscales"
-                icon={<Calculator className="h-5 w-5" />}
-                color="indigo"
-              />
-              
-              <ErpModuleCard 
-                title="Proyecciones" 
-                description="Proyecciones financieras y análisis de escenarios"
-                icon={<LineChart className="h-5 w-5" />}
-                color="violet"
-              />
-              
-              <ErpModuleCard 
-                title="Usuarios" 
-                description="Gestión de permisos y accesos al sistema"
-                icon={<Users className="h-5 w-5" />}
-                color="amber"
-              />
+
+            {/* Tax Management */}
+            <div className="grid grid-cols-1 gap-6 mb-8">
+              <Card className="overflow-hidden border-none shadow-elevation">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Calendario Tributario</CardTitle>
+                    <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                      <Maximize2 className="h-4 w-4" />
+                    </ButtonCustom>
+                  </div>
+                  <CardDescription>Próximos vencimientos</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="border-l-4 border-l-amber-500">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-5 w-5 text-amber-500" />
+                          <CardTitle className="text-base">Declaración IVA</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-600">Vencimiento: 15 de abril, 2024</p>
+                        <p className="text-sm font-medium mt-1">Monto estimado: $8,450</p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="border-l-4 border-l-blue-500">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-5 w-5 text-blue-500" />
+                          <CardTitle className="text-base">Retenciones</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-600">Vencimiento: 23 de abril, 2024</p>
+                        <p className="text-sm font-medium mt-1">Monto estimado: $2,120</p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="border-l-4 border-l-green-500">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-5 w-5 text-green-500" />
+                          <CardTitle className="text-base">Impuesto a las Ganancias</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-600">Vencimiento: 5 de mayo, 2024</p>
+                        <p className="text-sm font-medium mt-1">Monto estimado: $1,880</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
@@ -515,13 +583,49 @@ const trendData = [
   { name: 'Jun', ventas: 75000, costos: 48000 },
 ];
 
-// Datos para la sección de inventario
-const inventoryData = [
-  { name: 'Electrónica', value: 120 },
-  { name: 'Muebles', value: 85 },
-  { name: 'Ropa', value: 150 },
-  { name: 'Artículos de oficina', value: 75 },
-  { name: 'Otros', value: 40 },
+// Datos para la sección de gastos
+const EXPENSE_COLORS = ['#f59e0b', '#2563eb', '#059669', '#dc2626', '#7c3aed'];
+
+const expenseData = [
+  { name: 'Operativos', value: 35000 },
+  { name: 'Administrativos', value: 22000 },
+  { name: 'Marketing', value: 15000 },
+  { name: 'Impuestos', value: 8000 },
+  { name: 'Otros', value: 5000 },
+];
+
+const expenseTrendData = [
+  { name: 'Ene', operativos: 28000, administrativos: 18000, marketing: 12000 },
+  { name: 'Feb', operativos: 30000, administrativos: 20000, marketing: 13000 },
+  { name: 'Mar', operativos: 32000, administrativos: 19000, marketing: 15000 },
+  { name: 'Abr', operativos: 35000, administrativos: 22000, marketing: 14000 },
+  { name: 'May', operativos: 33000, administrativos: 21000, marketing: 16000 },
+  { name: 'Jun', operativos: 36000, administrativos: 23000, marketing: 15000 },
+  { name: 'Jul', operativos: 34000, administrativos: 21000, marketing: 14000 },
+  { name: 'Ago', operativos: 32000, administrativos: 20000, marketing: 13000 },
+  { name: 'Sep', operativos: 35000, administrativos: 22000, marketing: 15000 },
+  { name: 'Oct', operativos: 37000, administrativos: 23000, marketing: 16000 },
+  { name: 'Nov', operativos: 38000, administrativos: 24000, marketing: 17000 },
+  { name: 'Dic', operativos: 40000, administrativos: 25000, marketing: 18000 },
+];
+
+// Datos para la sección de ventas
+const salesPerformanceData = [
+  { name: 'Ene', actual: 65000, target: 60000 },
+  { name: 'Feb', actual: 70000, target: 65000 },
+  { name: 'Mar', actual: 80000, target: 75000 },
+  { name: 'Abr', actual: 85000, target: 80000 },
+  { name: 'May', actual: 90000, target: 85000 },
+  { name: 'Jun', actual: 95000, target: 90000 },
+];
+
+const topProductsData = [
+  { name: 'Producto Alpha Plus', value: 340 },
+  { name: 'Solución Enterprise', value: 270 },
+  { name: 'Kit Avanzado Pro', value: 220 },
+  { name: 'Servicio Premium', value: 180 },
+  { name: 'Paquete Básico', value: 150 },
 ];
 
 export default ManagementModule;
+
