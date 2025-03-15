@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -181,6 +182,17 @@ const Dashboard = () => {
     if (score >= 70) return { name: "Plata", color: "text-gray-500" };
     if (score >= 60) return { name: "Bronce", color: "text-amber-700" };
     return { name: "No certificado", color: "text-red-500" };
+  };
+  
+  // Add the missing function
+  const getTrustLevelColor = (level: string) => {
+    switch (level) {
+      case "Platino": return "bg-slate-200 text-slate-600";
+      case "Oro": return "bg-yellow-200 text-yellow-600";
+      case "Plata": return "bg-gray-200 text-gray-600";
+      case "Bronce": return "bg-amber-200 text-amber-700";
+      default: return "bg-red-200 text-red-600";
+    }
   };
 
   const renderAuthButton = () => {
