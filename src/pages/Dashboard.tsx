@@ -286,6 +286,46 @@ const Dashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center">
                 <Users className="mr-2 text-indigo-500" size={20} />
+                Búsqueda de Empleados
+              </CardTitle>
+              <CardDescription>Encuentra el talento ideal</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <span className="text-sm font-medium mr-2">Candidatos disponibles:</span>
+                  <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-semibold">
+                    24 perfiles
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <div className="flex items-center mt-1">
+                    <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
+                    <span className="text-sm">Desarrollador Frontend (urgente)</span>
+                  </div>
+                  <div className="flex items-center mt-1">
+                    <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
+                    <span className="text-sm">Especialista en Marketing</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <ButtonCustom 
+                variant="outline" 
+                size="sm" 
+                className="w-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                onClick={() => navigate('/busqueda-empleados')}
+              >
+                Buscar candidatos
+              </ButtonCustom>
+            </CardFooter>
+          </Card>
+
+          <Card className="border-l-4 border-l-indigo-500 shadow-md hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl flex items-center">
+                <Users className="mr-2 text-indigo-500" size={20} />
                 Certificación
               </CardTitle>
               <CardDescription>PyME360 Trust Score</CardDescription>
