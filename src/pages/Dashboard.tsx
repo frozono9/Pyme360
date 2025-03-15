@@ -184,7 +184,6 @@ const Dashboard = () => {
     return { name: "No certificado", color: "text-red-500" };
   };
   
-  // Add the missing function
   const getTrustLevelColor = (level: string) => {
     switch (level) {
       case "Platino": return "bg-slate-200 text-slate-600";
@@ -369,7 +368,7 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Tareas completadas:</span>
                   <span className="text-sm font-bold text-blue-600">
-                    {creditScore.score >= 80 ? "9" : creditScore.score >= 65 ? "7" : creditScore.score >= 50 ? "5" : "3}/10"
+                    {creditScore.score >= 80 ? "9" : creditScore.score >= 65 ? "7" : creditScore.score >= 50 ? "5" : "3"}/10
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
