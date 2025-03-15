@@ -38,6 +38,18 @@ const CreditScore = () => {
         
         // También mantenemos la compatibilidad con el getCreditScore para funcionalidad existente
         const data = await api.getCreditScore();
+
+        // Ensure components property exists and has the correct structure
+        if (data && !data.components) {
+          data.components = {
+            payment_history: null,
+            credit_utilization: null,
+            history_length: null,
+            credit_mix: null,
+            new_applications: null
+          };
+        }
+        
         setCreditData(data);
         console.log("Credit data fetched:", data);
       } catch (err) {

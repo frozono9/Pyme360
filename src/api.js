@@ -204,6 +204,25 @@ async function getCreditScore() {
 
     const data = await response.json();
     console.log("Credit score data received:", data);
+    
+    // Ensure the data has the necessary structure
+    if (!data.components) {
+      data.components = {};
+    }
+    
+    // Make sure all component objects exist
+    const componentTypes = ['payment_history', 'credit_utilization', 'history_length', 'credit_mix', 'new_applications'];
+    componentTypes.forEach(type => {
+      if (!data.components[type]) {
+        data.components[type] = { score: 0, data: {} };
+      }
+      
+      // Ensure the data property exists
+      if (!data.components[type].data) {
+        data.components[type].data = {};
+      }
+    });
+    
     return data;
   } catch (error) {
     console.error('Error al obtener puntuación crediticia:', error);
@@ -213,11 +232,88 @@ async function getCreditScore() {
       return {
         score: 720,
         components: {
-          payment_history: { percentage: 95, score: 90 },
-          credit_utilization: { utilization: 25, score: 85 },
-          history_length: { averageAge: 4.5, score: 80 },
-          credit_mix: { numTypes: 3, score: 90 },
-          new_applications: { numIncidents: 1, score: 90 }
+          payment_history: { 
+            score: 90, 
+            data: {
+              percentage: 95,
+              totalPayments: 48,
+              onTimePayments: 46,
+              latePayments: 2,
+              chartData: [
+                { month: "1/2023", "A tiempo": 3, "Atrasados": 0 },
+                { month: "2/2023", "A tiempo": 4, "Atrasados": 0 },
+                { month: "3/2023", "A tiempo": 3, "Atrasados": 1 },
+                { month: "4/2023", "A tiempo": 4, "Atrasados": 0 },
+                { month: "5/2023", "A tiempo": 4, "Atrasados": 0 },
+                { month: "6/2023", "A tiempo": 3, "Atrasados": 1 }
+              ]
+            }
+          },
+          credit_utilization: { 
+            score: 85, 
+            data: {
+              utilization: 25,
+              totalDebt: 25000,
+              totalAvailable: 100000,
+              utilizationByAccount: [
+                { name: "Banco A", value: 15000, limit: 50000, utilization: 30 },
+                { name: "Banco B", value: 10000, limit: 50000, utilization: 20 }
+              ],
+              colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d']
+            }
+          },
+          history_length: { 
+            score: 80, 
+            data: {
+              averageAge: 4.5,
+              numAccounts: 3,
+              accountAges: [
+                { entidad: "Banco A", years: 6.2 },
+                { entidad: "Banco B", years: 4.1 },
+                { entidad: "Financiera C", years: 3.2 }
+              ],
+              chartData: [
+                { name: "Banco A", años: 6.2 },
+                { name: "Banco B", años: 4.1 },
+                { name: "Financiera C", años: 3.2 }
+              ]
+            }
+          },
+          credit_mix: { 
+            score: 90, 
+            data: {
+              numTypes: 3,
+              types: ["Hipoteca", "Tarjeta de Crédito", "Préstamo Personal"],
+              typeCounts: { "Hipoteca": 1, "Tarjeta de Crédito": 2, "Préstamo Personal": 1 },
+              chartData: [
+                { name: "Hipoteca", value: 1 },
+                { name: "Tarjeta de Crédito", value: 2 },
+                { name: "Préstamo Personal", value: 1 }
+              ],
+              colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
+            }
+          },
+          new_applications: { 
+            score: 90, 
+            data: {
+              numIncidents: 1,
+              totalAmount: 5000,
+              incidents: [
+                { 
+                  tipo: "Solicitud reciente", 
+                  entidad: "Banco Nacional", 
+                  fecha: "2023-05-15", 
+                  monto: 5000, 
+                  estado: "Aprobado" 
+                }
+              ],
+              incidentsByType: { "Solicitud reciente": 1 },
+              chartData: [
+                { name: "Solicitud reciente", value: 1 }
+              ],
+              colors: ['#FF5252', '#FF7F7F', '#FFACAC', '#FFC4C4']
+            }
+          }
         },
         nivel: {
           nivel: "Bueno",
