@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -238,6 +237,26 @@ async def get_trust_score(current_user: dict = Depends(auth.get_current_user)):
     except Exception as e:
         print(f"Error al calcular PyME360 Trust Score: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al calcular PyME360 Trust Score: {str(e)}")
+
+# Nuevo endpoint para consultar al asistente IA de financiamiento
+@app.post("/api/financing-assistant")
+async def query_financing_assistant(
+    question: dict,
+    current_user: dict = Depends(auth.get_current_user)
+):
+    try:
+        from backend.agents.asistenteaifin import query
+        
+        # Obtener datos del usuario de MongoDB para pasarlos al asistente
+        user_data = json.dumps(current_user)
+        
+        # Enviar la consulta al asistente IA
+        response = query(user_data, question.get("question", ""))
+        
+        return {"response": response}
+    except Exception as e:
+        print(f"Error al consultar al asistente IA: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al consultar al asistente IA: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

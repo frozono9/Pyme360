@@ -8,6 +8,7 @@ import { Building, Users, CreditCard, BriefcaseBusiness, HandCoins, LandPlot } f
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import api from "@/api";
 
 const FinancingMarketplace = () => {
   const [userInput, setUserInput] = useState("");
@@ -72,21 +73,21 @@ const FinancingMarketplace = () => {
     setAgentResponse("");
 
     try {
-      // Simulating API call to OpenAI
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Llamada real a la API del asistente IA
+      const response = await api.queryFinancingAssistant(userInput);
       
-      // Mock response based on input (in a real scenario, this would be an actual API call)
-      const mockResponse = `Basado en tus KPIs actuales y la consulta "${userInput}", te recomendaría:
-
-1. **Prioridad Alta**: Explorar opciones con Banco Nacional en la categoría de Bancos Tradicionales. Tu perfil crediticio califica para tasas preferenciales del 12.5%.
-
-2. **Alternativa**: El programa gubernamental "Fondo PyME" ofrece tasas más bajas (5.5%) aunque con montos menores, sería ideal para necesidades específicas de corto plazo.
-
-3. **Para crecimiento**: Si buscas capital para expansión, considera "Growth Capital" que ofrece financiamiento con participación minoritaria, ideal para tu etapa de crecimiento.
-
-✅ Tu AI Credit Score de 82/100 te posiciona favorablemente para negociar mejores términos.`;
-
-      setAgentResponse(mockResponse);
+      let formattedResponse;
+      
+      // Procesar la respuesta según su estructura
+      if (typeof response.response === 'string') {
+        formattedResponse = response.response;
+      } else if (typeof response.response === 'object') {
+        formattedResponse = JSON.stringify(response.response, null, 2);
+      } else {
+        formattedResponse = "No se pudo obtener una respuesta clara del asistente.";
+      }
+      
+      setAgentResponse(formattedResponse);
     } catch (error) {
       console.error("Error al procesar la consulta:", error);
       toast({
