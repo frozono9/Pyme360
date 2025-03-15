@@ -16,8 +16,16 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    const userJson = localStorage.getItem("pyme360-user");
-    setIsAuthenticated(!!userJson);
+    const checkAuth = () => {
+      const userJson = localStorage.getItem("pyme360-user");
+      setIsAuthenticated(!!userJson);
+    };
+    
+    // Initial check
+    checkAuth();
+    
+    // Listen for storage changes (in case user logs in/out in another tab)
+    window.addEventListener('storage', checkAuth);
 
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -29,6 +37,7 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('storage', checkAuth);
     };
   }, [scrolled]);
 
@@ -89,6 +98,7 @@ const Navbar = () => {
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center space-x-1">
             <NavLink to="/">Inicio</NavLink>
+            <NavLink to="/nosotros">Nosotros</NavLink>
             
             {isAuthenticated && (
               <div className="relative">
@@ -125,7 +135,6 @@ const Navbar = () => {
             )}
             
             {isAuthenticated && <NavLink to="/certificacion">Certificación</NavLink>}
-            <NavLink to="/nosotros">Nosotros</NavLink>
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -180,6 +189,13 @@ const Navbar = () => {
             Inicio
           </Link>
           
+          <Link 
+            to="/nosotros" 
+            className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+          >
+            Nosotros
+          </Link>
+          
           {isAuthenticated && (
             <div className="relative">
               <button
@@ -219,13 +235,6 @@ const Navbar = () => {
               Certificación
             </Link>
           )}
-          
-          <Link 
-            to="/nosotros" 
-            className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-          >
-            Nosotros
-          </Link>
           
           <div className="pt-4 flex flex-col space-y-2">
             {isAuthenticated ? (
