@@ -43,7 +43,7 @@ const FinancingModule = () => {
                 icon={<Award className="h-10 w-10 text-pyme-blue" />}
                 title="AI Credit Score"
                 description="Evaluación crediticia basada en datos reales de tu empresa"
-                linkTo="/credit-score"
+                linkTo="/financiamiento/credito"
                 metrics={[
                   { label: "Puntuación Media", value: "720" },
                   { label: "Mejora Potencial", value: "+85 pts" }
@@ -111,41 +111,6 @@ const FinancingModule = () => {
                   title="Prepara tu solicitud"
                   description="Utiliza nuestras herramientas para generar la documentación necesaria y aumentar tus probabilidades de aprobación."
                 />
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                  <Link to="/credit-score">
-                    <ButtonCustom 
-                      variant="default" 
-                      size="lg"
-                      className="w-full"
-                      rightIcon={<ArrowRight className="h-4 w-4" />}
-                    >
-                      AI Credit Score
-                    </ButtonCustom>
-                  </Link>
-                  
-                  <Link to="/marketplace-financiamiento">
-                    <ButtonCustom 
-                      variant="outline" 
-                      size="lg"
-                      className="w-full"
-                      rightIcon={<ArrowRight className="h-4 w-4" />}
-                    >
-                      Marketplace Financiero
-                    </ButtonCustom>
-                  </Link>
-                  
-                  <Link to="/preparacion-financiamiento">
-                    <ButtonCustom 
-                      variant="outline" 
-                      size="lg"
-                      className="w-full"
-                      rightIcon={<ArrowRight className="h-4 w-4" />}
-                    >
-                      Preparación Documentos
-                    </ButtonCustom>
-                  </Link>
-                </div>
               </div>
             </div>
           </div>
