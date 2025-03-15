@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -380,6 +381,66 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     }
   }
 
+  // Ensure data objects are always defined with default values
+  const safePaymentHistory = {
+    score: paymentHistory?.score || 0,
+    data: paymentHistory?.data || {
+      percentage: 0,
+      totalPayments: 0,
+      onTimePayments: 0,
+      latePayments: 0,
+      chartData: []
+    }
+  };
+
+  const safeCreditUtilization = {
+    score: creditUtilization?.score || 0,
+    data: creditUtilization?.data || {
+      utilization: 0,
+      totalDebt: 0,
+      totalAvailable: 0,
+      utilizationByAccount: [],
+      colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d']
+    }
+  };
+
+  const safeHistoryLength = {
+    score: historyLength?.score || 0,
+    data: historyLength?.data || {
+      averageAge: 0,
+      numAccounts: 0,
+      accountAges: [],
+      chartData: []
+    }
+  };
+
+  const safeCreditMix = {
+    score: creditMix?.score || 0,
+    data: creditMix?.data || {
+      numTypes: 0,
+      types: [],
+      typeCounts: {},
+      chartData: [],
+      colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
+    }
+  };
+
+  const safeIncidents = {
+    score: incidents?.score || 0,
+    data: incidents?.data || {
+      numIncidents: 0,
+      totalAmount: 0,
+      incidents: [],
+      incidentsByType: {},
+      chartData: [],
+      colors: ['#FF5252', '#FF7F7F', '#FFACAC', '#FFC4C4']
+    }
+  };
+
+  // Debug logs
+  console.log("Credit data in calculator:", creditData);
+  console.log("Payment history component:", safePaymentHistory);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -405,33 +466,33 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           <CardHeader>
             <CardTitle>Historial de Pagos</CardTitle>
             <CardDescription>
-              35% de tu puntaje - {paymentHistory.score} puntos
+              35% de tu puntaje - {safePaymentHistory.score} puntos
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span>Porcentaje de pagos a tiempo:</span>
-                <span className="font-medium">{paymentHistory.data.percentage.toFixed(1)}%</span>
+                <span className="font-medium">{safePaymentHistory.data.percentage.toFixed(1)}%</span>
               </div>
-              <Progress value={paymentHistory.data.percentage} className="h-2" />
+              <Progress value={safePaymentHistory.data.percentage} className="h-2" />
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-green-50 border border-green-100 rounded-md p-3">
                 <div className="text-sm text-muted-foreground">Pagos a tiempo</div>
-                <div className="text-xl font-semibold text-green-600">{paymentHistory.data.onTimePayments}</div>
+                <div className="text-xl font-semibold text-green-600">{safePaymentHistory.data.onTimePayments}</div>
               </div>
               <div className="bg-red-50 border border-red-100 rounded-md p-3">
                 <div className="text-sm text-muted-foreground">Pagos atrasados</div>
-                <div className="text-xl font-semibold text-red-600">{paymentHistory.data.latePayments}</div>
+                <div className="text-xl font-semibold text-red-600">{safePaymentHistory.data.latePayments}</div>
               </div>
             </div>
             
-            {paymentHistory.data.chartData.length > 0 && (
+            {safePaymentHistory.data.chartData && safePaymentHistory.data.chartData.length > 0 && (
               <div className="h-60">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={paymentHistory.data.chartData}>
+                  <BarChart data={safePaymentHistory.data.chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis />
@@ -450,31 +511,31 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           <CardHeader>
             <CardTitle>Utilización de Crédito</CardTitle>
             <CardDescription>
-              30% de tu puntaje - {creditUtilization.score} puntos
+              30% de tu puntaje - {safeCreditUtilization.score} puntos
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span>Utilización general:</span>
-                <span className="font-medium">{creditUtilization.data.utilization.toFixed(1)}%</span>
+                <span className="font-medium">{safeCreditUtilization.data.utilization.toFixed(1)}%</span>
               </div>
               <div className="relative pt-1">
                 <Progress 
-                  value={creditUtilization.data.utilization} 
+                  value={safeCreditUtilization.data.utilization} 
                   className={`h-2 ${
-                    creditUtilization.data.utilization <= 30 ? "bg-secondary text-green-500" :
-                    creditUtilization.data.utilization <= 50 ? "bg-secondary text-yellow-500" :
-                    creditUtilization.data.utilization <= 70 ? "bg-secondary text-orange-500" : "bg-secondary text-red-500"
+                    safeCreditUtilization.data.utilization <= 30 ? "bg-secondary text-green-500" :
+                    safeCreditUtilization.data.utilization <= 50 ? "bg-secondary text-yellow-500" :
+                    safeCreditUtilization.data.utilization <= 70 ? "bg-secondary text-orange-500" : "bg-secondary text-red-500"
                   }`}
                 />
                 <div 
                   className={`absolute inset-0 h-2 rounded-full ${
-                    creditUtilization.data.utilization <= 30 ? "bg-green-500" :
-                    creditUtilization.data.utilization <= 50 ? "bg-yellow-500" :
-                    creditUtilization.data.utilization <= 70 ? "bg-orange-500" : "bg-red-500"
+                    safeCreditUtilization.data.utilization <= 30 ? "bg-green-500" :
+                    safeCreditUtilization.data.utilization <= 50 ? "bg-yellow-500" :
+                    safeCreditUtilization.data.utilization <= 70 ? "bg-orange-500" : "bg-red-500"
                   }`}
-                  style={{ width: `${creditUtilization.data.utilization}%`, maxWidth: "100%" }}
+                  style={{ width: `${safeCreditUtilization.data.utilization}%`, maxWidth: "100%" }}
                 />
               </div>
             </div>
@@ -482,20 +543,20 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-blue-50 border border-blue-100 rounded-md p-3">
                 <div className="text-sm text-muted-foreground">Deuda Total</div>
-                <div className="text-xl font-semibold text-blue-600">${creditUtilization.data.totalDebt.toLocaleString()}</div>
+                <div className="text-xl font-semibold text-blue-600">${safeCreditUtilization.data.totalDebt.toLocaleString()}</div>
               </div>
               <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3">
                 <div className="text-sm text-muted-foreground">Crédito Disponible</div>
-                <div className="text-xl font-semibold text-indigo-600">${creditUtilization.data.totalAvailable.toLocaleString()}</div>
+                <div className="text-xl font-semibold text-indigo-600">${safeCreditUtilization.data.totalAvailable.toLocaleString()}</div>
               </div>
             </div>
             
-            {creditUtilization.data.utilizationByAccount.length > 0 && (
+            {safeCreditUtilization.data.utilizationByAccount && safeCreditUtilization.data.utilizationByAccount.length > 0 && (
               <div className="h-60">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={creditUtilization.data.utilizationByAccount}
+                      data={safeCreditUtilization.data.utilizationByAccount}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -504,8 +565,8 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {creditUtilization.data.utilizationByAccount.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={creditUtilization.data.colors[index % creditUtilization.data.colors.length]} />
+                      {safeCreditUtilization.data.utilizationByAccount.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={safeCreditUtilization.data.colors[index % safeCreditUtilization.data.colors.length]} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => `$${Number(value).toLocaleString()}`} />
@@ -520,27 +581,27 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           <CardHeader>
             <CardTitle>Antigüedad Crediticia</CardTitle>
             <CardDescription>
-              15% de tu puntaje - {historyLength.score} puntos
+              15% de tu puntaje - {safeHistoryLength.score} puntos
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span>Antigüedad promedio:</span>
-                <span className="font-medium">{historyLength.data.averageAge.toFixed(1)} años</span>
+                <span className="font-medium">{safeHistoryLength.data.averageAge.toFixed(1)} años</span>
               </div>
-              <Progress value={Math.min(historyLength.data.averageAge * 10, 100)} className="h-2" />
+              <Progress value={Math.min(safeHistoryLength.data.averageAge * 10, 100)} className="h-2" />
             </div>
             
             <div className="bg-purple-50 border border-purple-100 rounded-md p-3 mb-4">
               <div className="text-sm text-muted-foreground">Número de cuentas</div>
-              <div className="text-xl font-semibold text-purple-600">{historyLength.data.numAccounts}</div>
+              <div className="text-xl font-semibold text-purple-600">{safeHistoryLength.data.numAccounts}</div>
             </div>
             
-            {historyLength.data.chartData.length > 0 && (
+            {safeHistoryLength.data.chartData && safeHistoryLength.data.chartData.length > 0 && (
               <div className="h-60">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={historyLength.data.chartData} layout="vertical">
+                  <BarChart data={safeHistoryLength.data.chartData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" domain={[0, 'dataMax + 1']} />
                     <YAxis dataKey="name" type="category" width={100} />
@@ -557,29 +618,29 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           <CardHeader>
             <CardTitle>Mezcla de Créditos</CardTitle>
             <CardDescription>
-              10% de tu puntaje - {creditMix.score} puntos
+              10% de tu puntaje - {safeCreditMix.score} puntos
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span>Tipos de crédito:</span>
-                <span className="font-medium">{creditMix.data.numTypes}</span>
+                <span className="font-medium">{safeCreditMix.data.numTypes}</span>
               </div>
-              <Progress value={creditMix.data.numTypes * 25} className="h-2" />
+              <Progress value={safeCreditMix.data.numTypes * 25} className="h-2" />
             </div>
             
             <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3 mb-4">
               <div className="text-sm text-muted-foreground">Diversidad crediticia</div>
-              <div className="text-lg font-medium text-indigo-600">{creditMix.data.types.join(', ')}</div>
+              <div className="text-lg font-medium text-indigo-600">{safeCreditMix.data.types.join(', ')}</div>
             </div>
             
-            {creditMix.data.chartData.length > 0 && (
+            {safeCreditMix.data.chartData && safeCreditMix.data.chartData.length > 0 && (
               <div className="h-60">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={creditMix.data.chartData}
+                      data={safeCreditMix.data.chartData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -588,8 +649,8 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {creditMix.data.chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={creditMix.data.colors[index % creditMix.data.colors.length]} />
+                      {safeCreditMix.data.chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={safeCreditMix.data.colors[index % safeCreditMix.data.colors.length]} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -605,24 +666,24 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           <CardHeader>
             <CardTitle>Incidentes Crediticios</CardTitle>
             <CardDescription>
-              10% de tu puntaje - {incidents.score} puntos
+              10% de tu puntaje - {safeIncidents.score} puntos
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span>Historial limpio:</span>
-                <span className="font-medium">{incidents.data.numIncidents === 0 ? 'Sí' : 'No'}</span>
+                <span className="font-medium">{safeIncidents.data.numIncidents === 0 ? 'Sí' : 'No'}</span>
               </div>
               <div className="relative pt-1">
-                <Progress value={100 - (incidents.data.numIncidents * 20)} className="h-2" />
-                {incidents.data.numIncidents > 0 && (
+                <Progress value={100 - (safeIncidents.data.numIncidents * 20)} className="h-2" />
+                {safeIncidents.data.numIncidents > 0 && (
                   <div 
                     className={`absolute inset-0 h-2 rounded-full ${
-                      incidents.data.numIncidents === 1 ? "bg-yellow-500" :
-                      incidents.data.numIncidents === 2 ? "bg-orange-500" : "bg-red-500"
+                      safeIncidents.data.numIncidents === 1 ? "bg-yellow-500" :
+                      safeIncidents.data.numIncidents === 2 ? "bg-orange-500" : "bg-red-500"
                     }`} 
-                    style={{ width: `${100 - (incidents.data.numIncidents * 20)}%`, maxWidth: "100%" }}
+                    style={{ width: `${100 - (safeIncidents.data.numIncidents * 20)}%`, maxWidth: "100%" }}
                   />
                 )}
               </div>
@@ -631,15 +692,15 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-red-50 border border-red-100 rounded-md p-3">
                 <div className="text-sm text-muted-foreground">Número de incidentes</div>
-                <div className="text-xl font-semibold text-red-600">{incidents.data.numIncidents}</div>
+                <div className="text-xl font-semibold text-red-600">{safeIncidents.data.numIncidents}</div>
               </div>
               <div className="bg-red-50 border border-red-100 rounded-md p-3">
                 <div className="text-sm text-muted-foreground">Monto total</div>
-                <div className="text-xl font-semibold text-red-600">${incidents.data.totalAmount.toLocaleString()}</div>
+                <div className="text-xl font-semibold text-red-600">${safeIncidents.data.totalAmount.toLocaleString()}</div>
               </div>
             </div>
             
-            {incidents.data.numIncidents > 0 && (
+            {safeIncidents.data.incidents && safeIncidents.data.incidents.length > 0 && (
               <div className="border rounded-md overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -652,7 +713,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {incidents.data.incidents.map((incident, index) => (
+                    {safeIncidents.data.incidents.map((incident, index) => (
                       <tr key={index}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{incident.tipo}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{incident.entidad}</td>
