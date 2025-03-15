@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import CreditScoreCalculator from '@/components/financiamiento/CreditScoreCalculator';
 import api from "@/api";
+import { toast } from "@/components/ui/use-toast";
 
 const CreditScore = () => {
   const [creditData, setCreditData] = useState<any>(null);
@@ -22,12 +23,18 @@ const CreditScore = () => {
         setIsLoading(true);
         const user = await api.getCurrentUser();
         if (!user) {
+          toast({
+            title: "Acceso denegado",
+            description: "Debes iniciar sesión para acceder a esta página",
+            variant: "destructive"
+          });
           navigate("/acceso");
           return;
         }
         
         // Guardamos todos los datos del usuario para el cálculo
         setUserData(user);
+        console.log("User data fetched:", user);
         
         // También mantenemos la compatibilidad con el getCreditScore para funcionalidad existente
         const data = await api.getCreditScore();
