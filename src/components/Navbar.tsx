@@ -1,16 +1,24 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, ChevronDown, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
+    // Check if user is logged in
+    const userJson = localStorage.getItem("pyme360-user");
+    setIsAuthenticated(!!userJson);
+
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
       if (isScrolled !== scrolled) {
@@ -31,6 +39,16 @@ const Navbar = () => {
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  
+  const handleLogout = () => {
+    localStorage.removeItem("pyme360-user");
+    setIsAuthenticated(false);
+    toast({
+      title: "Sesión cerrada",
+      description: "Has cerrado sesión correctamente",
+    });
+    navigate("/");
+  };
 
   const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) => {
     const isActive = location.pathname === to;
@@ -72,55 +90,69 @@ const Navbar = () => {
           <nav className="hidden md:flex items-center space-x-1">
             <NavLink to="/">Inicio</NavLink>
             
-            <div className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="flex items-center px-3 py-2 text-sm font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-              >
-                Módulos <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {dropdownOpen && (
-                <div 
-                  className="absolute top-full right-0 mt-1 w-56 glass-card-strong py-2 animate-fade-down origin-top-right z-10"
-                  onMouseLeave={() => setDropdownOpen(false)}
+            {isAuthenticated && (
+              <div className="relative">
+                <button
+                  onClick={toggleDropdown}
+                  className="flex items-center px-3 py-2 text-sm font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
                 >
-                  <Link to="/financiamiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                    Financiamiento Inteligente
-                  </Link>
-                  <Link to="/gestion" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                    Gestión Empresarial
-                  </Link>
-                  <Link to="/cumplimiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                    Cumplimiento Regulatorio
-                  </Link>
-                  <Link to="/crecimiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                    Crecimiento y Escalabilidad
-                  </Link>
-                  <Link to="/financiera" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                    Gestión Financiera
-                  </Link>
-                </div>
-              )}
-            </div>
+                  Módulos <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {dropdownOpen && (
+                  <div 
+                    className="absolute top-full right-0 mt-1 w-56 glass-card-strong py-2 animate-fade-down origin-top-right z-10"
+                    onMouseLeave={() => setDropdownOpen(false)}
+                  >
+                    <Link to="/financiamiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
+                      Financiamiento Inteligente
+                    </Link>
+                    <Link to="/gestion" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
+                      Gestión Empresarial
+                    </Link>
+                    <Link to="/cumplimiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
+                      Cumplimiento Regulatorio
+                    </Link>
+                    <Link to="/crecimiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
+                      Crecimiento y Escalabilidad
+                    </Link>
+                    <Link to="/financiera" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
+                      Gestión Financiera
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
             
-            <NavLink to="/certificacion">Certificación</NavLink>
+            {isAuthenticated && <NavLink to="/certificacion">Certificación</NavLink>}
             <NavLink to="/nosotros">Nosotros</NavLink>
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Link 
-              to="/acceso" 
-              className="text-sm font-medium px-4 py-2 rounded-md border border-pyme-blue/20 hover:border-pyme-blue/50 text-pyme-blue transition-all"
-            >
-              Iniciar Sesión
-            </Link>
-            <Link 
-              to="/registro" 
-              className="text-sm font-medium px-4 py-2 rounded-md bg-gradient-to-r from-pyme-blue to-pyme-blue-light text-white shadow-sm hover:shadow-md hover:from-pyme-blue-dark hover:to-pyme-blue transition-all"
-            >
-              Registrarse
-            </Link>
+            {isAuthenticated ? (
+              <button 
+                onClick={handleLogout}
+                className="text-sm font-medium px-4 py-2 rounded-md border border-pyme-blue/20 hover:border-pyme-blue/50 text-pyme-blue transition-all flex items-center"
+              >
+                <LogOut size={16} className="mr-2" />
+                Cerrar Sesión
+              </button>
+            ) : (
+              <>
+                <Link 
+                  to="/acceso" 
+                  className="text-sm font-medium px-4 py-2 rounded-md border border-pyme-blue/20 hover:border-pyme-blue/50 text-pyme-blue transition-all"
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link 
+                  to="/registro" 
+                  className="text-sm font-medium px-4 py-2 rounded-md bg-gradient-to-r from-pyme-blue to-pyme-blue-light text-white shadow-sm hover:shadow-md hover:from-pyme-blue-dark hover:to-pyme-blue transition-all"
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -147,41 +179,47 @@ const Navbar = () => {
           >
             Inicio
           </Link>
-          <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-            >
-              Módulos <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {dropdownOpen && (
-              <div className="pl-6 space-y-1 animate-fade-down">
-                <Link to="/financiamiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                  Financiamiento Inteligente
-                </Link>
-                <Link to="/gestion" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                  Gestión Empresarial
-                </Link>
-                <Link to="/cumplimiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                  Cumplimiento Regulatorio
-                </Link>
-                <Link to="/crecimiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                  Crecimiento y Escalabilidad
-                </Link>
-                <Link to="/financiera" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                  Gestión Financiera
-                </Link>
-              </div>
-            )}
-          </div>
           
-          <Link 
-            to="/certificacion" 
-            className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-          >
-            Certificación
-          </Link>
+          {isAuthenticated && (
+            <div className="relative">
+              <button
+                onClick={toggleDropdown}
+                className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                Módulos <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {dropdownOpen && (
+                <div className="pl-6 space-y-1 animate-fade-down">
+                  <Link to="/financiamiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
+                    Financiamiento Inteligente
+                  </Link>
+                  <Link to="/gestion" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
+                    Gestión Empresarial
+                  </Link>
+                  <Link to="/cumplimiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
+                    Cumplimiento Regulatorio
+                  </Link>
+                  <Link to="/crecimiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
+                    Crecimiento y Escalabilidad
+                  </Link>
+                  <Link to="/financiera" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
+                    Gestión Financiera
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {isAuthenticated && (
+            <Link 
+              to="/certificacion" 
+              className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+            >
+              Certificación
+            </Link>
+          )}
+          
           <Link 
             to="/nosotros" 
             className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
@@ -190,18 +228,30 @@ const Navbar = () => {
           </Link>
           
           <div className="pt-4 flex flex-col space-y-2">
-            <Link 
-              to="/acceso" 
-              className="text-center text-sm font-medium px-4 py-2 rounded-md border border-pyme-blue/20 text-pyme-blue transition-all"
-            >
-              Iniciar Sesión
-            </Link>
-            <Link 
-              to="/registro" 
-              className="text-center text-sm font-medium px-4 py-2 rounded-md bg-gradient-to-r from-pyme-blue to-pyme-blue-light text-white shadow-sm hover:shadow-md transition-all"
-            >
-              Registrarse
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="text-center text-sm font-medium px-4 py-2 rounded-md border border-pyme-blue/20 text-pyme-blue transition-all flex items-center justify-center"
+              >
+                <LogOut size={16} className="mr-2" />
+                Cerrar Sesión
+              </button>
+            ) : (
+              <>
+                <Link 
+                  to="/acceso" 
+                  className="text-center text-sm font-medium px-4 py-2 rounded-md border border-pyme-blue/20 text-pyme-blue transition-all"
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link 
+                  to="/registro" 
+                  className="text-center text-sm font-medium px-4 py-2 rounded-md bg-gradient-to-r from-pyme-blue to-pyme-blue-light text-white shadow-sm hover:shadow-md transition-all"
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
