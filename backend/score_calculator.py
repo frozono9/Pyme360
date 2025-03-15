@@ -1,4 +1,3 @@
-
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 import json
@@ -55,13 +54,33 @@ def calculate_payment_history_score(historial_crediticio: Dict) -> Dict:
         else:
             score_value = int(percentage / 2)  # Puntuación más baja para historial deficiente
     
+    # Crear datos para la gráfica de pagos (últimos 6 meses)
+    payment_chart_data = []
+    months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+    current_month = datetime.now().month - 1  # Índice 0-11
+    
+    for i in range(6):
+        month_index = (current_month - 5 + i) % 12
+        month_name = months[month_index]
+        
+        # Datos simulados para la gráfica
+        on_time = max(1, int((on_time_payments / 6) * (0.7 + 0.3 * i / 5)))
+        late = max(0, int((late_payments / 6) * (1.3 - 0.3 * i / 5)))
+        
+        payment_chart_data.append({
+            "month": month_name,
+            "A tiempo": on_time,
+            "Atrasados": late
+        })
+    
     return {
         "score": score_value,
         "percentage": percentage,
         "weight": 0.35,  # 35% del puntaje total
         "total_payments": total_payments,
         "on_time_payments": on_time_payments,
-        "late_payments": late_payments
+        "late_payments": late_payments,
+        "chart_data": payment_chart_data
     }
 
 # Función para calcular la utilización del crédito (25-30% del puntaje)
@@ -71,11 +90,26 @@ def calculate_credit_utilization_score(historial_crediticio: Dict) -> Dict:
     """
     total_debt = 0
     total_available = 0
+    accounts = []
     
     # Sumar deudas y límites de crédito
     for cuenta in historial_crediticio.get("cuentas_credito", []):
-        total_debt += cuenta.get("saldo_actual", 0)
-        total_available += cuenta.get("limite_credito", 0)
+        debt = cuenta.get("saldo_actual", 0)
+        limit = cuenta.get("limite_credito", 0)
+        total_debt += debt
+        total_available += limit
+        
+        if limit > 0:
+            utilization_pct = (debt / limit) * 100
+        else:
+            utilization_pct = 0
+            
+        accounts.append({
+            "name": cuenta.get("entidad", "Cuenta"),
+            "value": debt,
+            "limit": limit,
+            "utilization": utilization_pct
+        })
     
     # Si no hay crédito disponible, asignar un valor predeterminado
     if total_available == 0:
@@ -104,7 +138,8 @@ def calculate_credit_utilization_score(historial_crediticio: Dict) -> Dict:
         "utilization": utilization,
         "weight": 0.30,  # 30% del puntaje total
         "total_debt": total_debt,
-        "total_available": total_available
+        "total_available": total_available,
+        "accounts": accounts
     }
 
 # Función para calcular la antigüedad crediticia (15% del puntaje)
@@ -122,7 +157,11 @@ def calculate_credit_history_length_score(historial_crediticio: Dict) -> Dict:
                 # Convertir la fecha de string a datetime
                 fecha_apertura = datetime.strptime(cuenta["fecha_apertura"], "%Y-%m-%d")
                 years = (current_date - fecha_apertura).days / 365.25
-                account_ages.append(years)
+                
+                account_ages.append({
+                    "name": cuenta.get("entidad", "Cuenta"),
+                    "years": years
+                })
             except (ValueError, TypeError):
                 # Si la fecha no está en el formato esperado, ignorar
                 pass
@@ -132,7 +171,7 @@ def calculate_credit_history_length_score(historial_crediticio: Dict) -> Dict:
         avg_age = 0
         score_value = 50  # Puntuación neutral
     else:
-        avg_age = sum(account_ages) / len(account_ages)
+        avg_age = sum(account["years"] for account in account_ages) / len(account_ages)
         
         # Convertir la antigüedad a una puntuación
         # Más de 7 años = excelente, menos de 1 año = malo
@@ -153,7 +192,8 @@ def calculate_credit_history_length_score(historial_crediticio: Dict) -> Dict:
         "score": score_value,
         "average_age": avg_age,
         "weight": 0.15,  # 15% del puntaje total
-        "num_accounts": len(account_ages)
+        "num_accounts": len(account_ages),
+        "accounts": account_ages
     }
 
 # Función para calcular la mezcla de créditos (10% del puntaje)
@@ -162,15 +202,21 @@ def calculate_credit_mix_score(historial_crediticio: Dict) -> Dict:
     Calcula la puntuación basada en la mezcla de diferentes tipos de crédito.
     """
     credit_types = set()
+    type_counts = {}
     
     # Identificar tipos únicos de crédito
     for cuenta in historial_crediticio.get("cuentas_credito", []):
         if "tipo_credito" in cuenta:
-            credit_types.add(cuenta["tipo_credito"])
+            credit_type = cuenta["tipo_credito"]
+            credit_types.add(credit_type)
+            
+            type_counts[credit_type] = type_counts.get(credit_type, 0) + 1
     
     # Añadir créditos de proveedores como un tipo distinto
     if historial_crediticio.get("credito_proveedores", []):
-        credit_types.add("Crédito Comercial")
+        credit_type = "Crédito Comercial"
+        credit_types.add(credit_type)
+        type_counts[credit_type] = len(historial_crediticio.get("credito_proveedores", []))
     
     # Contar tipos únicos de crédito
     num_types = len(credit_types)
@@ -187,11 +233,18 @@ def calculate_credit_mix_score(historial_crediticio: Dict) -> Dict:
     else:
         score_value = 50  # Sin historial crediticio
     
+    # Preparar datos para la gráfica
+    type_counts_data = [
+        {"name": credit_type, "value": count}
+        for credit_type, count in type_counts.items()
+    ]
+    
     return {
         "score": score_value,
         "num_types": num_types,
         "types": list(credit_types),
-        "weight": 0.10  # 10% del puntaje total
+        "weight": 0.10,  # 10% del puntaje total
+        "type_counts": type_counts_data
     }
 
 # Función para calcular nuevas solicitudes de crédito (10% del puntaje)
