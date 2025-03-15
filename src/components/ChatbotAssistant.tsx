@@ -191,7 +191,7 @@ const ChatbotAssistant = () => {
                 onKeyDown={handleKeyPress}
                 placeholder="Escribe tu pregunta..."
                 className="min-h-[60px] resize-none flex-grow mr-2 focus-visible:ring-pyme-blue"
-                maxRows={4}
+                //maxRows={4}
                 disabled={isLoading}
               />
               <Button 

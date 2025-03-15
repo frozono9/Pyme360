@@ -274,7 +274,7 @@ async def query_general_assistant(
         user_data = json.dumps(serialize_mongo_document(current_user))
         
         # Cargar información de la web
-        with open('agents/web_database.txt', 'r') as file:
+        with open('agents/web_database.txt', 'r', encoding='utf-8') as file:
             info_web = file.read()
         
         # Enviar la consulta al asistente IA
