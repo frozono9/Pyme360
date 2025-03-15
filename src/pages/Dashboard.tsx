@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -63,13 +62,15 @@ const Dashboard = () => {
     try {
       const creditScoreData = await api.getCreditScore();
       if (creditScoreData) {
+        const scoreValue = creditScoreData.score || 0;
         setCreditScore({
-          score: creditScoreData.score || 0,
+          score: scoreValue,
           maxScore: 850,
           level: creditScoreData.nivel?.nivel || "N/A",
           percentage: creditScoreData.components?.payment_history?.percentage || 0,
           nivel: creditScoreData.nivel
         });
+        console.log("Credit Score set to:", scoreValue);
       }
       
       const trustScoreData = await api.getTrustScore();
@@ -327,18 +328,18 @@ const Dashboard = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">AI Credit Score:</span>
-                  <span className="text-sm font-bold text-purple-600">{creditScore.score}/{creditScore.maxScore}</span>
+                  <span className="text-sm font-bold text-purple-600">{creditScoreValue}/{maxCreditScore}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className="bg-purple-500 h-2 rounded-full" 
-                    style={{ width: `${(creditScore.score / creditScore.maxScore) * 100}%` }}
+                    style={{ width: `${(creditScoreValue / maxCreditScore) * 100}%` }}
                   ></div>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
-                  {creditScore.score >= 750 ? "Calificación excelente - Elegible para las mejores tasas" :
-                   creditScore.score >= 670 ? "Calificación buena - Elegible para mejores tasas" :
-                   creditScore.score >= 580 ? "Calificación regular - Opciones de financiamiento limitadas" :
+                  {creditScoreValue >= 750 ? "Calificación excelente - Elegible para las mejores tasas" :
+                   creditScoreValue >= 670 ? "Calificación buena - Elegible para mejores tasas" :
+                   creditScoreValue >= 580 ? "Calificación regular - Opciones de financiamiento limitadas" :
                    "Calificación baja - Recomendamos mejorar antes de solicitar financiamiento"}
                 </p>
               </div>
@@ -368,19 +369,19 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Tareas completadas:</span>
                   <span className="text-sm font-bold text-blue-600">
-                    {creditScore.score >= 80 ? "9" : creditScore.score >= 65 ? "7" : creditScore.score >= 50 ? "5" : "3"}/10
+                    {creditScoreValue >= 80 ? "9" : creditScoreValue >= 65 ? "7" : creditScoreValue >= 50 ? "5" : "3}/10"
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className="bg-blue-500 h-2 rounded-full" 
-                    style={{ width: `${creditScore.score >= 80 ? 90 : creditScore.score >= 65 ? 70 : creditScore.score >= 50 ? 50 : 30}%` }}
+                    style={{ width: `${creditScoreValue >= 80 ? 90 : creditScoreValue >= 65 ? 70 : creditScoreValue >= 50 ? 50 : 30}%` }}
                   ></div>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
-                  {creditScore.score >= 80 ? "1 tarea pendiente - Sistema casi optimizado" :
-                   creditScore.score >= 65 ? "3 tareas pendientes - Actualización de inventario requerida" :
-                   creditScore.score >= 50 ? "5 tareas pendientes - Se requiere atención" :
+                  {creditScoreValue >= 80 ? "1 tarea pendiente - Sistema casi optimizado" :
+                   creditScoreValue >= 65 ? "3 tareas pendientes - Actualización de inventario requerida" :
+                   creditScoreValue >= 50 ? "5 tareas pendientes - Se requiere atención" :
                    "7 tareas pendientes - Se requiere atención urgente"}
                 </p>
               </div>
@@ -410,7 +411,7 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Próximo vencimiento:</span>
                   <span className="text-sm font-bold text-amber-600">
-                    {creditScore.score >= 70 ? "15" : creditScore.score >= 50 ? "7" : "3"} días
+                    {creditScoreValue >= 70 ? "15" : creditScoreValue >= 50 ? "7" : "3"} días
                   </span>
                 </div>
                 <div className="flex items-center mt-2">
@@ -448,7 +449,7 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Oportunidades:</span>
                   <span className="text-sm font-bold text-green-600">
-                    {creditScore.score >= 80 ? "5" : creditScore.score >= 65 ? "3" : creditScore.score >= 50 ? "2" : "1"} nuevas
+                    {creditScoreValue >= 80 ? "5" : creditScoreValue >= 65 ? "3" : creditScoreValue >= 50 ? "2" : "1"} nuevas
                   </span>
                 </div>
                 <div className="flex items-center mt-2">
@@ -486,7 +487,7 @@ const Dashboard = () => {
                 <div className="flex items-center">
                   <span className="text-sm font-medium mr-2">Candidatos disponibles:</span>
                   <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-semibold">
-                    {creditScore.score >= 80 ? "48" : creditScore.score >= 65 ? "24" : "12"} perfiles
+                    {creditScoreValue >= 80 ? "48" : creditScoreValue >= 65 ? "24" : "12"} perfiles
                   </span>
                 </div>
                 <div className="mt-2">
@@ -525,7 +526,7 @@ const Dashboard = () => {
               <div className="space-y-2">
                 <div className="flex items-center">
                   <span className="text-sm font-medium mr-2">Puntuación actual:</span>
-                  <span className="text-sm font-bold text-indigo-600">{trustScore.score}/100</span>
+                  <span className="text-sm font-bold text-indigo-600">{trustScoreValue}/100</span>
                 </div>
                 <div className="flex items-center">
                   <span className="text-sm font-medium mr-2">Nivel actual:</span>
