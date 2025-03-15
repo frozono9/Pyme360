@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -7,7 +6,7 @@ import {
   LineChart, 
   PieChart, 
   Calendar, 
-  MixerHorizontal, 
+  SlidersHorizontal, 
   AlertTriangle 
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -464,7 +463,7 @@ const CreditScore = () => {
                     10% de tu puntaje
                   </CardDescription>
                 </div>
-                <MixerHorizontal className="h-4 w-4 text-muted-foreground" />
+                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between mb-2">
