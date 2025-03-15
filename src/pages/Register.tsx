@@ -27,6 +27,7 @@ const registerSchema = z.object({
   correo: z.string().email("Correo electrónico inválido"),
   sitio_web: z.string().optional(),
   fecha_fundacion: z.string().min(1, "Fecha de fundación es requerida"),
+  pais: z.string().min(1, "País es requerido"),
   sector: z.string().min(1, "Sector es requerido"),
   tamano_empresa: z.string().min(1, "Tamaño de empresa es requerido"),
   numero_empleados: z.coerce.number().min(1, "Debe tener al menos 1 empleado"),
@@ -58,6 +59,7 @@ const Register = () => {
       correo: "",
       sitio_web: "",
       fecha_fundacion: new Date().toISOString().split('T')[0],
+      pais: "",
       sector: "",
       tamano_empresa: "Micro",
       numero_empleados: 1,
@@ -81,6 +83,7 @@ const Register = () => {
           correo: data.correo,
           sitio_web: data.sitio_web || "",
           fecha_fundacion: data.fecha_fundacion,
+          pais: data.pais,
           sector: data.sector,
           tamano_empresa: data.tamano_empresa,
           numero_empleados: data.numero_empleados,
@@ -469,6 +472,50 @@ const Register = () => {
                       
                       <FormField
                         control={form.control}
+                        name="pais"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>País</FormLabel>
+                            <Select 
+                              onValueChange={field.onChange} 
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccione un país" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Argentina">Argentina</SelectItem>
+                                <SelectItem value="Bolivia">Bolivia</SelectItem>
+                                <SelectItem value="Brasil">Brasil</SelectItem>
+                                <SelectItem value="Chile">Chile</SelectItem>
+                                <SelectItem value="Colombia">Colombia</SelectItem>
+                                <SelectItem value="Costa Rica">Costa Rica</SelectItem>
+                                <SelectItem value="Cuba">Cuba</SelectItem>
+                                <SelectItem value="Ecuador">Ecuador</SelectItem>
+                                <SelectItem value="El Salvador">El Salvador</SelectItem>
+                                <SelectItem value="Guatemala">Guatemala</SelectItem>
+                                <SelectItem value="Honduras">Honduras</SelectItem>
+                                <SelectItem value="México">México</SelectItem>
+                                <SelectItem value="Nicaragua">Nicaragua</SelectItem>
+                                <SelectItem value="Panamá">Panamá</SelectItem>
+                                <SelectItem value="Paraguay">Paraguay</SelectItem>
+                                <SelectItem value="Perú">Perú</SelectItem>
+                                <SelectItem value="República Dominicana">República Dominicana</SelectItem>
+                                <SelectItem value="Uruguay">Uruguay</SelectItem>
+                                <SelectItem value="Venezuela">Venezuela</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
                         name="sector"
                         render={({ field }) => (
                           <FormItem>
@@ -497,9 +544,7 @@ const Register = () => {
                           </FormItem>
                         )}
                       />
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      
                       <FormField
                         control={form.control}
                         name="tamano_empresa"
@@ -526,7 +571,9 @@ const Register = () => {
                           </FormItem>
                         )}
                       />
-                      
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="numero_empleados"
@@ -540,21 +587,21 @@ const Register = () => {
                           </FormItem>
                         )}
                       />
+                      
+                      <FormField
+                        control={form.control}
+                        name="representante_legal"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Representante legal</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nombre del representante legal" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="representante_legal"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Representante legal</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nombre del representante legal" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     
                     <div className="flex space-x-4 pt-2">
                       <ButtonCustom 
