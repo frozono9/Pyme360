@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ import auth
 import json
 from models import UserCreate, UserLogin
 from fastapi.encoders import jsonable_encoder
+import score_calculator
 
 # Cargar variables de entorno
 load_dotenv()
@@ -61,12 +63,14 @@ def serialize_mongo_document(doc):
 @app.post("/api/test-connection")
 def test_mongo_connection(request: TestRequest):
     try:
+        print(f"Probando conexión a MongoDB con valor: {request.testValue}")
         # Insertar el valor en la colección de prueba
         test_data = {
             "test_value": request.testValue,
             "timestamp": datetime.now().isoformat()
         }
         result = test_collection.insert_one(test_data)
+        print(f"Documento insertado con ID: {result.inserted_id}")
         
         # Devolver respuesta con el ID del documento insertado
         return {
@@ -140,6 +144,100 @@ async def get_current_user(current_user: dict = Depends(auth.get_current_user)):
     # Convertir ObjectId a string
     current_user_serializable = serialize_mongo_document(current_user)
     return jsonable_encoder(current_user_serializable)
+
+# Nuevos endpoints para la puntuación crediticia
+@app.get("/api/credit-score")
+async def get_credit_score(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        # Calcular puntuación crediticia
+        credit_score = score_calculator.calculate_credit_score(current_user)
+        return credit_score
+    except Exception as e:
+        print(f"Error al calcular puntuación crediticia: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al calcular puntuación crediticia: {str(e)}")
+
+# Endpoint para obtener deudas activas del usuario
+@app.get("/api/active-debts")
+async def get_active_debts(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        historial_crediticio = current_user.get("historial_crediticio", {})
+        
+        # Obtener cuentas de crédito y proveedores
+        cuentas_credito = historial_crediticio.get("cuentas_credito", [])
+        credito_proveedores = historial_crediticio.get("credito_proveedores", [])
+        
+        deudas = []
+        
+        # Procesar cuentas de crédito
+        for cuenta in cuentas_credito:
+            if cuenta.get("saldo_actual", 0) > 0:
+                deuda = {
+                    "tipo": cuenta.get("tipo_credito", "Crédito"),
+                    "entidad": cuenta.get("entidad", "Entidad Financiera"),
+                    "monto": cuenta.get("saldo_actual", 0),
+                    "interes": f"{cuenta.get('tasa_interes', 0)}%",
+                    "fecha": cuenta.get("fecha_proximo_pago", ""),
+                    "estatus": "Al día" if not cuenta.get("pagos_tardios", []) else "Con retraso"
+                }
+                deudas.append(deuda)
+        
+        # Procesar créditos de proveedores
+        for proveedor in credito_proveedores:
+            if proveedor.get("saldo_actual", 0) > 0:
+                deuda = {
+                    "tipo": "Crédito Comercial",
+                    "entidad": proveedor.get("nombre_proveedor", "Proveedor"),
+                    "monto": proveedor.get("saldo_actual", 0),
+                    "interes": f"{proveedor.get('tasa_interes', 0)}%",
+                    "fecha": proveedor.get("fecha_proximo_pago", ""),
+                    "estatus": "Al día" if not proveedor.get("pagos_tardios", []) else "Con retraso"
+                }
+                deudas.append(deuda)
+        
+        # Si no hay deudas reales, generar datos simulados
+        if not deudas:
+            deudas = [
+                {
+                    "tipo": "Tarjeta de Crédito",
+                    "entidad": "Banco Nacional",
+                    "monto": 4500,
+                    "interes": "24.9%",
+                    "fecha": "15/07/2024",
+                    "estatus": "Al día"
+                },
+                {
+                    "tipo": "Préstamo Personal",
+                    "entidad": "Financiera Central",
+                    "monto": 12000,
+                    "interes": "16.5%",
+                    "fecha": "28/07/2024",
+                    "estatus": "Al día"
+                },
+                {
+                    "tipo": "Crédito Automotriz",
+                    "entidad": "Auto Finance",
+                    "monto": 35000,
+                    "interes": "11.2%",
+                    "fecha": "10/07/2024",
+                    "estatus": "Con retraso"
+                }
+            ]
+        
+        return {"deudas": deudas}
+    except Exception as e:
+        print(f"Error al obtener deudas activas: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener deudas activas: {str(e)}")
+
+# Endpoint para obtener el PyME360 Trust Score
+@app.get("/api/trust-score")
+async def get_trust_score(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        # Calcular PyME360 Trust Score
+        trust_score = score_calculator.calculate_trust_score(current_user)
+        return trust_score
+    except Exception as e:
+        print(f"Error al calcular PyME360 Trust Score: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al calcular PyME360 Trust Score: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

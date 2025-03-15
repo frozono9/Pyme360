@@ -1,4 +1,5 @@
 
+
 const BASE_URL = "http://localhost:8000";
 
 async function testMongoConnection(testInput) {
@@ -182,11 +183,95 @@ async function uploadDataset(formData) {
   }
 }
 
+// Nuevas funciones para obtener datos de puntuación crediticia
+async function getCreditScore() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/credit-score`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al obtener puntuación crediticia');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener puntuación crediticia:', error);
+    throw error;
+  }
+}
+
+// Función para obtener deudas activas
+async function getActiveDebts() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/active-debts`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al obtener deudas activas');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener deudas activas:', error);
+    throw error;
+  }
+}
+
+// Función para obtener PyME360 Trust Score
+async function getTrustScore() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/trust-score`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al obtener PyME360 Trust Score');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener PyME360 Trust Score:', error);
+    throw error;
+  }
+}
+
 export default {
   testMongoConnection,
   registerUser,
   loginUser,
   getCurrentUser,
   logoutUser,
-  uploadDataset
+  uploadDataset,
+  getCreditScore,
+  getActiveDebts,
+  getTrustScore
 }
