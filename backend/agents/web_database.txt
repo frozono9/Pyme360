@@ -1,0 +1,237 @@
+# GUÍA COMPLETA DE LA PLATAFORMA PyME360
+
+## INTRODUCCIÓN
+
+PyME360 es una plataforma integral diseñada para pequeñas y medianas empresas que ofrece herramientas de certificación de confiabilidad empresarial, evaluación crediticia alternativa, y diversos módulos de gestión adaptados al perfil real de cada empresa.
+
+## PÁGINAS PRINCIPALES Y SUS FUNCIONALIDADES
+
+### 1. Página de Inicio (/)
+
+La página inicial presenta una visión general de la plataforma PyME360 con las siguientes secciones:
+
+- **Hero**: Sección principal con mensaje de bienvenida y botones de llamada a la acción como "Comenzar" o "Conocer más".
+- **Features**: Resumen visual de las principales características de la plataforma, organizadas en tarjetas informativas.
+- **ModulesSection**: Presentación de los módulos disponibles con breves descripciones y enlaces para explorarlos.
+- **CertificationSystem**: Explicación del sistema de certificación PyME360 Trust Score y sus niveles (Bronce, Plata, Oro y Platino).
+
+### 2. Página de Acceso (/acceso)
+
+Esta página permite a los usuarios iniciar sesión en la plataforma y contiene:
+
+- **Formulario de login**: Con campos para usuario/email y contraseña.
+- **Enlace para recuperación de contraseña**: Texto "¿Olvidaste tu contraseña?" que redirige al proceso de recuperación.
+- **Enlace para registro**: Texto "¿No tienes cuenta? Regístrate" para nuevos usuarios.
+
+### 3. Dashboard (/dashboard)
+
+El dashboard es la página principal después de iniciar sesión y ofrece una vista general del estado de tu empresa:
+
+- **Encabezado personalizado**: Muestra un saludo con tu nombre y el botón de cierre de sesión.
+- **Tarjetas de resumen**: Primera fila con indicadores clave:
+   - Estado General: Indicador visual de la salud empresarial.
+   - Financiamiento: AI Credit Score actual.
+   - Crecimiento: Comparativa respecto al mes anterior.
+   - Alertas: Notificaciones que requieren atención.
+- **Módulos Principales**: Sección principal con tarjetas de acceso a cada módulo:
+   - Financiamiento: Resumen del AI Credit Score y botón para ver opciones.
+   - Gestión Empresarial: Tareas pendientes y acceso al dashboard completo.
+   - Cumplimiento: Próximos vencimientos regulatorios y calendario.
+   - Crecimiento: Oportunidades de expansión detectadas.
+   - Búsqueda de Empleados: Candidatos disponibles y acceso a la herramienta.
+   - Certificación: Nivel actual y progreso hacia el siguiente nivel.
+
+### 4. Página de Certificación (/certificacion)
+
+Esta página muestra el detalle de tu PyME360 Trust Score y contiene:
+
+- **Resumen del Trust Score**: En la parte superior:
+   - Puntuación global (valor numérico del 1-100).
+   - Nivel de certificación actual (Platino/Oro/Plata/Bronce).
+   - Indicador de puntos necesarios para alcanzar el siguiente nivel.
+- **Gráfico de componentes**: Sección central izquierda con un gráfico radar mostrando los 6 componentes del Trust Score:
+   - Cumplimiento Fiscal
+   - Prácticas Laborales
+   - Estabilidad Financiera
+   - Puntualidad de Pagos
+   - Innovación
+   - Sostenibilidad
+- **Evolución histórica**: Sección central derecha con gráfico de línea que muestra la evolución de tu puntuación en los últimos 6 meses.
+- **Recomendaciones de mejora**: Sección inferior izquierda con sugerencias específicas para mejorar tu puntuación.
+- **Beneficios actuales**: Sección inferior derecha que lista las ventajas asociadas a tu nivel de certificación actual.
+
+### 5. Página de AI Credit Score (/credit-score)
+
+Esta página muestra tu evaluación crediticia alternativa con:
+
+- **Puntuación principal**: Valor del credit score y nivel de riesgo asociado.
+- **Factores de influencia**: Elementos que impactan positiva y negativamente en tu puntuación, como:
+   - Historial de pagos a proveedores y entidades financieras
+   - Estabilidad de ingresos y fluctuaciones estacionales
+   - Crecimiento sostenible y manejo de deuda
+   - Comportamiento financiero histórico
+- **Recomendaciones**: Sugerencias específicas para mejorar tu puntuación crediticia.
+
+### 6. Página de Financiamiento (/financiamiento)
+
+Este módulo te permite acceder a opciones de financiamiento adaptadas a tu perfil y contiene:
+
+- **Estado crediticio**: Resumen de tu situación crediticia actual.
+- **Opciones recomendadas**: Productos financieros sugeridos según tu perfil.
+- **Enlaces a submódulos**:
+   - Marketplace Financiero: Catálogo de opciones de financiamiento.
+   - Preparación para Financiamiento: Asistente para preparar solicitudes.
+
+### 7. Página de Gestión Empresarial (/gestion)
+
+Este módulo ofrece herramientas para optimizar la administración de tu empresa y contiene:
+
+- **KPI Dashboard**: Indicadores clave de desempeño en diferentes áreas.
+- **Tareas pendientes**: Lista organizada de actividades por completar.
+- **Eficiencia operativa**: Métricas y recomendaciones para mejorar procesos internos.
+
+### 8. Página de Cumplimiento (/cumplimiento)
+
+Este módulo te ayuda a mantenerte al día con tus obligaciones regulatorias y contiene:
+
+- **Calendario de obligaciones**: Fechas de vencimientos legales, fiscales y regulatorios.
+- **Estado de cumplimiento**: Porcentaje de obligaciones completadas y pendientes.
+- **Alertas de próximos vencimientos**: Notificaciones sobre fechas cercanas.
+
+### 9. Página de Crecimiento (/crecimiento)
+
+Este módulo ofrece herramientas para expansión y desarrollo con:
+
+- **Oportunidades detectadas**: Posibles áreas de expansión para tu negocio.
+- **Análisis de mercado**: Información sectorial relevante con tendencias actuales.
+- **Alianzas estratégicas**: Posibles colaboraciones detectadas según tu perfil.
+
+### 10. Página de Búsqueda de Empleados (/busqueda-empleados)
+
+Esta herramienta te permite encontrar talento verificado para tu empresa y contiene:
+
+- **Filtros de búsqueda**: Opciones para filtrar candidatos por habilidades, experiencia, ubicación, etc.
+- **Perfiles recomendados**: Candidatos sugeridos según tus necesidades específicas.
+- **Gestión de vacantes**: Herramientas para administrar tus posiciones abiertas.
+
+### 11. Marketplace Financiero (/marketplace-financiamiento)
+
+Este submódulo del área de financiamiento muestra un catálogo de opciones disponibles:
+
+- **Ofertas personalizadas**: Productos financieros adaptados específicamente a tu perfil.
+- **Comparador**: Herramienta para contrastar diferentes opciones según tus necesidades.
+- **Solicitud directa**: Formularios pre-llenados para aplicación rápida a las opciones seleccionadas.
+
+### 12. Preparación para Financiamiento (/preparacion-financiamiento)
+
+Este submódulo te ayuda a maximizar tus posibilidades de aprobación:
+
+- **Checklist documental**: Lista interactiva de documentos requeridos y su estado de preparación.
+- **Recomendaciones de presentación**: Consejos específicos para mejorar tu solicitud.
+- **Vista previa de aplicación**: Simulación de cómo verán tu solicitud las entidades financieras.
+
+### 13. Página de Nosotros (/nosotros)
+
+Esta página proporciona información sobre la plataforma y su equipo:
+
+- **Misión y visión**: Propósito y objetivos a largo plazo de PyME360.
+- **Equipo**: Integrantes clave del proyecto y sus roles.
+- **Contacto**: Información para comunicarse con soporte técnico o comercial.
+
+## PREGUNTAS FRECUENTES (FAQs)
+
+### Sobre Certificación
+
+**P: ¿Cómo puedo mejorar rápidamente mi Trust Score?**
+R: Enfócate en los componentes con menor puntuación e implementa las recomendaciones prioritarias. Las acciones relacionadas con Puntualidad de Pagos y Cumplimiento Fiscal suelen tener impacto más rápido.
+
+**P: ¿Con qué frecuencia se actualiza mi Trust Score?**
+R: La puntuación se actualiza semanalmente, cada lunes. Las acciones importantes pueden reflejarse en actualizaciones especiales más inmediatas.
+
+**P: ¿Cómo puedo utilizar mi certificación fuera de la plataforma?**
+R: En la sección de Beneficios puedes generar un distintivo digital para tu sitio web, descargar un certificado PDF oficial y obtener un código QR de verificación para incluir en propuestas comerciales.
+
+### Sobre AI Credit Score
+
+**P: ¿Qué pasa si mi empresa tiene un bajo AI Credit Score?**
+R: Sigue las recomendaciones personalizadas en la sección correspondiente. Prioriza acciones relacionadas con la regularización de pagos e implementa un plan de estabilización financiera. La puntuación puede mejorar significativamente en 2-3 meses con acciones consistentes.
+
+**P: ¿Las entidades financieras tradicionales reconocen este score?**
+R: Sí, PyME360 tiene alianzas con más de 30 instituciones financieras que consideran el AI Credit Score en sus evaluaciones. Algunas lo usan como complemento y otras como evaluación principal.
+
+**P: ¿Cómo se diferencia del score crediticio tradicional?**
+R: A diferencia del score tradicional que se basa principalmente en historial bancario, el AI Credit Score analiza más de 50 variables operativas y financieras de tu negocio, incluyendo comportamiento de pagos a proveedores, estacionalidad de ingresos y sostenibilidad de crecimiento.
+
+### Sobre Financiamiento
+
+**P: ¿Cómo comparar efectivamente las opciones de financiamiento?**
+R: Utiliza el comparador del Marketplace Financiero que permite analizar hasta 5 opciones simultáneamente. Además de la tasa, evalúa el CAT (Costo Anual Total), comisiones, penalizaciones por prepago y flexibilidad de plazos.
+
+**P: ¿Qué documentación necesito para solicitar financiamiento?**
+R: Varía según el tipo de financiamiento, pero generalmente incluye: estados financieros de los últimos 2 años, declaraciones fiscales anuales, estados de cuenta bancarios de los últimos 6 meses, comprobante de domicilio comercial y constitución legal de la empresa. La herramienta de Preparación para Financiamiento te mostrará los requisitos específicos para cada opción.
+
+**P: ¿Cuánto tiempo toma recibir respuesta a una solicitud?**
+R: El tiempo promedio de respuesta inicial es de 3 días hábiles. Las solicitudes completadas a través de la herramienta de Preparación para Financiamiento reciben respuesta hasta 40% más rápido.
+
+### Sobre la Plataforma en General
+
+**P: ¿Mis datos están seguros en PyME360?**
+R: Sí, PyME360 cumple con los estándares más estrictos de seguridad y privacidad de datos. Utilizamos encriptación de extremo a extremo y nunca compartimos información sensible sin tu autorización explícita.
+
+**P: ¿Puedo integrar PyME360 con mis sistemas existentes?**
+R: Sí, ofrecemos APIs de integración con los principales ERPs, sistemas contables y CRMs del mercado. Consulta la sección de integraciones en tu perfil para las opciones disponibles.
+
+**P: ¿Cómo puedo maximizar el valor de PyME360 para mi empresa?**
+R: Completa tu perfil al 100%, conecta tus sistemas existentes mediante las integraciones disponibles, implementa las recomendaciones prioritarias y utiliza la plataforma regularmente para monitorear tu progreso. Los usuarios que acceden al menos 3 veces por semana reportan mejoras 2.5 veces más rápidas.
+
+## SOLUCIÓN DE PROBLEMAS COMUNES
+
+### No puedo iniciar sesión
+
+**Posibles causas y soluciones**:
+- **Contraseña incorrecta**: Utiliza la opción "¿Olvidaste tu contraseña?" en la pantalla de acceso.
+- **Cuenta bloqueada**: Después de 5 intentos fallidos, la cuenta se bloquea por 30 minutos. Espera o contacta a soporte.
+- **Correo no verificado**: Revisa tu bandeja de entrada (y spam) para el correo de verificación o solicita uno nuevo en la pantalla de acceso.
+
+### Mi AI Credit Score es bajo a pesar de tener buenas finanzas
+
+**Posibles causas y soluciones**:
+- **Información incompleta**: Asegúrate de haber conectado todas tus cuentas bancarias y sistemas de facturación.
+- **Historial limitado**: Las empresas con menos de 6 meses de operación reciben puntuaciones iniciales más conservadoras.
+- **Inconsistencias en reportes**: Verifica que tus reportes fiscales coincidan con tus movimientos bancarios.
+- **Sectores de alto riesgo**: Algunos sectores tienen evaluaciones más estrictas; revisa los factores específicos de tu industria.
+
+### No veo opciones de financiamiento que esperaba
+
+**Posibles causas y soluciones**:
+- **Perfil incompleto**: Completa al 100% tu perfil financiero para desbloquear más opciones.
+- **Documentación pendiente**: Algunas opciones avanzadas requieren documentación específica verificada.
+- **Filtros demasiado específicos**: Prueba ampliando los criterios de búsqueda en el Marketplace.
+- **Score insuficiente**: Algunas opciones premium requieren un mínimo de AI Credit Score o nivel de certificación.
+
+### El gráfico de componentes del Trust Score no carga
+
+**Posibles causas y soluciones**:
+- **Conexión lenta**: Recarga la página o intenta más tarde.
+- **Navegador desactualizado**: Actualiza a la última versión de Chrome, Firefox, Safari o Edge.
+- **Datos insuficientes**: Si tu empresa es nueva en la plataforma, algunos componentes pueden estar en evaluación.
+- **Bloqueo de scripts**: Asegúrate de que tu navegador permite scripts de la plataforma.
+
+### No recibo las alertas de cumplimiento
+
+**Posibles causas y soluciones**:
+- **Preferencias incorrectas**: Verifica la configuración de notificaciones en tu perfil.
+- **Correo marcado como spam**: Añade noreply@pyme360.com a tus contactos seguros.
+- **Calendario no sincronizado**: Asegúrate de que hayas autorizado la sincronización con tu calendario.
+- **Usuario incorrecto**: Confirma que el usuario designado para notificaciones de cumplimiento sea el correcto.
+
+## AYUDA Y SOPORTE
+
+Si necesitas asistencia, puedes acceder a las siguientes opciones:
+
+- **Centro de ayuda**: Accesible desde el ícono de interrogación (?) en la esquina inferior derecha en todas las páginas.
+- **Chat en vivo**: Disponible en horario laboral (9:00-18:00) haciendo clic en el ícono de chat en la parte inferior derecha.
+- **Correo de soporte**: support@pyme360.com para consultas que requieran mayor elaboración.
+- **Tutoriales interactivos**: Disponibles en cada módulo haciendo clic en "¿Cómo funciona esto?".
+- **Webinars semanales**: Sesiones en vivo para resolver dudas comunes, accesibles desde el calendario en el Centro de ayuda.
+`;

@@ -28,7 +28,7 @@ def query(user_message, info_web, user_data):
 # Cargar info_web.json desde el directorio actual
 
 
-with open('sigma_web.txt', 'r') as file:
+with open('web_database.txt', 'r') as file:
     info_web = file.read()
 
 with open('caso1.json', 'r') as file2:
