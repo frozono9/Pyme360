@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ import auth
 import json
 from models import UserCreate, UserLogin
 from fastapi.encoders import jsonable_encoder
+from score_calculator import calculate_credit_score, calculate_pyme360_trust_score
 
 # Cargar variables de entorno
 load_dotenv()
@@ -61,12 +63,14 @@ def serialize_mongo_document(doc):
 @app.post("/api/test-connection")
 def test_mongo_connection(request: TestRequest):
     try:
+        print(f"Probando conexión a MongoDB con valor: {request.testValue}")
         # Insertar el valor en la colección de prueba
         test_data = {
             "test_value": request.testValue,
             "timestamp": datetime.now().isoformat()
         }
         result = test_collection.insert_one(test_data)
+        print(f"Documento insertado con ID: {result.inserted_id}")
         
         # Devolver respuesta con el ID del documento insertado
         return {
@@ -82,9 +86,11 @@ def test_mongo_connection(request: TestRequest):
 @app.post("/api/auth/register")
 async def register(user_data: UserCreate):
     try:
+        print(f"Intento de registro para usuario: {user_data.username}")
         # Verificar si el usuario ya existe
         existing_user = user_collection.find_one({"username": user_data.username})
         if existing_user:
+            print(f"Usuario {user_data.username} ya existe")
             raise HTTPException(status_code=400, detail="El nombre de usuario ya está en uso")
         
         # Hashear la contraseña
@@ -94,11 +100,27 @@ async def register(user_data: UserCreate):
         user_dict = user_data.model_dump()
         user_dict["password"] = hashed_password
         
+        # Eliminar la contraseña de información general si existe
+        if "informacion_general" in user_dict and "contrasena" in user_dict["informacion_general"]:
+            del user_dict["informacion_general"]["contrasena"]
+        
+        # Calcular el credit score y el pyme360 trust score
+        credit_score = calculate_credit_score(user_dict)
+        pyme360_trust_score = calculate_pyme360_trust_score(user_dict)
+        
+        # Agregar los scores calculados
+        if "error" not in credit_score:
+            user_dict["credit_score"] = credit_score
+        if "error" not in pyme360_trust_score:
+            user_dict["pyme360_trust_score"] = pyme360_trust_score
+        
         # Insertar el usuario en la base de datos
         result = user_collection.insert_one(user_dict)
+        print(f"Usuario {user_data.username} registrado con ID: {result.inserted_id}")
         
         return {"message": "Usuario registrado correctamente", "user_id": str(result.inserted_id)}
     except HTTPException as he:
+        print(f"Error HTTP en registro: {he.detail}")
         raise he
     except Exception as e:
         print(f"Error en el registro: {str(e)}")
@@ -140,6 +162,75 @@ async def get_current_user(current_user: dict = Depends(auth.get_current_user)):
     # Convertir ObjectId a string
     current_user_serializable = serialize_mongo_document(current_user)
     return jsonable_encoder(current_user_serializable)
+
+# Nuevos endpoints para obtener scores
+@app.get("/api/scores/credit")
+async def get_credit_score(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        # Si ya existe un credit score calculado, devolverlo
+        if "credit_score" in current_user:
+            return current_user["credit_score"]
+        
+        # Si no existe, calcularlo
+        credit_score = calculate_credit_score(current_user)
+        
+        # Actualizar en la base de datos
+        user_collection.update_one(
+            {"_id": current_user["_id"]},
+            {"$set": {"credit_score": credit_score}}
+        )
+        
+        return credit_score
+    except Exception as e:
+        print(f"Error al obtener credit score: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener credit score: {str(e)}")
+
+@app.get("/api/scores/trust")
+async def get_trust_score(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        # Si ya existe un trust score calculado, devolverlo
+        if "pyme360_trust_score" in current_user:
+            return current_user["pyme360_trust_score"]
+        
+        # Si no existe, calcularlo
+        trust_score = calculate_pyme360_trust_score(current_user)
+        
+        # Actualizar en la base de datos
+        user_collection.update_one(
+            {"_id": current_user["_id"]},
+            {"$set": {"pyme360_trust_score": trust_score}}
+        )
+        
+        return trust_score
+    except Exception as e:
+        print(f"Error al obtener trust score: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener trust score: {str(e)}")
+
+# Endpoint para recalcular y actualizar scores
+@app.post("/api/scores/update")
+async def update_scores(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        # Recalcular ambos scores
+        credit_score = calculate_credit_score(current_user)
+        trust_score = calculate_pyme360_trust_score(current_user)
+        
+        # Actualizar en la base de datos
+        user_collection.update_one(
+            {"_id": current_user["_id"]},
+            {"$set": {
+                "credit_score": credit_score,
+                "pyme360_trust_score": trust_score
+            }}
+        )
+        
+        return {
+            "message": "Scores actualizados correctamente",
+            "credit_score": credit_score,
+            "trust_score": trust_score
+        }
+    except Exception as e:
+        print(f"Error al actualizar scores: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al actualizar scores: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

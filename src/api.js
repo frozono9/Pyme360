@@ -20,13 +20,22 @@ async function testMongoConnection(testInput) {
 
         console.log("Response status:", response.status);
         
+        let data;
+        
+        try {
+            // Intentar parsear como JSON
+            data = await response.json();
+        } catch (e) {
+            // Si no es JSON, obtener como texto
+            const text = await response.text();
+            throw new Error(`Error de respuesta: ${text}`);
+        }
+        
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Error response:", errorText);
-            throw new Error(`Error ${response.status}: ${errorText}`);
+            console.error("Error response:", data);
+            throw new Error(`Error ${response.status}: ${data.detail || "Error desconocido"}`);
         }
 
-        const data = await response.json();
         console.log("Response data:", data);
         return data;
     } catch (error) {
@@ -39,16 +48,11 @@ async function testMongoConnection(testInput) {
 async function registerUser(userData) {
   try {
     console.log("Registrando usuario:", userData.username);
-    console.log("Contrasena:", userData.password);
-    if (!userData.informacion_general) {
-        userData.informacion_general = {};
+    
+    // Garantizar que no hay contraseña duplicada
+    if (userData.informacion_general && userData.informacion_general.contrasena) {
+      delete userData.informacion_general.contrasena;
     }
-    userData.informacion_general.contrasena = userData.password;
-    console.log("Datos enviados:", userData.informacion_general);
-    // Eliminar la contraseña duplicada en información general
-    // if (userData.informacion_general && userData.informacion_general.contrasena) {
-    //   delete userData.informacion_general.contrasena;
-    // }
     
     const response = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
@@ -60,12 +64,11 @@ async function registerUser(userData) {
 
     // Intentar obtener el cuerpo como JSON, pero manejar casos donde no es JSON
     let responseData;
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
+    try {
       responseData = await response.json();
-    } else {
+    } catch (e) {
       const text = await response.text();
-      responseData = { detail: text };
+      responseData = { detail: text || "Error desconocido" };
     }
     
     if (!response.ok) {
@@ -99,8 +102,11 @@ async function loginUser(username, password) {
     let responseData;
     try {
       responseData = await response.json();
+      console.log("Response data:", responseData);
     } catch (e) {
+      console.error("Error parsing JSON:", e);
       const text = await response.text();
+      console.error("Raw response:", text);
       responseData = { detail: text || 'Error desconocido' };
     }
 
@@ -141,7 +147,8 @@ async function getCurrentUser() {
       throw new Error('Error al obtener información del usuario');
     }
 
-    return await response.json();
+    const userData = await response.json();
+    return userData;
   } catch (error) {
     console.error('Error al obtener usuario actual:', error);
     return null;
@@ -151,6 +158,86 @@ async function getCurrentUser() {
 function logoutUser() {
   localStorage.removeItem('token');
   localStorage.removeItem('pyme360-user');
+}
+
+// Funciones para obtener scores
+async function getCreditScore() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+    
+    const response = await fetch(`${BASE_URL}/api/scores/credit`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al obtener credit score');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener credit score:', error);
+    throw error;
+  }
+}
+
+async function getTrustScore() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+    
+    const response = await fetch(`${BASE_URL}/api/scores/trust`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al obtener trust score');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener trust score:', error);
+    throw error;
+  }
+}
+
+async function updateScores() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+    
+    const response = await fetch(`${BASE_URL}/api/scores/update`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al actualizar scores');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al actualizar scores:', error);
+    throw error;
+  }
 }
 
 // Funciones para subir datasets
@@ -188,5 +275,8 @@ export default {
   loginUser,
   getCurrentUser,
   logoutUser,
-  uploadDataset
+  uploadDataset,
+  getCreditScore,
+  getTrustScore,
+  updateScores
 }
