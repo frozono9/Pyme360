@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -17,7 +16,6 @@ import {
   Legend
 } from 'recharts';
 
-// Interfaces para los tipos de datos que vamos a utilizar
 interface HistorialPago {
   fecha: string;
   monto: number;
@@ -67,19 +65,16 @@ interface CreditScoreCalculatorProps {
 }
 
 export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ historialCrediticio }) => {
-  // 1. Cálculo del historial de pagos (35% del puntaje)
   const calculatePaymentHistoryScore = (): { score: number; data: any } => {
     let totalPayments = 0;
     let latePayments = 0;
     let onTimePayments = 0;
     const paymentsByMonth: Record<string, { late: number; onTime: number }> = {};
     
-    // Procesar cuentas de crédito
     historialCrediticio.cuentas_credito.forEach(cuenta => {
       cuenta.historial_pagos.forEach(pago => {
         totalPayments++;
         
-        // Extraer mes y año del pago para la gráfica
         const date = new Date(pago.fecha);
         const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
         
@@ -97,12 +92,10 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       });
     });
     
-    // Procesar créditos de proveedores
     historialCrediticio.credito_proveedores.forEach(proveedor => {
       proveedor.historial_pagos.forEach(pago => {
         totalPayments++;
         
-        // Extraer mes y año del pago para la gráfica
         const date = new Date(pago.fecha);
         const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
         
@@ -120,8 +113,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       });
     });
     
-    // Calcular el puntaje
-    let scoreValue = 50; // Valor por defecto
+    let scoreValue = 50;
     let percentage = 0;
     
     if (totalPayments > 0) {
@@ -135,7 +127,6 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       else scoreValue = Math.floor(percentage / 2);
     }
     
-    // Preparar datos para la gráfica
     const chartData = Object.entries(paymentsByMonth).map(([month, counts]) => ({
       month,
       'A tiempo': counts.onTime,
@@ -144,7 +135,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       const [aMonth, aYear] = a.month.split('/').map(Number);
       const [bMonth, bYear] = b.month.split('/').map(Number);
       return aYear === bYear ? aMonth - bMonth : aYear - bYear;
-    }).slice(-6); // Mostrar solo los últimos 6 meses
+    }).slice(-6);
     
     return {
       score: scoreValue,
@@ -158,18 +149,15 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     };
   };
 
-  // 2. Cálculo de utilización de crédito (30% del puntaje)
   const calculateCreditUtilizationScore = (): { score: number; data: any } => {
     let totalDebt = 0;
     let totalAvailable = 0;
     const utilizationByAccount: { name: string; value: number; limit: number; utilization: number }[] = [];
     
-    // Sumar deudas y límites de crédito
     historialCrediticio.cuentas_credito.forEach(cuenta => {
       totalDebt += cuenta.saldo_actual;
       totalAvailable += cuenta.limite_credito;
       
-      // Datos para gráfica por cuenta
       utilizationByAccount.push({
         name: cuenta.entidad,
         value: cuenta.saldo_actual,
@@ -178,8 +166,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       });
     });
     
-    // Calcular el puntaje
-    let scoreValue = 50; // Valor por defecto
+    let scoreValue = 50;
     let utilization = 0;
     
     if (totalAvailable > 0) {
@@ -193,10 +180,8 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       else scoreValue = 20;
     }
     
-    // Ordenar cuentas por utilización
     utilizationByAccount.sort((a, b) => b.utilization - a.utilization);
     
-    // Colores para la gráfica de utilización
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
     
     return {
@@ -211,12 +196,10 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     };
   };
 
-  // 3. Cálculo de antigüedad crediticia (15% del puntaje)
   const calculateCreditHistoryLengthScore = (): { score: number; data: any } => {
     const currentDate = new Date();
     const accountAges: { entidad: string; years: number }[] = [];
     
-    // Calcular la antigüedad de cada cuenta
     historialCrediticio.cuentas_credito.forEach(cuenta => {
       if (cuenta.fecha_apertura) {
         try {
@@ -229,9 +212,8 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       }
     });
     
-    // Calcular el puntaje
     let avgAge = 0;
-    let scoreValue = 50; // Valor por defecto
+    let scoreValue = 50;
     
     if (accountAges.length > 0) {
       avgAge = accountAges.reduce((sum, account) => sum + account.years, 0) / accountAges.length;
@@ -244,10 +226,8 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       else scoreValue = 50;
     }
     
-    // Ordenar cuentas por antigüedad
     accountAges.sort((a, b) => b.years - a.years);
     
-    // Datos para la gráfica
     const chartData = accountAges.map(account => ({
       name: account.entidad,
       años: parseFloat(account.years.toFixed(1))
@@ -264,12 +244,10 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     };
   };
 
-  // 4. Cálculo de mezcla de créditos (10% del puntaje)
   const calculateCreditMixScore = (): { score: number; data: any } => {
     const creditTypes = new Set<string>();
     const typeCounts: Record<string, number> = {};
     
-    // Identificar tipos únicos de crédito
     historialCrediticio.cuentas_credito.forEach(cuenta => {
       if (cuenta.tipo) {
         creditTypes.add(cuenta.tipo);
@@ -281,28 +259,24 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       }
     });
     
-    // Añadir créditos de proveedores como un tipo distinto
     if (historialCrediticio.credito_proveedores && historialCrediticio.credito_proveedores.length > 0) {
       creditTypes.add("Crédito Comercial");
       typeCounts["Crédito Comercial"] = historialCrediticio.credito_proveedores.length;
     }
     
-    // Calcular el puntaje
     const numTypes = creditTypes.size;
-    let scoreValue = 50; // Valor por defecto
+    let scoreValue = 50;
     
     if (numTypes >= 4) scoreValue = 100;
     else if (numTypes === 3) scoreValue = 90;
     else if (numTypes === 2) scoreValue = 75;
     else if (numTypes === 1) scoreValue = 60;
     
-    // Datos para la gráfica
     const chartData = Object.entries(typeCounts).map(([type, count]) => ({
       name: type,
       value: count
     }));
     
-    // Colores para la gráfica de tipos
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
     
     return {
@@ -317,23 +291,19 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     };
   };
 
-  // 5. Cálculo de incidentes crediticios (10% del puntaje)
   const calculateIncidentsScore = (): { score: number; data: any } => {
     const incidents = historialCrediticio.incidentes_crediticios || [];
     const numIncidents = incidents.length;
     
-    // Calcular el monto total de incidentes
     const totalAmount = incidents.reduce((sum, incident) => sum + incident.monto, 0);
     
-    // Calcular el puntaje
-    let scoreValue = 100; // Valor por defecto (sin incidentes)
+    let scoreValue = 100;
     
     if (numIncidents >= 5) scoreValue = 20;
     else if (numIncidents >= 3) scoreValue = 40;
     else if (numIncidents === 2) scoreValue = 60;
     else if (numIncidents === 1) scoreValue = 80;
     
-    // Agrupar incidentes por tipo
     const incidentsByType: Record<string, number> = {};
     incidents.forEach(incident => {
       if (!incidentsByType[incident.tipo]) {
@@ -342,13 +312,11 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       incidentsByType[incident.tipo]++;
     });
     
-    // Datos para la gráfica
     const chartData = Object.entries(incidentsByType).map(([type, count]) => ({
       name: type,
       value: count
     }));
     
-    // Colores para la gráfica de incidentes
     const COLORS = ['#FF5252', '#FF7F7F', '#FFACAC', '#FFC4C4'];
     
     return {
@@ -364,14 +332,12 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     };
   };
 
-  // Calcular todos los componentes
   const paymentHistory = calculatePaymentHistoryScore();
   const creditUtilization = calculateCreditUtilizationScore();
   const historyLength = calculateCreditHistoryLengthScore();
   const creditMix = calculateCreditMixScore();
   const incidents = calculateIncidentsScore();
   
-  // Calcular el puntaje final ponderado
   const weightedScore = (
     paymentHistory.score * 0.35 +
     creditUtilization.score * 0.30 +
@@ -380,10 +346,8 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     incidents.score * 0.10
   );
   
-  // Escalar el puntaje al rango de 300-850
   const finalScore = Math.round(300 + (weightedScore / 100) * 550);
   
-  // Determinar el nivel del puntaje
   const getScoreLevel = (score: number) => {
     if (score >= 750) {
       return {
@@ -441,7 +405,6 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Componente Historial de Pagos */}
         <Card>
           <CardHeader>
             <CardTitle>Historial de Pagos</CardTitle>
@@ -487,7 +450,6 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           </CardContent>
         </Card>
 
-        {/* Componente Utilización de Crédito */}
         <Card>
           <CardHeader>
             <CardTitle>Utilización de Crédito</CardTitle>
@@ -501,15 +463,24 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
                 <span>Utilización general:</span>
                 <span className="font-medium">{creditUtilization.data.utilization.toFixed(1)}%</span>
               </div>
-              <Progress 
-                value={creditUtilization.data.utilization} 
-                className="h-2" 
-                indicatorColor={
-                  creditUtilization.data.utilization <= 30 ? "bg-green-500" :
-                  creditUtilization.data.utilization <= 50 ? "bg-yellow-500" :
-                  creditUtilization.data.utilization <= 70 ? "bg-orange-500" : "bg-red-500"
-                }
-              />
+              <div className="relative pt-1">
+                <Progress 
+                  value={creditUtilization.data.utilization} 
+                  className={`h-2 ${
+                    creditUtilization.data.utilization <= 30 ? "bg-secondary text-green-500" :
+                    creditUtilization.data.utilization <= 50 ? "bg-secondary text-yellow-500" :
+                    creditUtilization.data.utilization <= 70 ? "bg-secondary text-orange-500" : "bg-secondary text-red-500"
+                  }`}
+                />
+                <div 
+                  className={`absolute inset-0 h-2 rounded-full ${
+                    creditUtilization.data.utilization <= 30 ? "bg-green-500" :
+                    creditUtilization.data.utilization <= 50 ? "bg-yellow-500" :
+                    creditUtilization.data.utilization <= 70 ? "bg-orange-500" : "bg-red-500"
+                  }`}
+                  style={{ width: `${creditUtilization.data.utilization}%`, maxWidth: "100%" }}
+                />
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -549,7 +520,6 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           </CardContent>
         </Card>
 
-        {/* Componente Antigüedad Crediticia */}
         <Card>
           <CardHeader>
             <CardTitle>Antigüedad Crediticia</CardTitle>
@@ -587,7 +557,6 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           </CardContent>
         </Card>
 
-        {/* Componente Mezcla de Créditos */}
         <Card>
           <CardHeader>
             <CardTitle>Mezcla de Créditos</CardTitle>
@@ -636,7 +605,6 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
           </CardContent>
         </Card>
 
-        {/* Componente Incidentes Crediticios */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Incidentes Crediticios</CardTitle>
@@ -650,15 +618,18 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
                 <span>Historial limpio:</span>
                 <span className="font-medium">{incidents.data.numIncidents === 0 ? 'Sí' : 'No'}</span>
               </div>
-              <Progress 
-                value={100 - (incidents.data.numIncidents * 20)} 
-                className="h-2" 
-                indicatorColor={
-                  incidents.data.numIncidents === 0 ? "bg-green-500" :
-                  incidents.data.numIncidents === 1 ? "bg-yellow-500" :
-                  incidents.data.numIncidents === 2 ? "bg-orange-500" : "bg-red-500"
-                }
-              />
+              <div className="relative pt-1">
+                <Progress value={100 - (incidents.data.numIncidents * 20)} className="h-2" />
+                {incidents.data.numIncidents > 0 && (
+                  <div 
+                    className={`absolute inset-0 h-2 rounded-full ${
+                      incidents.data.numIncidents === 1 ? "bg-yellow-500" :
+                      incidents.data.numIncidents === 2 ? "bg-orange-500" : "bg-red-500"
+                    }`} 
+                    style={{ width: `${100 - (incidents.data.numIncidents * 20)}%`, maxWidth: "100%" }}
+                  />
+                )}
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
