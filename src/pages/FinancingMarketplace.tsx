@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, Users, CreditCard, BriefcaseBusiness, HandCoins, LandPlot, BuildingIcon } from "lucide-react";
+import { Building, Users, CreditCard, BriefcaseBusiness, HandCoins, LandPlot } from "lucide-react";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,7 +18,7 @@ const FinancingMarketplace = () => {
   const mockFinancingOptions = [
     {
       type: "Bancos Tradicionales",
-      icon: <BuildingIcon className="h-10 w-10 text-blue-600" />,
+      icon: <Building className="h-10 w-10 text-blue-600" />,
       color: "blue",
       entities: [
         { name: "Banco Nacional", rate: "12-15%", amount: "Hasta $2,000,000", term: "1-5 años" },
@@ -122,7 +122,7 @@ const FinancingMarketplace = () => {
             <TabsContent value="marketplace">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 {mockFinancingOptions.map((option, index) => (
-                  <Card key={index} className={`border-l-4 border-l-${option.color}-500`}>
+                  <Card key={index} className={`border-l-4 border-${option.color}-500`}>
                     <CardHeader>
                       <div className="flex items-center gap-4">
                         <div className={`p-3 rounded-lg bg-${option.color}-100`}>
