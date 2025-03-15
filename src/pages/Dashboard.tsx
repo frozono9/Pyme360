@@ -165,7 +165,12 @@ const Dashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <ButtonCustom variant="outline" size="sm" className="w-full hover:bg-purple-50 hover:text-purple-600 transition-colors">
+              <ButtonCustom 
+                variant="outline" 
+                size="sm" 
+                className="w-full hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                onClick={() => navigate('/financiamiento')}
+              >
                 Ver opciones de financiamiento
               </ButtonCustom>
             </CardFooter>
@@ -194,7 +199,12 @@ const Dashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <ButtonCustom variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-600 transition-colors">
+              <ButtonCustom 
+                variant="outline" 
+                size="sm" 
+                className="w-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                onClick={() => navigate('/gestion')}
+              >
                 Ver dashboard completo
               </ButtonCustom>
             </CardFooter>
@@ -225,7 +235,12 @@ const Dashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <ButtonCustom variant="outline" size="sm" className="w-full hover:bg-amber-50 hover:text-amber-600 transition-colors">
+              <ButtonCustom 
+                variant="outline" 
+                size="sm" 
+                className="w-full hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                onClick={() => navigate('/cumplimiento')}
+              >
                 Ver calendario completo
               </ButtonCustom>
             </CardFooter>
@@ -256,7 +271,12 @@ const Dashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <ButtonCustom variant="outline" size="sm" className="w-full hover:bg-green-50 hover:text-green-600 transition-colors">
+              <ButtonCustom 
+                variant="outline" 
+                size="sm" 
+                className="w-full hover:bg-green-50 hover:text-green-600 transition-colors"
+                onClick={() => navigate('/crecimiento')}
+              >
                 Explorar oportunidades
               </ButtonCustom>
             </CardFooter>
@@ -291,7 +311,12 @@ const Dashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <ButtonCustom variant="outline" size="sm" className="w-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+              <ButtonCustom 
+                variant="outline" 
+                size="sm" 
+                className="w-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                onClick={() => navigate('/certificacion')}
+              >
                 Mejorar certificación
               </ButtonCustom>
             </CardFooter>
