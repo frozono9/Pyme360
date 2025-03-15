@@ -230,14 +230,35 @@ const Register = () => {
     // Validar solo los campos del paso actual
     if (currentStep === 1) {
       const { username, password, confirmPassword } = form.getValues();
-      const result = z.object({
-        username: registerSchema.shape.username,
-        password: registerSchema.shape.password,
-        confirmPassword: registerSchema.shape.confirmPassword
-      }).safeParse({ username, password, confirmPassword });
+      
+      // Crear un esquema parcial para validar solo los campos del paso 1
+      const firstStepSchema = z.object({
+        username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
+        password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+        confirmPassword: z.string().min(6, "La contraseña debe tener al menos 6 caracteres")
+      }).refine((data) => data.password === data.confirmPassword, {
+        message: "Las contraseñas no coinciden",
+        path: ["confirmPassword"],
+      });
+      
+      const result = firstStepSchema.safeParse({ username, password, confirmPassword });
       
       if (!result.success) {
-        // Si hay errores, mantenerse en el paso actual
+        // Mostrar manualmente los errores de validación
+        const formattedErrors = result.error.format();
+        
+        if (formattedErrors.username?._errors) {
+          form.setError("username", { message: formattedErrors.username._errors[0] });
+        }
+        
+        if (formattedErrors.password?._errors) {
+          form.setError("password", { message: formattedErrors.password._errors[0] });
+        }
+        
+        if (formattedErrors.confirmPassword?._errors) {
+          form.setError("confirmPassword", { message: formattedErrors.confirmPassword._errors[0] });
+        }
+        
         return;
       }
     }

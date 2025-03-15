@@ -13,8 +13,8 @@ from models import UserCreate, UserLogin
 load_dotenv()
 
 # Configuración de seguridad
-# Usar un esquema más compatible con la versión de bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+# Usar un esquema más simple para evitar problemas con bcrypt
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 # Conectar a MongoDB
@@ -50,20 +50,35 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 def get_user_by_username(username: str):
-    user = users_collection.find_one({"username": username})
-    print(f"Usuario encontrado: {user is not None}")
-    return user
+    try:
+        user = users_collection.find_one({"username": username})
+        print(f"Usuario encontrado: {user is not None}")
+        return user
+    except Exception as e:
+        print(f"Error buscando usuario: {e}")
+        return None
 
 def authenticate_user(username: str, password: str):
-    user = get_user_by_username(username)
-    if not user:
-        print(f"Usuario {username} no encontrado")
+    try:
+        user = get_user_by_username(username)
+        if not user:
+            print(f"Usuario {username} no encontrado")
+            return False
+        
+        # Asegurarnos de que la contraseña esté en el formato correcto
+        if not isinstance(password, str):
+            print("La contraseña no es una cadena de texto")
+            return False
+            
+        if not verify_password(password, user["password"]):
+            print(f"Contraseña incorrecta para {username}")
+            return False
+            
+        print(f"Autenticación exitosa para {username}")
+        return user
+    except Exception as e:
+        print(f"Error durante la autenticación: {e}")
         return False
-    if not verify_password(password, user["password"]):
-        print(f"Contraseña incorrecta para {username}")
-        return False
-    print(f"Autenticación exitosa para {username}")
-    return user
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
@@ -71,7 +86,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Token de autenticación inválido")
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        print(f"Error al decodificar JWT: {e}")
         raise HTTPException(status_code=401, detail="Token de autenticación inválido")
     
     user = get_user_by_username(username)

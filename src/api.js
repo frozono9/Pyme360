@@ -1,3 +1,4 @@
+
 const BASE_URL = "http://localhost:8000";
 
 async function testMongoConnection(testInput) {
@@ -52,7 +53,15 @@ async function registerUser(userData) {
       body: JSON.stringify(userData),
     });
 
-    const responseData = await response.json();
+    // Intentar obtener el cuerpo como JSON, pero manejar casos donde no es JSON
+    let responseData;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      responseData = await response.json();
+    } else {
+      const text = await response.text();
+      responseData = { detail: text };
+    }
     
     if (!response.ok) {
       console.error("Error en el registro:", responseData);
@@ -82,13 +91,18 @@ async function loginUser(username, password) {
       body: formData,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error en login:", errorData);
-      throw new Error(errorData.detail || 'Credenciales incorrectas');
+    let responseData;
+    try {
+      responseData = await response.json();
+    } catch (e) {
+      const text = await response.text();
+      responseData = { detail: text || 'Error desconocido' };
     }
-    
-    const responseData = await response.json();
+
+    if (!response.ok) {
+      console.error("Error en login:", responseData);
+      throw new Error(responseData.detail || 'Credenciales incorrectas');
+    }
     
     // Guardar el token en localStorage
     localStorage.setItem('token', responseData.access_token);

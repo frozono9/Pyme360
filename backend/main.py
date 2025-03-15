@@ -57,6 +57,7 @@ def test_mongo_connection(request: TestRequest):
         # Insertar el valor en la colección de prueba
         test_data = {
             "test_value": request.testValue,
+            "timestamp": datetime.now().isoformat()
         }
         result = test_collection.insert_one(test_data)
         
@@ -67,6 +68,7 @@ def test_mongo_connection(request: TestRequest):
             "test_value": request.testValue
         }
     except Exception as e:
+        print(f"Error al conectar con MongoDB: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al conectar con MongoDB: {str(e)}")
 
 # Endpoints de autenticación
@@ -96,6 +98,7 @@ async def register(user_data: UserCreate):
     except HTTPException as he:
         raise he
     except Exception as e:
+        print(f"Error en el registro: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error en el registro: {str(e)}")
 
 @app.post("/api/auth/login")
