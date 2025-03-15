@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -59,9 +58,8 @@ const Register = () => {
           tamano_empresa: "Micro",
           numero_empleados: 1,
           representante_legal: "No especificado",
-          contrasena: data.password
+          contrasena: "********"
         },
-        // Inicializar estructuras de datos vacías para los demás campos requeridos
         historial_crediticio: {
           cuentas_credito: [],
           credito_proveedores: [],

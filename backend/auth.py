@@ -1,3 +1,4 @@
+
 import os
 import jwt
 from datetime import datetime, timedelta
@@ -19,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
 db = client["pyme360"]
-users_collection = db["usuarios"]  # Ajustado a la estructura de la BD
+users_collection = db["users"]  # Colección de usuarios
 
 # Clave secreta para JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "UN_SECRETO_MUY_SEGURO")
@@ -39,11 +40,11 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_user_by_email(email: str):
-    return users_collection.find_one({"correo": email})  # Adaptado al esquema
+def get_user_by_username(username: str):
+    return users_collection.find_one({"username": username})
 
-def authenticate_user(email: str, password: str):
-    user = get_user_by_email(email)
+def authenticate_user(username: str, password: str):
+    user = get_user_by_username(username)
     if not user:
         return False
     if not verify_password(password, user["password"]):
@@ -53,13 +54,13 @@ def authenticate_user(email: str, password: str):
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-        if email is None:
+        username = payload.get("sub")
+        if username is None:
             raise HTTPException(status_code=401, detail="Token de autenticación inválido")
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Token de autenticación inválido")
     
-    user = get_user_by_email(email)
+    user = get_user_by_username(username)
     if user is None:
         raise HTTPException(status_code=401, detail="Usuario no encontrado")
     

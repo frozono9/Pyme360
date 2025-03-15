@@ -38,6 +38,7 @@ async function testMongoConnection(testInput) {
 // Funciones de autenticación
 async function registerUser(userData) {
   try {
+    console.log("Registrando usuario:", userData.username);
     const response = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
@@ -46,12 +47,14 @@ async function registerUser(userData) {
       body: JSON.stringify(userData),
     });
 
+    const responseData = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Error en el registro');
+      console.error("Error en el registro:", responseData);
+      throw new Error(responseData.detail || 'Error en el registro');
     }
 
-    return await response.json();
+    return responseData;
   } catch (error) {
     console.error('Error en el registro:', error);
     throw error;
@@ -60,9 +63,10 @@ async function registerUser(userData) {
 
 async function loginUser(username, password) {
   try {
+    console.log("Iniciando sesión con usuario:", username);
     // El endpoint espera un formato de formulario
     const formData = new URLSearchParams();
-    formData.append('username', username); // OAuth2 usa 'username' aunque enviemos email
+    formData.append('username', username);
     formData.append('password', password);
 
     const response = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -73,15 +77,16 @@ async function loginUser(username, password) {
       body: formData,
     });
 
+    const responseData = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Credenciales incorrectas');
+      console.error("Error en login:", responseData);
+      throw new Error(responseData.detail || 'Credenciales incorrectas');
     }
-
-    const data = await response.json();
+    
     // Guardar el token en localStorage
-    localStorage.setItem('token', data.access_token);
-    return data;
+    localStorage.setItem('token', responseData.access_token);
+    return responseData;
   } catch (error) {
     console.error('Error en login:', error);
     throw error;

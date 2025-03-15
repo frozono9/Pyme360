@@ -85,6 +85,11 @@ async def register(user_data: UserCreate):
         user_dict = user_data.model_dump()
         user_dict["password"] = hashed_password
         
+        # Evitar duplicar la contraseña en informacion_general
+        # Para compatibilidad, mantenemos el campo pero lo guardamos vacío o con un placeholder
+        if "informacion_general" in user_dict and "contrasena" in user_dict["informacion_general"]:
+            user_dict["informacion_general"]["contrasena"] = "********"
+        
         # Insertar el usuario en la base de datos
         result = user_collection.insert_one(user_dict)
         
@@ -111,6 +116,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
         
         return {"access_token": access_token, "token_type": "bearer"}
+    except HTTPException as he:
+        raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error de autenticación: {str(e)}")
 
