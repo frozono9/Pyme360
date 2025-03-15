@@ -1,52 +1,45 @@
 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import Dashboard from "@/pages/Dashboard";
+import AboutUs from "@/pages/AboutUs";
+import NotFound from "@/pages/NotFound";
+import Certification from "@/pages/Certification";
+import ManagementModule from "@/pages/ManagementModule";
+import FinancingModule from "@/pages/FinancingModule";
+import ComplianceModule from "@/pages/ComplianceModule";
+import GrowthModule from "@/pages/GrowthModule";
+import FinancingPreparation from "@/pages/FinancingPreparation";
+import FinancingMarketplace from "@/pages/FinancingMarketplace";
+import CreditScore from "@/pages/CreditScore";
+import EmployeeSearchModule from "@/pages/EmployeeSearchModule";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Certification from "./pages/Certification";
-import CreditScore from "./pages/CreditScore";
-import NotFound from "./pages/NotFound";
-import FinancingModule from "./pages/FinancingModule";
-import ManagementModule from "./pages/ManagementModule";
-import GrowthModule from "./pages/GrowthModule";
-import ComplianceModule from "./pages/ComplianceModule";
-import EmployeeSearchModule from "./pages/EmployeeSearchModule";
-import FinancingMarketplace from "./pages/FinancingMarketplace";
-import FinancingPreparation from "./pages/FinancingPreparation";
-import AboutUs from "./pages/AboutUs";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/acceso" element={<Login />} />
+        <Route path="/registro" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/nosotros" element={<AboutUs />} />
+        <Route path="/certificacion" element={<Certification />} />
+        <Route path="/gestion" element={<ManagementModule />} />
+        <Route path="/financiamiento" element={<FinancingModule />} />
+        <Route path="/financiamiento/preparacion" element={<FinancingPreparation />} />
+        <Route path="/financiamiento/marketplace" element={<FinancingMarketplace />} />
+        <Route path="/financiamiento/credito" element={<CreditScore />} />
+        <Route path="/cumplimiento" element={<ComplianceModule />} />
+        <Route path="/crecimiento" element={<GrowthModule />} />
+        <Route path="/busqueda-empleados" element={<EmployeeSearchModule />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/acceso" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/certificacion" element={<Certification />} />
-          <Route path="/credit-score" element={<CreditScore />} />
-          <Route path="/financiamiento" element={<FinancingModule />} />
-          <Route path="/gestion" element={<ManagementModule />} />
-          <Route path="/crecimiento" element={<GrowthModule />} />
-          <Route path="/cumplimiento" element={<ComplianceModule />} />
-          <Route path="/busqueda-empleados" element={<EmployeeSearchModule />} />
-          <Route path="/marketplace-financiamiento" element={<FinancingMarketplace />} />
-          <Route path="/preparacion-financiamiento" element={<FinancingPreparation />} />
-          <Route path="/nosotros" element={<AboutUs />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </Router>
+  );
+}
 
 export default App;

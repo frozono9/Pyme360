@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Lock, LogIn } from "lucide-react";
+import api from "@/api";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Nombre de usuario es requerido"),
@@ -35,29 +36,37 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     
-    // Demo login - in a real app, this would be an API call
-    setTimeout(() => {
-      if (data.username && data.password) {
-        // Store user info in localStorage for demo purposes
-        localStorage.setItem("pyme360-user", JSON.stringify({ username: data.username }));
-        
-        // Notify user
-        toast({
-          title: "Inicio de sesión exitoso",
-          description: "Bienvenido a PyME360",
-        });
-        
-        // Redirect to dashboard
-        navigate("/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error de inicio de sesión",
-          description: "Usuario o contraseña incorrectos",
-        });
-      }
+    try {
+      // Llamar a la API real de login
+      const response = await api.loginUser(data.username, data.password);
+      
+      // Obtener información del usuario después de iniciar sesión
+      const userData = await api.getCurrentUser();
+      
+      // Guardar información básica del usuario en localStorage para la UI
+      localStorage.setItem("pyme360-user", JSON.stringify({ 
+        username: userData.username,
+        nombre_empresa: userData.informacion_general?.nombre_empresa || "Empresa"
+      }));
+      
+      // Notificar al usuario
+      toast({
+        title: "Inicio de sesión exitoso",
+        description: `Bienvenido a PyME360, ${userData.informacion_general?.nombre_empresa || data.username}`,
+      });
+      
+      // Redirigir al dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error de inicio de sesión:", error);
+      toast({
+        variant: "destructive",
+        title: "Error de inicio de sesión",
+        description: "Usuario o contraseña incorrectos",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

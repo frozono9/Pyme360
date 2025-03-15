@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -11,6 +12,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 import auth
 import json
+from models import UserCreate, UserLogin
 
 # Cargar variables de entorno
 load_dotenv()
@@ -66,6 +68,58 @@ def test_mongo_connection(request: TestRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al conectar con MongoDB: {str(e)}")
+
+# Endpoints de autenticación
+@app.post("/api/auth/register")
+async def register(user_data: UserCreate):
+    try:
+        # Verificar si el usuario ya existe
+        existing_user = user_collection.find_one({"username": user_data.username})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="El nombre de usuario ya está en uso")
+        
+        # Hashear la contraseña
+        hashed_password = auth.get_password_hash(user_data.password)
+        
+        # Preparar el modelo de usuario para guardar
+        user_dict = user_data.model_dump()
+        user_dict["password"] = hashed_password
+        
+        # Insertar el usuario en la base de datos
+        result = user_collection.insert_one(user_dict)
+        
+        return {"message": "Usuario registrado correctamente", "user_id": str(result.inserted_id)}
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en el registro: {str(e)}")
+
+@app.post("/api/auth/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    try:
+        user = auth.authenticate_user(form_data.username, form_data.password)
+        if not user:
+            raise HTTPException(
+                status_code=401,
+                detail="Credenciales incorrectas",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Generar token JWT
+        access_token = auth.create_access_token(
+            data={"sub": user["username"]}
+        )
+        
+        return {"access_token": access_token, "token_type": "bearer"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error de autenticación: {str(e)}")
+
+@app.get("/api/auth/me")
+async def get_current_user(current_user: dict = Depends(auth.get_current_user)):
+    # Eliminar la contraseña del objeto de usuario
+    if "password" in current_user:
+        current_user.pop("password")
+    return current_user
 
 if __name__ == "__main__":
     import uvicorn

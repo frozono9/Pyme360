@@ -58,11 +58,11 @@ async function registerUser(userData) {
   }
 }
 
-async function loginUser(email, password) {
+async function loginUser(username, password) {
   try {
     // El endpoint espera un formato de formulario
     const formData = new URLSearchParams();
-    formData.append('username', email); // OAuth2 usa 'username' aunque enviemos email
+    formData.append('username', username); // OAuth2 usa 'username' aunque enviemos email
     formData.append('password', password);
 
     const response = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -120,6 +120,7 @@ async function getCurrentUser() {
 
 function logoutUser() {
   localStorage.removeItem('token');
+  localStorage.removeItem('pyme360-user');
 }
 
 // Funciones para subir datasets
