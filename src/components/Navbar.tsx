@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, LogOut, Database } from 'lucide-react';
+import { Menu, X, LogOut, Database, LayoutDashboard, DollarSign, FileText, CheckCircle, TrendingUp, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -47,7 +46,6 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   
   const handleLogout = () => {
     localStorage.removeItem("pyme360-user");
@@ -97,44 +95,51 @@ const Navbar = () => {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center space-x-1">
-            <NavLink to="/">Inicio</NavLink>
-            <NavLink to="/nosotros">Nosotros</NavLink>
-            
-            {isAuthenticated && (
+            {!isAuthenticated ? (
+              // Links for non-authenticated users
               <>
-                <div className="relative">
-                  <button
-                    onClick={toggleDropdown}
-                    className="flex items-center px-3 py-2 text-sm font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-                  >
-                    Módulos <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  
-                  {dropdownOpen && (
-                    <div 
-                      className="absolute top-full right-0 mt-1 w-56 glass-card-strong py-2 animate-fade-down origin-top-right z-10"
-                      onMouseLeave={() => setDropdownOpen(false)}
-                    >
-                      <Link to="/financiamiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                        Financiamiento Inteligente
-                      </Link>
-                      <Link to="/gestion" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                        Gestión Empresarial
-                      </Link>
-                      <Link to="/cumplimiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                        Cumplimiento Regulatorio
-                      </Link>
-                      <Link to="/crecimiento" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                        Crecimiento y Escalabilidad
-                      </Link>
-                      <Link to="/financiera" className="block px-4 py-2 text-sm hover:bg-pyme-blue/5 hover:text-pyme-blue transition-colors">
-                        Gestión Financiera
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              
-                <NavLink to="/certificacion">Certificación</NavLink>
+                <NavLink to="/">Inicio</NavLink>
+                <NavLink to="/nosotros">Nosotros</NavLink>
+              </>
+            ) : (
+              // Links for authenticated users
+              <>
+                <NavLink to="/dashboard">
+                  <div className="flex items-center">
+                    <LayoutDashboard className="h-4 w-4 mr-1" />
+                    Dashboard
+                  </div>
+                </NavLink>
+                <NavLink to="/financiamiento">
+                  <div className="flex items-center">
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    Financiamiento Inteligente
+                  </div>
+                </NavLink>
+                <NavLink to="/gestion">
+                  <div className="flex items-center">
+                    <FileText className="h-4 w-4 mr-1" />
+                    Gestión Empresarial
+                  </div>
+                </NavLink>
+                <NavLink to="/cumplimiento">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    Cumplimiento Regulatorio
+                  </div>
+                </NavLink>
+                <NavLink to="/crecimiento">
+                  <div className="flex items-center">
+                    <TrendingUp className="h-4 w-4 mr-1" />
+                    Crecimiento
+                  </div>
+                </NavLink>
+                <NavLink to="/certificacion">
+                  <div className="flex items-center">
+                    <Award className="h-4 w-4 mr-1" />
+                    Certificación
+                  </div>
+                </NavLink>
                 <NavLink to="/database">
                   <div className="flex items-center">
                     <Database className="h-4 w-4 mr-1" />
@@ -190,61 +195,70 @@ const Navbar = () => {
         isOpen ? "max-h-[400px] border-pyme-gray-light" : "max-h-0 border-transparent"
       )}>
         <div className="px-4 pt-2 pb-4 space-y-1">
-          <Link 
-            to="/" 
-            className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-          >
-            Inicio
-          </Link>
-          
-          <Link 
-            to="/nosotros" 
-            className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-          >
-            Nosotros
-          </Link>
-          
-          {isAuthenticated && (
+          {!isAuthenticated ? (
+            // Mobile links for non-authenticated users
             <>
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-                >
-                  Módulos <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {dropdownOpen && (
-                  <div className="pl-6 space-y-1 animate-fade-down">
-                    <Link to="/financiamiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                      Financiamiento Inteligente
-                    </Link>
-                    <Link to="/gestion" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                      Gestión Empresarial
-                    </Link>
-                    <Link to="/cumplimiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                      Cumplimiento Regulatorio
-                    </Link>
-                    <Link to="/crecimiento" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                      Crecimiento y Escalabilidad
-                    </Link>
-                    <Link to="/financiera" className="block px-3 py-2 text-sm hover:text-pyme-blue transition-colors">
-                      Gestión Financiera
-                    </Link>
-                  </div>
-                )}
-              </div>
-              
               <Link 
-                to="/certificacion" 
+                to="/" 
                 className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
               >
+                Inicio
+              </Link>
+              <Link 
+                to="/nosotros" 
+                className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                Nosotros
+              </Link>
+            </>
+          ) : (
+            // Mobile links for authenticated users
+            <>
+              <Link 
+                to="/dashboard" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Link>
+              <Link 
+                to="/financiamiento" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <DollarSign className="h-4 w-4 mr-2" />
+                Financiamiento Inteligente
+              </Link>
+              <Link 
+                to="/gestion" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Gestión Empresarial
+              </Link>
+              <Link 
+                to="/cumplimiento" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Cumplimiento Regulatorio
+              </Link>
+              <Link 
+                to="/crecimiento" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Crecimiento
+              </Link>
+              <Link 
+                to="/certificacion" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <Award className="h-4 w-4 mr-2" />
                 Certificación
               </Link>
-              
               <Link 
                 to="/database" 
-                className="block px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors flex items-center"
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
               >
                 <Database className="h-4 w-4 mr-2" />
                 Database
