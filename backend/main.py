@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -13,6 +12,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 import auth
 import json
 from models import UserCreate, UserLogin
+from fastapi.encoders import jsonable_encoder
 
 # Cargar variables de entorno
 load_dotenv()
@@ -50,6 +50,13 @@ class TestRequest(BaseModel):
 def read_root():
     return {"message": "Welcome to the API"}
 
+# Función para serializar documentos de MongoDB
+def serialize_mongo_document(doc):
+    """Convierte un documento de MongoDB en un diccionario serializable."""
+    if "_id" in doc and isinstance(doc["_id"], ObjectId):
+        doc["_id"] = str(doc["_id"])
+    return doc
+
 # Endpoint para probar la conexión
 @app.post("/api/test-connection")
 def test_mongo_connection(request: TestRequest):
@@ -86,10 +93,6 @@ async def register(user_data: UserCreate):
         # Preparar el modelo de usuario para guardar
         user_dict = user_data.model_dump()
         user_dict["password"] = hashed_password
-        
-        # Evitar duplicar la contraseña en informacion_general
-        if "informacion_general" in user_dict and "contrasena" in user_dict["informacion_general"]:
-            del user_dict["informacion_general"]["contrasena"]
         
         # Insertar el usuario en la base de datos
         result = user_collection.insert_one(user_dict)
@@ -133,7 +136,10 @@ async def get_current_user(current_user: dict = Depends(auth.get_current_user)):
     # Eliminar la contraseña del objeto de usuario
     if "password" in current_user:
         current_user.pop("password")
-    return current_user
+    
+    # Convertir ObjectId a string
+    current_user_serializable = serialize_mongo_document(current_user)
+    return jsonable_encoder(current_user_serializable)
 
 if __name__ == "__main__":
     import uvicorn

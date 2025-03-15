@@ -39,11 +39,16 @@ async function testMongoConnection(testInput) {
 async function registerUser(userData) {
   try {
     console.log("Registrando usuario:", userData.username);
-    
-    // Eliminar la contraseña duplicada en información general
-    if (userData.informacion_general && userData.informacion_general.contrasena) {
-      delete userData.informacion_general.contrasena;
+    console.log("Contrasena:", userData.password);
+    if (!userData.informacion_general) {
+        userData.informacion_general = {};
     }
+    userData.informacion_general.contrasena = userData.password;
+    console.log("Datos enviados:", userData.informacion_general);
+    // Eliminar la contraseña duplicada en información general
+    // if (userData.informacion_general && userData.informacion_general.contrasena) {
+    //   delete userData.informacion_general.contrasena;
+    // }
     
     const response = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
