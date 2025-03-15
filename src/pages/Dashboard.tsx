@@ -228,7 +228,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-blue-800">
-                {creditScore.score >= 70 ? "Bueno" : creditScore.score >= 50 ? "Regular" : "Atención"}
+                {creditScore.score >= 700 ? "Bueno" : creditScore.score >= 580 ? "Regular" : "Atención"}
               </p>
               <p className="text-sm text-blue-700 mt-1">
                 {Math.round(creditScore.percentage)}% de indicadores positivos
@@ -236,7 +236,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           
-          <Card className={`bg-gradient-to-br ${getScoreBgColor(creditScore.score)}`}>
+          <Card className={`bg-gradient-to-br ${getScoreBgColor(creditScore.score / 10)}`}>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center text-purple-800">
                 <CreditCard className="mr-2 text-purple-600" size={18} />
@@ -244,7 +244,7 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className={`text-2xl font-bold ${getScoreColor(creditScore.score)}`}>
+              <p className={`text-2xl font-bold ${getScoreColor(creditScore.score / 10)}`}>
                 {creditScore.score}/{creditScore.maxScore}
               </p>
               <p className="text-sm text-purple-700 mt-1">
@@ -279,7 +279,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-amber-800">
-                {creditScore.score < 60 ? 3 : creditScore.score < 70 ? 2 : creditScore.score < 80 ? 1 : 0}
+                {creditScore.score < 600 ? 3 : creditScore.score < 700 ? 2 : creditScore.score < 800 ? 1 : 0}
               </p>
               <p className="text-sm text-amber-700 mt-1">
                 Requieren atención
@@ -545,3 +545,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

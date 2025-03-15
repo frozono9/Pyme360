@@ -62,9 +62,15 @@ interface HistorialCrediticio {
 
 interface CreditScoreCalculatorProps {
   historialCrediticio: HistorialCrediticio;
+  creditData?: any; // Added prop for credit data from API
 }
 
-export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ historialCrediticio }) => {
+export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ historialCrediticio, creditData }) => {
+  // Use the pre-calculated credit score from the API if available
+  const finalScore = creditData?.score || 0;
+  const scoreLevel = creditData?.nivel || getScoreLevel(finalScore);
+
+  // Keep the calculation logic but only use it if no creditData is provided
   const calculatePaymentHistoryScore = (): { score: number; data: any } => {
     let totalPayments = 0;
     let latePayments = 0;
@@ -332,23 +338,15 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
     };
   };
 
-  const paymentHistory = calculatePaymentHistoryScore();
-  const creditUtilization = calculateCreditUtilizationScore();
-  const historyLength = calculateCreditHistoryLengthScore();
-  const creditMix = calculateCreditMixScore();
-  const incidents = calculateIncidentsScore();
-  
-  const weightedScore = (
-    paymentHistory.score * 0.35 +
-    creditUtilization.score * 0.30 +
-    historyLength.score * 0.15 +
-    creditMix.score * 0.10 +
-    incidents.score * 0.10
-  );
-  
-  const finalScore = Math.round(300 + (weightedScore / 100) * 550);
-  
-  const getScoreLevel = (score: number) => {
+  // Use the components from the API or calculate them if needed
+  const paymentHistory = creditData?.components?.payment_history || calculatePaymentHistoryScore();
+  const creditUtilization = creditData?.components?.credit_utilization || calculateCreditUtilizationScore();
+  const historyLength = creditData?.components?.history_length || calculateCreditHistoryLengthScore();
+  const creditMix = creditData?.components?.credit_mix || calculateCreditMixScore();
+  const incidents = creditData?.components?.new_applications || calculateIncidentsScore();
+
+  // Local backup function for score level if not provided by API
+  function getScoreLevel(score: number) {
     if (score >= 750) {
       return {
         nivel: "Excelente",
@@ -380,9 +378,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ hi
         description: "Tu puntaje es considerablemente bajo. Te recomendamos enfocarte en mejorar tu historial de pagos y reducir tus deudas actuales."
       };
     }
-  };
-  
-  const scoreLevel = getScoreLevel(finalScore);
+  }
 
   return (
     <div className="space-y-6">

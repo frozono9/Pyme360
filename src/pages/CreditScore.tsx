@@ -69,7 +69,7 @@ const CreditScore = () => {
       );
     }
 
-    return <CreditScoreCalculator historialCrediticio={userData.historial_crediticio} />;
+    return <CreditScoreCalculator historialCrediticio={userData.historial_crediticio} creditData={creditData} />;
   };
 
   return (
