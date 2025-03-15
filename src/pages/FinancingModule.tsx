@@ -1,8 +1,12 @@
+
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ButtonCustom } from "@/components/ui/button-custom";
-import { ArrowRight, CreditCard, Building, FileText, PieChart } from "lucide-react";
+import { ArrowRight, CreditCard, Building, FileText, PieChart, BarChart, Award } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 const FinancingModule = () => {
   return (
@@ -10,7 +14,7 @@ const FinancingModule = () => {
       <Navbar />
       
       <main className="flex-grow">
-        <section className="pt-32 pb-20 relative bg-gradient-to-b from-white to-pyme-gray-light overflow-hidden">
+        <section className="pt-24 pb-16 relative bg-gradient-to-b from-white to-pyme-gray-light overflow-hidden">
           {/* Background decorative elements */}
           <div className="absolute inset-0">
             <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-bl from-pyme-blue/10 to-transparent blur-3xl"></div>
@@ -18,12 +22,12 @@ const FinancingModule = () => {
           </div>
           
           <div className="max-w-7xl mx-auto container-padding relative z-10">
-            <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-up">
+            <div className="text-center max-w-3xl mx-auto mb-12 animate-fade-up">
               <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-pyme-blue bg-pyme-blue/10 border border-pyme-blue/20 mb-4">
                 Módulo de PyME360
               </div>
               
-              <h1 className="mb-6 text-balance">
+              <h1 className="mb-4 text-balance">
                 Financiamiento <span className="text-pyme-blue">Inteligente</span>
               </h1>
               
@@ -32,40 +36,47 @@ const FinancingModule = () => {
                 financiamiento adaptadas al perfil real de tu empresa.
               </p>
             </div>
-          </div>
-        </section>
-        
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto container-padding">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Link to="/credit-score" className="block">
-                <FeatureCard 
-                  icon={<CreditCard />}
-                  title="AI Credit Score"
-                  description="Evaluación crediticia basada en historial de pagos, cumplimiento fiscal y transacciones reales."
-                />
-              </Link>
+            
+            {/* Mini Dashboard */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-10 mb-10 max-w-5xl mx-auto">
+              <DashboardCard 
+                icon={<Award className="h-10 w-10 text-pyme-blue" />}
+                title="AI Credit Score"
+                description="Evaluación crediticia basada en datos reales de tu empresa"
+                linkTo="/credit-score"
+                metrics={[
+                  { label: "Puntuación Media", value: "720" },
+                  { label: "Mejora Potencial", value: "+85 pts" }
+                ]}
+              />
               
-              <Link to="/marketplace-financiamiento" className="block">
-                <FeatureCard 
-                  icon={<Building />}
-                  title="Marketplace Financiero"
-                  description="Conexión con bancos, plataformas de crowdfunding, inversionistas y programas gubernamentales."
-                />
-              </Link>
+              <DashboardCard 
+                icon={<Building className="h-10 w-10 text-pyme-success" />}
+                title="Marketplace Financiero"
+                description="Opciones de financiamiento personalizadas"
+                linkTo="/marketplace-financiamiento"
+                metrics={[
+                  { label: "Opciones Disponibles", value: "12+" },
+                  { label: "Tasa Promedio", value: "9.4%" }
+                ]}
+              />
               
-              <Link to="/preparacion-financiamiento" className="block">
-                <FeatureCard 
-                  icon={<FileText />}
-                  title="Documentación Asistida"
-                  description="Generación automatizada de planes de negocio y documentación financiera necesaria."
-                />
-              </Link>
+              <DashboardCard 
+                icon={<FileText className="h-10 w-10 text-pyme-warning" />}
+                title="Preparación de Documentos"
+                description="Documentación asistida para solicitudes"
+                linkTo="/preparacion-financiamiento"
+                metrics={[
+                  { label: "Tiempo de Preparación", value: "-60%" },
+                  { label: "Tasa de Aprobación", value: "+35%" }
+                ]}
+              />
             </div>
           </div>
         </section>
         
-        <section className="py-16 bg-pyme-gray-light">
+        {/* How it works section */}
+        <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto container-padding">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="mb-6">¿Cómo funciona?</h2>
@@ -146,21 +157,53 @@ const FinancingModule = () => {
   );
 };
 
-interface FeatureCardProps {
+interface DashboardCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
+  linkTo: string;
+  metrics: { label: string; value: string }[];
 }
 
-const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
+const DashboardCard = ({ icon, title, description, linkTo, metrics }: DashboardCardProps) => {
   return (
-    <div className="glass-card p-6 hover:shadow-elevation transition-all duration-300">
-      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-pyme-blue/10 text-pyme-blue mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-pyme-gray-dark">{description}</p>
-    </div>
+    <Card className="overflow-hidden border-none shadow-elevation hover:shadow-lg transition-all duration-300">
+      <CardHeader className="bg-gradient-to-r from-white to-pyme-gray-light pb-0">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="rounded-full p-2 bg-white shadow-subtle">
+            {icon}
+          </div>
+          <div>
+            <CardTitle className="text-xl">{title}</CardTitle>
+          </div>
+        </div>
+        <CardDescription className="text-pyme-gray-dark mb-2">
+          {description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="flex justify-between mb-4">
+          {metrics.map((metric, idx) => (
+            <div key={idx} className="text-center">
+              <div className="text-lg font-bold text-pyme-blue">{metric.value}</div>
+              <div className="text-xs text-pyme-gray">{metric.label}</div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="bg-pyme-gray-light pt-3">
+        <Link to={linkTo} className="w-full">
+          <ButtonCustom 
+            variant="default" 
+            size="default"
+            className="w-full"
+            rightIcon={<ArrowRight className="h-4 w-4" />}
+          >
+            Ver detalles
+          </ButtonCustom>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 };
 
