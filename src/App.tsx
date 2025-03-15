@@ -15,6 +15,7 @@ import FinancingPreparation from "@/pages/FinancingPreparation";
 import FinancingMarketplace from "@/pages/FinancingMarketplace";
 import CreditScore from "@/pages/CreditScore";
 import EmployeeSearchModule from "@/pages/EmployeeSearchModule";
+import DatabaseView from "@/pages/DatabaseView";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/cumplimiento" element={<ComplianceModule />} />
         <Route path="/crecimiento" element={<GrowthModule />} />
         <Route path="/busqueda-empleados" element={<EmployeeSearchModule />} />
+        <Route path="/database" element={<DatabaseView />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
