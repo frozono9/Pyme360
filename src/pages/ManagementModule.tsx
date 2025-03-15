@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,6 +9,9 @@ import {
   BarChart2, 
   Users, 
   Bot, 
+  FileSpreadsheet,
+  Package,
+  FileText,
   AreaChart,
   TrendingUp,
   TrendingDown,
@@ -15,7 +19,11 @@ import {
   PieChart,
   LineChart,
   Maximize2,
-  Send
+  CalendarDays,
+  Briefcase,
+  Receipt,
+  ClipboardList,
+  DollarSign
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,9 +47,15 @@ import {
   Legend
 } from "recharts";
 
+// Importaciones de componentes
+import { KpiCard } from "@/components/management/KpiCard";
+import { ErpModuleCard } from "@/components/management/ErpModuleCard";
+import { Alert } from "@/components/management/Alert";
+import { EfficiencyCard } from "@/components/management/EfficiencyCard";
+import { FeatureCard } from "@/components/management/FeatureCard";
+
 const ManagementModule = () => {
   const [activeTab, setActiveTab] = useState("erp");
-  const [promptValue, setPromptValue] = useState("");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -68,11 +82,11 @@ const ManagementModule = () => {
               
               <p className="text-pyme-gray-dark text-lg">
                 Plataforma integrada para administrar todos los aspectos de tu negocio con 
-                asistencia de IA que te ayuda a tomar mejores decisiones.
+                herramientas avanzadas que te ayudan a tomar mejores decisiones.
               </p>
             </div>
 
-            {/* Tabs for ERP and Business Intelligence */}
+            {/* Tabs for different modules */}
             <div className="max-w-6xl mx-auto">
               <Tabs 
                 defaultValue="erp" 
@@ -80,12 +94,13 @@ const ManagementModule = () => {
                 onValueChange={setActiveTab}
                 className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-2 mb-8">
-                  <TabsTrigger value="erp" className="text-base py-3">ERP Simplificado con IA</TabsTrigger>
-                  <TabsTrigger value="dashboard" className="text-base py-3">Dashboard de Inteligencia Empresarial</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 mb-8">
+                  <TabsTrigger value="erp" className="text-base py-3">ERP Simplificado</TabsTrigger>
+                  <TabsTrigger value="rrhh" className="text-base py-3">Recursos Humanos</TabsTrigger>
+                  <TabsTrigger value="dashboard" className="text-base py-3">Dashboard Inteligente</TabsTrigger>
                 </TabsList>
                 
-                {/* ERP Simplificado con IA */}
+                {/* ERP Simplificado */}
                 <TabsContent value="erp" className="space-y-6">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* KPI Cards */}
@@ -130,7 +145,7 @@ const ManagementModule = () => {
                         <CardDescription>Últimos 4 trimestres</CardDescription>
                       </CardHeader>
                       <CardContent className="pb-2">
-                        <div className="h-[250px]">
+                        <div className="h-[300px]">
                           <ChartContainer 
                             config={{
                               sales: { label: "Ventas" },
@@ -178,64 +193,224 @@ const ManagementModule = () => {
                       </CardContent>
                     </Card>
                     
-                    {/* AI Assistant */}
+                    {/* Inventario Chart */}
                     <Card className="overflow-hidden border-none shadow-elevation">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Asistente IA de Gestión</CardTitle>
-                        <CardDescription>Análisis y recomendaciones en tiempo real</CardDescription>
-                      </CardHeader>
-                      <CardContent className="h-[250px] overflow-y-auto bg-muted/30 rounded-md p-4 space-y-4">
-                        <AiMessage 
-                          content="Basado en tus últimos datos financieros, veo que el margen de beneficio ha mejorado un 2.1%. Las estrategias de reducción de costos están funcionando."
-                          isAi={true}
-                        />
-                        <AiMessage 
-                          content="¿Qué sugiere para mejorar la tendencia a la baja en clientes nuevos?"
-                          isAi={false}
-                        />
-                        <AiMessage 
-                          content="Observo que la inversión en marketing digital ha disminuido un 15% este trimestre. Recomendaría aumentar presupuesto en campañas de adquisición y revisar la estrategia de precios para nuevos clientes."
-                          isAi={true}
-                        />
-                      </CardContent>
-                      <CardFooter className="border-t p-3">
-                        <div className="flex w-full items-center space-x-2">
-                          <input
-                            type="text"
-                            placeholder="Pregunta algo sobre tu negocio..."
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                            value={promptValue}
-                            onChange={(e) => setPromptValue(e.target.value)}
-                          />
-                          <ButtonCustom size="icon" className="h-10 w-10">
-                            <Send className="h-4 w-4" />
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Inventario</CardTitle>
+                          <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                            <Maximize2 className="h-4 w-4" />
                           </ButtonCustom>
                         </div>
-                      </CardFooter>
+                        <CardDescription>Productos por categoría</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-[300px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPieChart>
+                              <Pie
+                                data={inventoryData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                outerRadius={100}
+                                fill="#8884d8"
+                                dataKey="value"
+                                nameKey="name"
+                                label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                              >
+                                {inventoryData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={INVENTORY_COLORS[index % INVENTORY_COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <Legend />
+                              <Tooltip formatter={(value, name) => [`${value} unidades`, name]} />
+                            </RechartsPieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
                     </Card>
                   </div>
                   
                   {/* ERP modules grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <ErpModuleCard 
-                      title="Ventas e Ingresos" 
+                      title="Ventas" 
                       description="Gestión de facturación, pedidos y seguimiento de clientes"
-                      icon={<BarChart2 className="h-5 w-5" />}
+                      icon={<Receipt className="h-5 w-5" />}
                       color="blue"
                     />
                     
                     <ErpModuleCard 
                       title="Inventario" 
                       description="Control de stock, alertas y gestión de proveedores"
-                      icon={<AreaChart className="h-5 w-5" />}
+                      icon={<Package className="h-5 w-5" />}
                       color="indigo"
                     />
                     
                     <ErpModuleCard 
                       title="Contabilidad" 
                       description="Registros contables, impuestos y balances"
-                      icon={<LineChart className="h-5 w-5" />}
+                      icon={<FileText className="h-5 w-5" />}
                       color="violet"
+                    />
+                    
+                    <ErpModuleCard 
+                      title="Presupuestos" 
+                      description="Planificación financiera y seguimiento de gastos"
+                      icon={<DollarSign className="h-5 w-5" />}
+                      color="amber"
+                    />
+                  </div>
+                </TabsContent>
+                
+                {/* Recursos Humanos */}
+                <TabsContent value="rrhh" className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* RRHH KPI Cards */}
+                    <KpiCard 
+                      title="Total Empleados" 
+                      value="86" 
+                      trend="+4"
+                      trendDirection="up"
+                      icon={<Users />}
+                      color="blue"
+                    />
+                    
+                    <KpiCard 
+                      title="Tasa de Retención" 
+                      value="94.2%" 
+                      trend="+1.7%"
+                      trendDirection="up"
+                      icon={<TrendingUp />}
+                      color="green"
+                    />
+                    
+                    <KpiCard 
+                      title="Días de Ausencia" 
+                      value="3.2" 
+                      trend="-0.8"
+                      trendDirection="down"
+                      icon={<CalendarDays />}
+                      color="amber"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Distribución Empleados Chart */}
+                    <Card className="overflow-hidden border-none shadow-elevation">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Distribución de Empleados</CardTitle>
+                          <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                            <Maximize2 className="h-4 w-4" />
+                          </ButtonCustom>
+                        </div>
+                        <CardDescription>Por departamento</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-[300px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPieChart>
+                              <Pie
+                                data={employeeData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                outerRadius={100}
+                                fill="#8884d8"
+                                dataKey="value"
+                                nameKey="name"
+                                label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                              >
+                                {employeeData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={EMPLOYEE_COLORS[index % EMPLOYEE_COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <Legend />
+                              <Tooltip />
+                            </RechartsPieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Próximas Contrataciones Table */}
+                    <Card className="overflow-hidden border-none shadow-elevation">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Próximas Contrataciones</CardTitle>
+                          <ButtonCustom variant="ghost" size="icon" className="h-8 w-8">
+                            <Maximize2 className="h-4 w-4" />
+                          </ButtonCustom>
+                        </div>
+                        <CardDescription>Posiciones pendientes de cubrir</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="overflow-hidden">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left p-3 font-medium text-gray-500">Posición</th>
+                                <th className="text-left p-3 font-medium text-gray-500">Departamento</th>
+                                <th className="text-left p-3 font-medium text-gray-500">Candidatos</th>
+                                <th className="text-left p-3 font-medium text-gray-500">Estado</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {hiringData.map((position, index) => (
+                                <tr key={index} className={index < hiringData.length - 1 ? "border-b" : ""}>
+                                  <td className="p-3">{position.title}</td>
+                                  <td className="p-3">{position.department}</td>
+                                  <td className="p-3">{position.candidates}</td>
+                                  <td className="p-3">
+                                    <span className={`px-2 py-1 rounded-full text-xs ${
+                                      position.status === "Entrevistando" 
+                                        ? "bg-blue-100 text-blue-800" 
+                                        : position.status === "Selección final" 
+                                        ? "bg-amber-100 text-amber-800" 
+                                        : "bg-green-100 text-green-800"
+                                    }`}>
+                                      {position.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  {/* RRHH modules grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <ErpModuleCard 
+                      title="Personal" 
+                      description="Gestión de empleados y organización"
+                      icon={<Users className="h-5 w-5" />}
+                      color="blue"
+                    />
+                    
+                    <ErpModuleCard 
+                      title="Nómina" 
+                      description="Administración de pagos y beneficios"
+                      icon={<DollarSign className="h-5 w-5" />}
+                      color="indigo"
+                    />
+                    
+                    <ErpModuleCard 
+                      title="Asistencia" 
+                      description="Control de horarios y ausencias"
+                      icon={<CalendarDays className="h-5 w-5" />}
+                      color="violet"
+                    />
+                    
+                    <ErpModuleCard 
+                      title="Desempeño" 
+                      description="Evaluaciones y seguimiento de objetivos"
+                      icon={<ClipboardList className="h-5 w-5" />}
+                      color="amber"
                     />
                   </div>
                 </TabsContent>
@@ -367,13 +542,13 @@ const ManagementModule = () => {
           </div>
         </section>
         
-        {/* Feature Section - Keeping this but simplifying it */}
+        {/* Feature Section */}
         <section className="py-12 bg-white">
           <div className="max-w-7xl mx-auto container-padding">
             <h2 className="text-2xl font-bold text-center mb-10">Funcionalidades Principales</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <FeatureCard 
-                icon={<BarChart2 />}
+                icon={<FileSpreadsheet />}
                 title="ERP Simplificado"
                 description="Gestión de ventas, inventario, contabilidad y presupuestos en una sola plataforma intuitiva."
               />
@@ -382,12 +557,6 @@ const ManagementModule = () => {
                 icon={<Users />}
                 title="Recursos Humanos"
                 description="Administración de personal, nómina, asistencia y desempeño con procesos automatizados."
-              />
-              
-              <FeatureCard 
-                icon={<Bot />}
-                title="Asistente Virtual"
-                description="Chatbot especializado en gestión empresarial para resolver dudas y recibir recomendaciones."
               />
               
               <FeatureCard 
@@ -401,199 +570,6 @@ const ManagementModule = () => {
       </main>
       
       <Footer />
-    </div>
-  );
-};
-
-// KPI Card Component
-interface KpiCardProps {
-  title: string;
-  value: string;
-  trend: string;
-  trendDirection: "up" | "down";
-  icon: React.ReactNode;
-  color: "blue" | "green" | "amber" | "red";
-}
-
-const KpiCard = ({ title, value, trend, trendDirection, icon, color }: KpiCardProps) => {
-  const colorClasses = {
-    blue: "bg-blue-50 text-blue-600",
-    green: "bg-green-50 text-green-600",
-    amber: "bg-amber-50 text-amber-600",
-    red: "bg-red-50 text-red-600",
-  };
-  
-  const trendIconClass = trendDirection === "up" ? "text-green-500" : "text-red-500";
-  const TrendIcon = trendDirection === "up" ? TrendingUp : TrendingDown;
-  
-  return (
-    <Card className="border-none shadow-elevation hover:shadow-lg transition-all duration-300">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">{title}</CardTitle>
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${colorClasses[color]}`}>
-            {icon}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-end gap-2 mb-2">
-          <div className="text-3xl font-bold">{value}</div>
-          <div className="flex items-center mb-1">
-            <TrendIcon className={`h-4 w-4 mr-1 ${trendIconClass}`} />
-            <span className={trendIconClass}>{trend}</span>
-          </div>
-        </div>
-        <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-          <div 
-            className={`h-full rounded-full ${color === "blue" ? "bg-blue-500" : color === "green" ? "bg-green-500" : color === "amber" ? "bg-amber-500" : "bg-red-500"}`}
-            style={{ width: "70%" }}
-          ></div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// AI Message Component
-interface AiMessageProps {
-  content: string;
-  isAi: boolean;
-}
-
-const AiMessage = ({ content, isAi }: AiMessageProps) => {
-  return (
-    <div className={`flex ${isAi ? "justify-start" : "justify-end"}`}>
-      <div 
-        className={`max-w-[75%] rounded-lg px-4 py-2 ${
-          isAi 
-            ? "bg-blue-100 text-blue-800 rounded-tl-none" 
-            : "bg-gray-100 text-gray-800 rounded-tr-none"
-        }`}
-      >
-        {content}
-      </div>
-    </div>
-  );
-};
-
-// ERP Module Card Component
-interface ErpModuleCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  color: "blue" | "indigo" | "violet" | "amber";
-}
-
-const ErpModuleCard = ({ title, description, icon, color }: ErpModuleCardProps) => {
-  const colorClasses = {
-    blue: "from-blue-500 to-blue-600",
-    indigo: "from-indigo-500 to-indigo-600",
-    violet: "from-violet-500 to-violet-600",
-    amber: "from-amber-500 to-amber-600",
-  };
-  
-  return (
-    <Card className="border-none shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-      <div className={`h-1.5 w-full bg-gradient-to-r ${colorClasses[color]}`}></div>
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center 
-            ${color === "blue" ? "bg-blue-100 text-blue-600" : 
-              color === "indigo" ? "bg-indigo-100 text-indigo-600" : 
-              color === "violet" ? "bg-violet-100 text-violet-600" : 
-              "bg-amber-100 text-amber-600"}`}>
-            {icon}
-          </div>
-          <CardTitle className="text-lg">{title}</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <p className="text-sm text-gray-600">{description}</p>
-      </CardContent>
-      <CardFooter className="pt-0">
-        <ButtonCustom variant="ghost" className="p-0 h-auto hover:bg-transparent hover:underline" size="sm">
-          <span className="text-sm">Ver más</span>
-          <ArrowRight className="h-3 w-3 ml-1" />
-        </ButtonCustom>
-      </CardFooter>
-    </Card>
-  );
-};
-
-// Alert Component
-interface AlertProps {
-  title: string;
-  description: string;
-  severity: "high" | "medium" | "low";
-}
-
-const Alert = ({ title, description, severity }: AlertProps) => {
-  const severityClasses = {
-    high: "border-red-500 bg-red-50",
-    medium: "border-amber-500 bg-amber-50",
-    low: "border-blue-500 bg-blue-50",
-  };
-  
-  const textClasses = {
-    high: "text-red-700",
-    medium: "text-amber-700",
-    low: "text-blue-700",
-  };
-  
-  return (
-    <div className={`border-l-4 px-4 py-2 rounded-r ${severityClasses[severity]}`}>
-      <div className={`font-medium ${textClasses[severity]}`}>{title}</div>
-      <div className="text-sm text-gray-600">{description}</div>
-    </div>
-  );
-};
-
-// Efficiency Card Component
-interface EfficiencyCardProps {
-  title: string;
-  value: string;
-  trend: string;
-  status: "positive" | "negative" | "neutral";
-}
-
-const EfficiencyCard = ({ title, value, trend, status }: EfficiencyCardProps) => {
-  const statusColor = status === "positive" 
-    ? "text-green-600" 
-    : status === "negative" 
-      ? "text-red-600" 
-      : "text-gray-600";
-  
-  return (
-    <Card className="border-none shadow-sm hover:shadow-md transition-all duration-300">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold mb-1">{value}</div>
-        <div className={`text-sm ${statusColor}`}>
-          {trend}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Feature Card Component (from original design)
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
-  return (
-    <div className="glass-card p-6 hover:shadow-elevation transition-all duration-300">
-      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-pyme-blue/10 text-pyme-blue mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-pyme-gray-dark">{description}</p>
     </div>
   );
 };
@@ -623,6 +599,35 @@ const trendData = [
   { name: 'Abr', ventas: 81000, costos: 56000 },
   { name: 'May', ventas: 56000, costos: 40000 },
   { name: 'Jun', ventas: 75000, costos: 48000 },
+];
+
+// Nuevos datos para la sección de inventario
+const INVENTORY_COLORS = ['#4f46e5', '#0284c7', '#0f766e', '#4d7c0f', '#b45309'];
+
+const inventoryData = [
+  { name: 'Electrónica', value: 120 },
+  { name: 'Muebles', value: 85 },
+  { name: 'Ropa', value: 150 },
+  { name: 'Artículos de oficina', value: 75 },
+  { name: 'Otros', value: 40 },
+];
+
+// Nuevos datos para Recursos Humanos
+const EMPLOYEE_COLORS = ['#6366f1', '#0ea5e9', '#14b8a6', '#84cc16', '#f59e0b'];
+
+const employeeData = [
+  { name: 'Ventas', value: 18 },
+  { name: 'Operaciones', value: 24 },
+  { name: 'Tecnología', value: 15 },
+  { name: 'Administración', value: 8 },
+  { name: 'Marketing', value: 12 },
+];
+
+const hiringData = [
+  { title: 'Desarrollador Frontend', department: 'Tecnología', candidates: 8, status: 'Entrevistando' },
+  { title: 'Ejecutivo de Ventas', department: 'Ventas', candidates: 5, status: 'Selección final' },
+  { title: 'Analista de Datos', department: 'Operaciones', candidates: 4, status: 'Entrevistando' },
+  { title: 'Diseñador UX/UI', department: 'Marketing', candidates: 6, status: 'Oferta enviada' },
 ];
 
 export default ManagementModule;
