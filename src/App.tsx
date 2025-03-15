@@ -35,7 +35,7 @@ function App() {
         <Route path="/financiamiento/marketplace" element={<FinancingMarketplace />} />
         <Route path="/financiamiento/credito" element={<CreditScore />} />
         <Route path="/cumplimiento" element={<ComplianceModule />} />
-        <Route path="/crecimiento" element={<GrowthModule />} />
+        <Route path="/crecimiento/*" element={<GrowthModule />} />
         <Route path="/busqueda-empleados" element={<EmployeeSearchModule />} />
         <Route path="/database" element={<DatabaseView />} />
         <Route path="*" element={<NotFound />} />

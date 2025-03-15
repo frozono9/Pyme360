@@ -1,3 +1,4 @@
+
 const BASE_URL = "http://localhost:8000";
 
 async function testMongoConnection(testInput) {
@@ -359,6 +360,113 @@ async function queryGeneralAssistant(question) {
   }
 }
 
+// Nueva función para predecir KPIs
+async function predictKpi(predictionParams) {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/kpi-prediction`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(predictionParams),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al generar predicción de KPI');
+    }
+
+    const data = await response.json();
+    console.log("KPI prediction data received:", data);
+    return data;
+  } catch (error) {
+    console.error('Error al generar predicción de KPI:', error);
+    
+    // Manejo alternativo para entornos de desarrollo/prueba
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("Returning fallback KPI prediction data");
+      
+      // Datos simulados para desarrollo
+      const monthLabels = [
+        "ene 2024", "feb 2024", "mar 2024", "abr 2024", "may 2024", "jun 2024", 
+        "jul 2024", "ago 2024", "sept 2024", "oct 2024", "nov 2024", "dic 2024",
+        "ene 2025", "feb 2025", "mar 2025", "abr 2025", "may 2025", "jun 2025", 
+        "jul 2025", "ago 2025", "sept 2025", "oct 2025", "nov 2025", "dic 2025"
+      ];
+      
+      // Generar valores simulados con crecimiento
+      const initialValue = 10000;
+      let currentValue = initialValue;
+      const monthlyValues = [initialValue];
+      const upperLimit = [initialValue * 1.1];
+      const lowerLimit = [initialValue * 0.9];
+      
+      for (let i = 1; i < 25; i++) {
+        const growth = 1 + (Math.random() * 0.08 + 0.02); // Crecimiento entre 2% y 10%
+        currentValue = currentValue * growth;
+        monthlyValues.push(currentValue);
+        upperLimit.push(currentValue * (1 + Math.random() * 0.2));
+        lowerLimit.push(currentValue * (1 - Math.random() * 0.2));
+      }
+      
+      return {
+        kpi_type: predictionParams.kpi_type,
+        initial_value: initialValue,
+        final_value: monthlyValues[monthlyValues.length - 1],
+        monthly_values: monthlyValues,
+        upper_limit: upperLimit,
+        lower_limit: lowerLimit,
+        total_growth_percentage: 229.4,
+        monthly_growth_percentage: 9.56,
+        volatility: 9.26,
+        month_labels: monthLabels,
+        market_events: [
+          {
+            mes: "may",
+            año: 2025,
+            descripcion: "Temporada alta"
+          },
+          {
+            mes: "oct",
+            año: 2025,
+            descripcion: "Desaceleración del mercado"
+          },
+          {
+            mes: "ene",
+            año: 2026,
+            descripcion: "Impulso pre-festividades"
+          }
+        ],
+        best_month: {
+          month: "dic 2025",
+          growth: 25.34
+        },
+        worst_month: {
+          month: "ene 2027",
+          growth: -12.52
+        },
+        factors: {
+          seasonality: predictionParams.include_seasonality,
+          market_factors: predictionParams.include_market_factors,
+          country: "México",
+          sector: "Tecnología"
+        },
+        recommendation: "Basado en tu proyección de ingresos, es recomendable preparar tu operación para escalar rápidamente. Considera invertir en capacidad adicional y optimizar procesos para mantener la calidad durante este fuerte crecimiento. La tendencia histórica volátil sugiere preparar planes de contingencia para diferentes escenarios. Mantén reservas operativas y financieras para adaptarte a cambios bruscos.",
+        confidence: "moderada"
+      };
+    }
+    
+    throw error;
+  }
+}
+
 export default {
   testMongoConnection,
   registerUser,
@@ -370,5 +478,6 @@ export default {
   getActiveDebts,
   getTrustScore,
   queryFinancingAssistant,
-  queryGeneralAssistant
+  queryGeneralAssistant,
+  predictKpi
 }

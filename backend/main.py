@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -14,6 +15,7 @@ import json
 from models import UserCreate, UserLogin
 from fastapi.encoders import jsonable_encoder
 import score_calculator
+import random
 
 # Cargar variables de entorno
 load_dotenv()
@@ -45,6 +47,14 @@ user_collection = db["users"]  # Colección para usuarios
 # Modelo para la solicitud de prueba
 class TestRequest(BaseModel):
     testValue: str
+
+# Modelo para la solicitud de predicción de KPI
+class KpiPredictionRequest(BaseModel):
+    kpi_type: str
+    period: str
+    include_seasonality: bool = False
+    include_market_factors: bool = False
+    show_confidence_interval: bool = True
 
 # Ruta de prueba
 @app.get("/")
@@ -290,6 +300,193 @@ async def query_general_assistant(
     except Exception as e:
         print(f"Error al consultar al asistente IA general: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al consultar al asistente IA general: {str(e)}")
+
+# Nuevo endpoint para predicciones de KPIs
+@app.post("/api/kpi-prediction")
+async def predict_kpi(
+    request: KpiPredictionRequest,
+    current_user: dict = Depends(auth.get_current_user)
+):
+    try:
+        print(f"Generando predicción para KPI: {request.kpi_type}")
+        
+        # Obtener información del usuario
+        info_general = current_user.get("informacion_general", {})
+        sector = info_general.get("sector", "Tecnología")
+        pais = info_general.get("pais", "México")
+        
+        # Variables financieras
+        finanzas = current_user.get("finanzas", {})
+        ingresos_base = finanzas.get("ingresos_anuales", random.randint(8000, 15000))
+        
+        # Período en meses
+        periodo_meses = 12
+        if request.period == "12m":
+            periodo_meses = 12
+        elif request.period == "24m":
+            periodo_meses = 24
+        elif request.period == "36m":
+            periodo_meses = 36
+        
+        # Calcular tasa de crecimiento basada en el sector
+        tasas_crecimiento = {
+            "Tecnología": random.uniform(0.08, 0.15),
+            "Retail": random.uniform(0.05, 0.12),
+            "Servicios": random.uniform(0.06, 0.10),
+            "Manufactura": random.uniform(0.04, 0.09),
+            "Construcción": random.uniform(0.03, 0.08),
+            "Salud": random.uniform(0.07, 0.14),
+        }
+        tasa_mensual = tasas_crecimiento.get(sector, random.uniform(0.05, 0.10)) / 12
+        
+        # Ajustar por país
+        multiplicadores_pais = {
+            "México": 1.0,
+            "Colombia": 1.1,
+            "Chile": 1.2,
+            "Perú": 0.9,
+            "Argentina": 0.85,
+            "España": 1.15
+        }
+        tasa_mensual *= multiplicadores_pais.get(pais, 1.0)
+        
+        # Generar datos mensuales
+        valores_mensuales = []
+        valor_actual = ingresos_base
+        
+        for i in range(periodo_meses + 1):  # +1 para incluir el valor inicial
+            # Añadir factores de estacionalidad si se solicita
+            factor_estacional = 1.0
+            if request.include_seasonality:
+                # Estacionalidad basada en el mes (suponiendo que empezamos en enero)
+                mes_actual = (i % 12) + 1
+                if mes_actual in [11, 12]:  # Noviembre y diciembre
+                    factor_estacional = 1.2  # Temporada alta
+                elif mes_actual in [1, 2]:  # Enero y febrero
+                    factor_estacional = 0.8  # Temporada baja
+            
+            # Añadir factores de mercado aleatorios si se solicita
+            factor_mercado = 1.0
+            if request.include_market_factors and random.random() < 0.3:  # 30% de probabilidad de evento de mercado
+                factor_mercado = random.uniform(0.9, 1.1)
+            
+            # Calcular valor con todos los factores
+            if i > 0:  # Para el primer punto, usar el valor base
+                crecimiento = (1 + tasa_mensual) * factor_estacional * factor_mercado
+                volatilidad = random.uniform(0.97, 1.03)  # Añadir algo de ruido
+                valor_actual = valor_actual * crecimiento * volatilidad
+            
+            # Añadir a la lista de valores mensuales
+            valores_mensuales.append(round(valor_actual, 2))
+        
+        # Calcular valor final e incremento total
+        valor_inicial = valores_mensuales[0]
+        valor_final = valores_mensuales[-1]
+        crecimiento_total = ((valor_final / valor_inicial) - 1) * 100
+        crecimiento_mensual = ((1 + crecimiento_total/100) ** (1/periodo_meses) - 1) * 100
+        
+        # Identificar meses con eventos especiales
+        eventos_mercado = []
+        fechas_base = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"]
+        años = [2024, 2025, 2026, 2027]
+        
+        # Generar entre 2 y 4 eventos
+        num_eventos = random.randint(2, 4)
+        eventos_posibles = [
+            {"mes": "may", "año": 2025, "descripcion": "Temporada alta"},
+            {"mes": "oct", "año": 2025, "descripcion": "Desaceleración del mercado"},
+            {"mes": "ene", "año": 2026, "descripcion": "Impulso pre-festividades"},
+            {"mes": "jul", "año": 2026, "descripcion": "Expansión del sector"},
+            {"mes": "dic", "año": 2025, "descripcion": "Cierre fiscal favorable"},
+            {"mes": "mar", "año": 2026, "descripcion": "Nuevas regulaciones"}
+        ]
+        
+        eventos_seleccionados = random.sample(eventos_posibles, min(num_eventos, len(eventos_posibles)))
+        for evento in eventos_seleccionados:
+            eventos_mercado.append(evento)
+        
+        # Etiquetas para el eje X (meses)
+        etiquetas_meses = []
+        for i in range(periodo_meses + 1):
+            mes_idx = i % 12
+            año = años[i // 12]
+            etiqueta = f"{fechas_base[mes_idx]} {año}"
+            etiquetas_meses.append(etiqueta)
+        
+        # Crear intervalo de confianza (valores superior e inferior)
+        if request.show_confidence_interval:
+            valores_superior = [v * random.uniform(1.05, 1.15) for v in valores_mensuales]
+            valores_inferior = [v * random.uniform(0.85, 0.95) for v in valores_mensuales]
+        else:
+            valores_superior = valores_mensuales
+            valores_inferior = valores_mensuales
+        
+        # Determinar volatilidad
+        volatilidad = round(random.uniform(6.5, 12.5), 2)
+        
+        # Determinar mes de mayor y menor crecimiento
+        incrementos_mensuales = []
+        for i in range(1, len(valores_mensuales)):
+            incremento = ((valores_mensuales[i] / valores_mensuales[i-1]) - 1) * 100
+            incrementos_mensuales.append({"mes": etiquetas_meses[i], "incremento": incremento})
+        
+        incrementos_mensuales.sort(key=lambda x: x["incremento"], reverse=True)
+        mejor_mes = incrementos_mensuales[0]["mes"]
+        mejor_incremento = round(incrementos_mensuales[0]["incremento"], 2)
+        
+        peor_mes = incrementos_mensuales[-1]["mes"]
+        peor_incremento = round(incrementos_mensuales[-1]["incremento"], 2)
+        
+        # Crear recomendación basada en los resultados
+        recomendacion = ""
+        if crecimiento_total > 50:
+            recomendacion = "Basado en tu proyección de ingresos, es recomendable preparar tu operación para escalar rápidamente. Considera invertir en capacidad adicional y optimizar procesos para mantener la calidad durante este fuerte crecimiento."
+        elif crecimiento_total > 20:
+            recomendacion = "Tu negocio muestra un crecimiento sólido. Recomendamos reforzar tus procesos operativos y comenzar a planificar la siguiente fase de expansión para aprovechar esta tendencia positiva."
+        else:
+            recomendacion = "Tu proyección muestra un crecimiento moderado. Enfócate en optimizar costos y mejorar márgenes, mientras exploras nuevas oportunidades de mercado para acelerar el crecimiento."
+        
+        # Añadir recomendación sobre volatilidad
+        if volatilidad > 10:
+            recomendacion += " La tendencia histórica volátil sugiere preparar planes de contingencia para diferentes escenarios. Mantén reservas operativas y financieras para adaptarte a cambios bruscos."
+        else:
+            recomendacion += " Tu negocio muestra una tendencia estable, lo que facilita la planificación a largo plazo. Aprovecha esta estabilidad para realizar inversiones estratégicas con mayor confianza."
+        
+        # Construir respuesta
+        respuesta = {
+            "kpi_type": request.kpi_type,
+            "initial_value": valor_inicial,
+            "final_value": valor_final,
+            "monthly_values": valores_mensuales,
+            "upper_limit": valores_superior,
+            "lower_limit": valores_inferior,
+            "total_growth_percentage": round(crecimiento_total, 2),
+            "monthly_growth_percentage": round(crecimiento_mensual, 2),
+            "volatility": volatilidad,
+            "month_labels": etiquetas_meses,
+            "market_events": eventos_mercado,
+            "best_month": {
+                "month": mejor_mes,
+                "growth": mejor_incremento
+            },
+            "worst_month": {
+                "month": peor_mes,
+                "growth": peor_incremento
+            },
+            "factors": {
+                "seasonality": request.include_seasonality,
+                "market_factors": request.include_market_factors,
+                "country": pais,
+                "sector": sector
+            },
+            "recommendation": recomendacion,
+            "confidence": "moderada"
+        }
+        
+        return respuesta
+    except Exception as e:
+        print(f"Error al generar predicción de KPI: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al generar predicción de KPI: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
