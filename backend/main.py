@@ -245,15 +245,18 @@ async def query_financing_assistant(
     current_user: dict = Depends(auth.get_current_user)
 ):
     try:
-        from backend.agents.asistenteaifin import query
+        from agents.asistenteaifin import query
         
         # Obtener datos del usuario de MongoDB para pasarlos al asistente
-        user_data = json.dumps(current_user)
+        user_data = json.dumps(serialize_mongo_document(current_user))
         
         # Enviar la consulta al asistente IA
         response = query(user_data, question.get("question", ""))
         
-        return {"response": response}
+        # Extraer solo el texto de la respuesta
+        response_text = response.get("text", "")
+        
+        return {"response": response_text}
     except Exception as e:
         print(f"Error al consultar al asistente IA: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al consultar al asistente IA: {str(e)}")
