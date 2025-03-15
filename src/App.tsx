@@ -17,6 +17,7 @@ import CreditScore from "@/pages/CreditScore";
 import EmployeeSearchModule from "@/pages/EmployeeSearchModule";
 import DatabaseView from "@/pages/DatabaseView";
 import { Toaster } from "@/components/ui/toaster";
+import ChatbotAssistant from "@/components/ChatbotAssistant";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
+      <ChatbotAssistant />
     </Router>
   );
 }

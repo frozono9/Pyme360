@@ -321,6 +321,44 @@ async function queryFinancingAssistant(question) {
   }
 }
 
+// Función para consultar al asistente IA general
+async function queryGeneralAssistant(question) {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/general-assistant`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al consultar al asistente IA general');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al consultar al asistente IA general:', error);
+    
+    // En modo desarrollo, devolver una respuesta simulada
+    if (process.env.NODE_ENV !== 'production') {
+      return {
+        response: `Simulación de respuesta IA para la consulta: "${question}"\n\nHola, soy el asistente virtual de PyME360. ¿En qué puedo ayudarte? Si tienes preguntas sobre cualquiera de nuestros módulos o servicios, estaré encantado de asistirte. También puedo proporcionarte información general sobre la plataforma, recomendaciones personalizadas o ayudarte a resolver problemas específicos.`
+      };
+    }
+    
+    throw error;
+  }
+}
+
 export default {
   testMongoConnection,
   registerUser,
@@ -331,5 +369,6 @@ export default {
   getCreditScore,
   getActiveDebts,
   getTrustScore,
-  queryFinancingAssistant
+  queryFinancingAssistant,
+  queryGeneralAssistant
 }
