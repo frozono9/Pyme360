@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -443,6 +444,116 @@ function getTaxCalendar(userData: any) {
   }));
 }
 
+// Adding the missing calculateSalesMetrics function
+function calculateSalesMetrics(userData: any) {
+  const defaultResult = {
+    hasSalesData: false,
+    totalSales: 0,
+    onlineSales: 0,
+    inStoreSales: 0,
+    salesChange: 0,
+    onlinePct: 0,
+    inStorePct: 0
+  };
+  
+  if (!userData) return defaultResult;
+  
+  const ventasMensuales = userData.ventas_mensuales || {};
+  const datosMensuales = ventasMensuales.datos_mensuales || [];
+  
+  if (datosMensuales.length === 0) {
+    return defaultResult;
+  }
+  
+  const lastMonth = datosMensuales[0];
+  
+  const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
+  
+  const totalSales = lastMonth.total || 0;
+  const onlineSales = lastMonth.online || 0;
+  const inStoreSales = lastMonth.tienda || 0;
+  
+  const onlinePct = totalSales > 0 ? (onlineSales / totalSales) * 100 : 0;
+  const inStorePct = totalSales > 0 ? (inStoreSales / totalSales) * 100 : 0;
+  
+  let salesChange = 0;
+  if (prevMonth && prevMonth.total > 0) {
+    salesChange = ((totalSales - prevMonth.total) / prevMonth.total) * 100;
+  }
+  
+  return {
+    hasSalesData: true,
+    totalSales,
+    onlineSales,
+    inStoreSales,
+    salesChange,
+    onlinePct,
+    inStorePct
+  };
+}
+
+// Adding the missing calculateProfitMetrics function
+function calculateProfitMetrics(userData: any) {
+  const defaultResult = {
+    hasData: false,
+    revenue: 0,
+    grossMargin: 0,
+    netMargin: 0,
+    grossMarginChange: 0,
+    netMarginChange: 0
+  };
+  
+  if (!userData) return defaultResult;
+  
+  const margenBeneficio = userData.margen_beneficio || {};
+  const datosMensuales = margenBeneficio.datos_mensuales || [];
+  
+  if (datosMensuales.length === 0) {
+    return defaultResult;
+  }
+  
+  const lastMonth = datosMensuales[0];
+  
+  const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
+  
+  const revenue = lastMonth.ingresos || 0;
+  const cogs = lastMonth.costo_ventas || 0;
+  const opExpenses = lastMonth.gastos_operativos || 0;
+  
+  let grossMargin = lastMonth.margen_bruto !== undefined ? 
+    (typeof lastMonth.margen_bruto === 'number' ? lastMonth.margen_bruto * 100 : parseFloat(lastMonth.margen_bruto) * 100) :
+    (revenue > 0 ? ((revenue - cogs) / revenue) * 100 : 0);
+  
+  let netMargin = lastMonth.margen_neto !== undefined ? 
+    (typeof lastMonth.margen_neto === 'number' ? lastMonth.margen_neto * 100 : parseFloat(lastMonth.margen_neto) * 100) :
+    (revenue > 0 ? ((revenue - cogs - opExpenses) / revenue) * 100 : 0);
+  
+  let grossMarginChange = 0;
+  let netMarginChange = 0;
+  
+  if (prevMonth) {
+    const prevGrossMargin = prevMonth.margen_bruto !== undefined ? 
+      (typeof prevMonth.margen_bruto === 'number' ? prevMonth.margen_bruto * 100 : parseFloat(prevMonth.margen_bruto) * 100) :
+      (prevMonth.ingresos > 0 ? ((prevMonth.ingresos - prevMonth.costo_ventas) / prevMonth.ingresos) * 100 : 0);
+    
+    const prevNetMargin = prevMonth.margen_neto !== undefined ? 
+      (typeof prevMonth.margen_neto === 'number' ? prevMonth.margen_neto * 100 : parseFloat(prevMonth.margen_neto) * 100) :
+      (prevMonth.ingresos > 0 ? ((prevMonth.ingresos - prevMonth.costo_ventas - prevMonth.gastos_operativos) / prevMonth.ingresos) * 100 : 0);
+    
+    grossMarginChange = grossMargin - prevGrossMargin;
+    netMarginChange = netMargin - prevNetMargin;
+  }
+  
+  return {
+    hasData: true,
+    revenue,
+    grossMargin,
+    netMargin,
+    grossMarginChange,
+    netMarginChange
+  };
+}
+
 const ManagementModule = () => {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -616,7 +727,7 @@ const ManagementModule = () => {
                       formatCurrency(metrics.expenseMetrics.totalExpenses) : "No disponible"} 
                     trend={metrics.expenseMetrics.hasData ? 
                       `${metrics.expenseMetrics.expenseChange > 0 ? '+' : ''}${metrics.expenseMetrics.expenseChange.toFixed(1)}%` : "--"}
-                    trendDirection={metrics.expenseMetrics.hasData && metrics.expenseChange < 0 ? "down" : "up"}
+                    trendDirection={metrics.expenseMetrics.hasData && metrics.expenseMetrics.expenseChange < 0 ? "down" : "up"}
                     icon={<TrendingDown />}
                     color={metrics.expenseMetrics.hasData && metrics.expenseMetrics.expenseChange < 0 ? "green" : "amber"}
                   />
