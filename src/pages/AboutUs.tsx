@@ -29,10 +29,10 @@ const AboutUs = () => {
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-pyme-blue/20 to-pyme-blue-light/20 flex items-center justify-center mb-4">
                 <span className="text-5xl">🐷</span>
               </div>
-              <h3 className="text-xl font-bold text-pyme-navy">Napoleón</h3>
+              <h3 className="text-xl font-bold text-pyme-navy">Alex</h3>
               <p className="text-pyme-gray text-center mt-2">CEO & Fundador</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
-                Experto en estrategia empresarial y visión de futuro para PyMEs.
+                Ingeniero y estudiante de primer curso de IA en la UPC.
               </p>
             </div>
             
@@ -41,10 +41,10 @@ const AboutUs = () => {
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-pyme-blue/20 to-pyme-blue-light/20 flex items-center justify-center mb-4">
                 <span className="text-5xl">🐷</span>
               </div>
-              <h3 className="text-xl font-bold text-pyme-navy">Porcinette</h3>
+              <h3 className="text-xl font-bold text-pyme-navy">Nicolas</h3>
               <p className="text-pyme-gray text-center mt-2">CFO</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
-                Especialista en finanzas y optimización fiscal para pequeños negocios.
+                Estudiante de primer curso de IA en la UPC.
               </p>
             </div>
             
@@ -53,10 +53,10 @@ const AboutUs = () => {
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-pyme-blue/20 to-pyme-blue-light/20 flex items-center justify-center mb-4">
                 <span className="text-5xl">🐷</span>
               </div>
-              <h3 className="text-xl font-bold text-pyme-navy">Jamón</h3>
+              <h3 className="text-xl font-bold text-pyme-navy">Javier</h3>
               <p className="text-pyme-gray text-center mt-2">CTO</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
-                Genio tecnológico responsable de nuestra plataforma innovadora.
+                Estudiante de primer curso de IA en la UPC.
               </p>
             </div>
             
@@ -65,10 +65,10 @@ const AboutUs = () => {
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-pyme-blue/20 to-pyme-blue-light/20 flex items-center justify-center mb-4">
                 <span className="text-5xl">🐷</span>
               </div>
-              <h3 className="text-xl font-bold text-pyme-navy">Tocino</h3>
+              <h3 className="text-xl font-bold text-pyme-navy">Robert</h3>
               <p className="text-pyme-gray text-center mt-2">COO</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
-                Experto en operaciones y procesos eficientes para empresas en crecimiento.
+                Estudiante de primer curso de IA en la UPC.
               </p>
             </div>
           </div>
@@ -81,7 +81,7 @@ const AboutUs = () => {
             )}>
               <h2 className="text-2xl font-bold text-pyme-navy mb-4">Nuestra Historia</h2>
               <p className="text-pyme-gray-dark mb-4">
-                Porks in París nació en 2020 cuando cuatro amigos cerditos con experiencia en diferentes áreas de negocio decidieron unir fuerzas para crear una solución integral que ayudara a las pequeñas y medianas empresas a prosperar en un mercado cada vez más competitivo.
+                Porks in París nació en 2024 cuando cuatro estudiantes cerditos con experiencia en diferentes áreas de IA decidieron unir fuerzas para crear una solución integral que ayudara a las pequeñas y medianas empresas a prosperar en un mercado cada vez más competitivo.
               </p>
               <p className="text-pyme-gray-dark mb-4">
                 Tras experimentar de primera mano los desafíos que enfrentan las PyMEs, desarrollamos PyME360: una plataforma todo en uno que simplifica la gestión empresarial, el cumplimiento regulatorio y el acceso a financiamiento.

@@ -6,8 +6,66 @@ import { ArrowRight, CreditCard, Building, Bot, PieChart, BarChart, Award } from
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import api from "@/api";
+
+interface CreditScoreData {
+  score: number;
+  maxScore: number;
+  level: string;
+  percentage: number;
+  nivel?: {
+    nivel: string;
+    color: string;
+    description: string;
+  };
+}
 
 const FinancingModule = () => {
+  const [username, setUsername] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [creditScore, setCreditScore] = useState<CreditScoreData>({
+    score: 0,
+    maxScore: 850,
+    level: "N/A",
+    percentage: 0,
+  });
+
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const creditScoreData = await api.getCreditScore();
+      if (creditScoreData) {
+        const scoreValue = creditScoreData.score || 0;
+        setCreditScore({
+          score: scoreValue,
+          maxScore: 850,
+          level: creditScoreData.nivel?.nivel || "N/A",
+          percentage: creditScoreData.components?.payment_history?.percentage || 0,
+          nivel: creditScoreData.nivel
+        });
+        console.log("Credit Score set to:", scoreValue);
+      }
+    } catch (error) {
+      console.error("Error fetching credit score data:", error);
+      toast({
+        variant: "destructive",
+        title: "Error de datos",
+        description: "No se pudieron cargar los datos del puntaje crediticio",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -39,36 +97,36 @@ const FinancingModule = () => {
             {/* Mini Dashboard */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-10 mb-10 max-w-5xl mx-auto">
               <DashboardCard 
-                icon={<Award className="h-10 w-10 text-pyme-blue" />}
-                title="AI Credit Score"
-                description="Evaluación crediticia basada en datos reales de tu empresa"
-                linkTo="/financiamiento/credito"
-                metrics={[
-                  { label: "Puntuación Media", value: "720" },
-                  { label: "Mejora Potencial", value: "+85 pts" }
-                ]}
+              icon={<Award className="h-10 w-10 text-pyme-blue" />}
+              title="AI Credit Score"
+              description="Evaluación crediticia basada en datos reales de tu empresa"
+              linkTo="/financiamiento/credito"
+              metrics={[
+                { label: "Puntuación Actual", value: `${creditScore.score}` },
+                { label: "Nivel", value: `${creditScore.nivel?.nivel}` }
+              ]}
               />
               
               <DashboardCard 
-                icon={<Building className="h-10 w-10 text-pyme-success" />}
-                title="Marketplace Financiero"
-                description="Opciones de financiamiento personalizadas"
-                linkTo="/financiamiento/marketplace"
-                metrics={[
-                  { label: "Opciones Disponibles", value: "12+" },
-                  { label: "Tasa Promedio", value: "9.4%" }
-                ]}
+              icon={<Building className="h-10 w-10 text-pyme-success" />}
+              title="Marketplace Financiero"
+              description="Opciones de financiamiento personalizadas"
+              linkTo="/financiamiento/marketplace"
+              metrics={[
+                { label: "Opciones Disponibles", value: "12+" },
+                { label: "Tasa Promedio", value: "9.4%" }
+              ]}
               />
               
               <DashboardCard 
-                icon={<Bot className="h-10 w-10 text-pyme-warning" />}
-                title="Asesor IA Personalizado"
-                description="Consultas y recomendaciones de financiamiento"
-                linkTo="/financiamiento/asesor-ia"
-                metrics={[
-                  { label: "Respuestas Precisas", value: "+90%" },
-                  { label: "Recomendaciones", value: "Personalizadas" }
-                ]}
+              icon={<Bot className="h-10 w-10 text-pyme-warning" />}
+              title="Asesor IA Personalizado"
+              description="Consultas y recomendaciones de financiamiento"
+              linkTo="/financiamiento/asesor-ia"
+              metrics={[
+                { label: "Respuestas Precisas", value: "+90%" },
+                { label: "Recomendaciones", value: "Personalizadas" }
+              ]}
               />
             </div>
           </div>
