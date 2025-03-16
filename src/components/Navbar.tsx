@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, Database, LayoutDashboard, DollarSign, FileText, CheckCircle, TrendingUp, Award } from 'lucide-react';
+import { Menu, X, LogOut, Database, LayoutDashboard, DollarSign, FileText, TrendingUp, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,16 +13,13 @@ const Navbar = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is logged in
     const checkAuth = () => {
       const userJson = localStorage.getItem("pyme360-user");
       setIsAuthenticated(!!userJson);
     };
     
-    // Initial check
     checkAuth();
     
-    // Listen for storage changes (in case user logs in/out in another tab)
     window.addEventListener('storage', checkAuth);
 
     const handleScroll = () => {
@@ -40,7 +36,6 @@ const Navbar = () => {
     };
   }, [scrolled]);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
@@ -93,16 +88,13 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Desktop nav */}
           <nav className="hidden md:flex items-center space-x-1">
             {!isAuthenticated ? (
-              // Links for non-authenticated users
               <>
                 <NavLink to="/">Inicio</NavLink>
                 <NavLink to="/nosotros">Nosotros</NavLink>
               </>
             ) : (
-              // Links for authenticated users
               <>
                 <NavLink to="/dashboard">
                   <div className="flex items-center">
@@ -120,12 +112,6 @@ const Navbar = () => {
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-1" />
                     Gestión Empresarial
-                  </div>
-                </NavLink>
-                <NavLink to="/cumplimiento">
-                  <div className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    Cumplimiento Regulatorio
                   </div>
                 </NavLink>
                 <NavLink to="/crecimiento">
@@ -177,7 +163,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button 
               onClick={toggleMenu}
@@ -189,14 +174,12 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       <div className={cn(
         "md:hidden transition-all duration-300 overflow-hidden ease-in-out bg-white/90 backdrop-blur-md border-b",
         isOpen ? "max-h-[400px] border-pyme-gray-light" : "max-h-0 border-transparent"
       )}>
         <div className="px-4 pt-2 pb-4 space-y-1">
           {!isAuthenticated ? (
-            // Mobile links for non-authenticated users
             <>
               <Link 
                 to="/" 
@@ -212,7 +195,6 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            // Mobile links for authenticated users
             <>
               <Link 
                 to="/dashboard" 
@@ -234,13 +216,6 @@ const Navbar = () => {
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Gestión Empresarial
-              </Link>
-              <Link 
-                to="/cumplimiento" 
-                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
-              >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Cumplimiento Regulatorio
               </Link>
               <Link 
                 to="/crecimiento" 

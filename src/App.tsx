@@ -10,7 +10,6 @@ import NotFound from "@/pages/NotFound";
 import Certification from "@/pages/Certification";
 import ManagementModule from "@/pages/ManagementModule";
 import FinancingModule from "@/pages/FinancingModule";
-import ComplianceModule from "@/pages/ComplianceModule";
 import GrowthModule from "@/pages/GrowthModule";
 import FinancingPreparation from "@/pages/FinancingPreparation";
 import FinancingMarketplace from "@/pages/FinancingMarketplace";
@@ -41,7 +40,6 @@ function App() {
           <Route path="/financiamiento/marketplace" element={<FinancingMarketplace />} />
           <Route path="/financiamiento/asesor-ia" element={<FinancingAiAdvisor />} />
           <Route path="/financiamiento/credito" element={<CreditScore />} />
-          <Route path="/cumplimiento" element={<ComplianceModule />} />
           <Route path="/crecimiento/*" element={<GrowthModule />} />
           <Route path="/busqueda-empleados" element={<EmployeeSearchModule />} />
           <Route path="/database" element={<DatabaseView />} />
