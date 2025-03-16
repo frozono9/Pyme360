@@ -114,7 +114,7 @@ const MarketTrendsAnalysis = () => {
     );
   }
 
-  const { text, trends_data } = trendsData;
+  const { trends_data } = trendsData || {};
   const { sector, pais, historic, impact_factors, opportunity_areas, projection } = trends_data || {};
 
   const historicDates = historic?.dates || [];
@@ -135,14 +135,12 @@ const MarketTrendsAnalysis = () => {
   }));
 
   return (
-    // Increased bottom margin to ensure no footer overlap
     <div className="space-y-6 mb-24">
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h2 className="text-xl font-bold mb-4 flex items-center">
           <TrendingUp className="mr-2 text-pyme-blue" />
           Análisis de Tendencias: {sector || "Tu Sector"}{pais ? ` - ${pais}` : ''}
         </h2>
-        <p className="text-gray-700 mb-6">{text}</p>
         
         <form onSubmit={handleQuestionSubmit} className="flex gap-2 mb-6">
           <Input
@@ -157,8 +155,8 @@ const MarketTrendsAnalysis = () => {
           </Button>
         </form>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="mb-6 w-full justify-start">
             <TabsTrigger value="historic" className="flex items-center">
               <TrendingUp className="mr-1 h-4 w-4" />
               Tendencias Históricas
@@ -177,187 +175,188 @@ const MarketTrendsAnalysis = () => {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="historic">
-            <Card>
-              <CardHeader>
-                <CardTitle>Evolución del Sector</CardTitle>
-                <CardDescription>Tendencias de los últimos 12 meses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Fixed height container to prevent layout shifts */}
-                <div className="h-[350px] w-full">
-                  <ChartContainer
-                    config={{
-                      sector: { color: "#2563eb" },
-                      subsector1: { color: "#059669" },
-                      subsector2: { color: "#d97706" },
-                      subsector3: { color: "#7c3aed" }
-                    }}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={historicData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip content={<ChartTooltipContent />} />
-                        <Legend />
-                        <Line 
-                          type="monotone" 
-                          dataKey="sector" 
-                          name="Sector General" 
-                          stroke="#2563eb" 
-                          strokeWidth={2} 
-                          dot={{ r: 4 }} 
-                        />
-                        {historic?.subsectors?.map((subsector, idx) => (
-                          <Line 
-                            key={subsector.name}
-                            type="monotone" 
-                            dataKey={subsector.name} 
-                            stroke={idx === 0 ? "#059669" : idx === 1 ? "#d97706" : "#7c3aed"}
-                            strokeWidth={1.5}
-                            dot={{ r: 3 }}
-                          />
-                        ))}
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="impact">
-            <Card>
-              <CardHeader>
-                <CardTitle>Factores de Impacto</CardTitle>
-                <CardDescription>Nivel de influencia en el mercado</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[350px] w-full">
-                  <ChartContainer
-                    config={{
-                      impact: { color: "#2563eb" }
-                    }}
-                  >
-                    {impact_factors && impact_factors.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <TabsContent value="historic" className="col-span-full m-0">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle>Evolución del Sector</CardTitle>
+                  <CardDescription>Tendencias de los últimos 12 meses</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] w-full">
+                    <ChartContainer
+                      config={{
+                        sector: { color: "#2563eb" },
+                        subsector1: { color: "#059669" },
+                        subsector2: { color: "#d97706" },
+                        subsector3: { color: "#7c3aed" }
+                      }}
+                    >
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart 
-                          data={impact_factors}
-                          layout="vertical"
-                          margin={{ top: 20, right: 30, left: 120, bottom: 5 }}
-                        >
+                        <LineChart data={historicData}>
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis type="number" domain={[0, 10]} />
-                          <YAxis type="category" dataKey="factor" width={100} />
+                          <XAxis dataKey="date" />
+                          <YAxis />
                           <Tooltip content={<ChartTooltipContent />} />
-                          <Bar dataKey="impact" fill="#2563eb" name="Nivel de Impacto" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-gray-500">
-                        No hay datos disponibles
-                      </div>
-                    )}
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="opportunity">
-            <Card>
-              <CardHeader>
-                <CardTitle>Áreas de Oportunidad</CardTitle>
-                <CardDescription>Potencial por área estratégica</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[350px] w-full">
-                  <ChartContainer
-                    config={{
-                      value: { color: "#2563eb" }
-                    }}
-                  >
-                    {opportunity_areas && opportunity_areas.length > 0 ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart outerRadius={90} data={opportunity_areas}>
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="area" />
-                          <PolarRadiusAxis domain={[0, 100]} />
-                          <Radar 
-                            name="Potencial" 
-                            dataKey="value" 
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="sector" 
+                            name="Sector General" 
                             stroke="#2563eb" 
-                            fill="#2563eb" 
-                            fillOpacity={0.6} 
+                            strokeWidth={2} 
+                            dot={{ r: 4 }} 
                           />
-                          <Tooltip content={<ChartTooltipContent />} />
-                        </RadarChart>
+                          {historic?.subsectors?.map((subsector, idx) => (
+                            <Line 
+                              key={subsector.name}
+                              type="monotone" 
+                              dataKey={subsector.name} 
+                              stroke={idx === 0 ? "#059669" : idx === 1 ? "#d97706" : "#7c3aed"}
+                              strokeWidth={1.5}
+                              dot={{ r: 3 }}
+                            />
+                          ))}
+                        </LineChart>
                       </ResponsiveContainer>
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-gray-500">
-                        No hay datos disponibles
-                      </div>
-                    )}
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="projection">
-            <Card>
-              <CardHeader>
-                <CardTitle>Proyección a 6 Meses</CardTitle>
-                <CardDescription>Escenarios de evolución del mercado</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[350px] w-full">
-                  <ChartContainer
-                    config={{
-                      baseline: { color: "#2563eb" },
-                      optimistic: { color: "#059669" },
-                      pessimistic: { color: "#dc2626" }
-                    }}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={projectionData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip content={<ChartTooltipContent />} />
-                        <Legend />
-                        <Line 
-                          type="monotone" 
-                          dataKey="baseline" 
-                          name="Escenario Base" 
-                          stroke="#2563eb" 
-                          strokeWidth={2} 
-                          dot={{ r: 4 }} 
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="optimistic" 
-                          name="Escenario Optimista" 
-                          stroke="#059669" 
-                          strokeWidth={1.5}
-                          strokeDasharray="5 5"
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="pessimistic" 
-                          name="Escenario Pesimista" 
-                          stroke="#dc2626" 
-                          strokeWidth={1.5}
-                          strokeDasharray="5 5"
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="impact" className="m-0">
+              <Card className="h-full">
+                <CardHeader className="pb-2">
+                  <CardTitle>Factores de Impacto</CardTitle>
+                  <CardDescription>Nivel de influencia en el mercado</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] w-full">
+                    <ChartContainer
+                      config={{
+                        impact: { color: "#2563eb" }
+                      }}
+                    >
+                      {impact_factors && impact_factors.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart 
+                            data={impact_factors}
+                            layout="vertical"
+                            margin={{ top: 20, right: 30, left: 120, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis type="number" domain={[0, 10]} />
+                            <YAxis type="category" dataKey="factor" width={100} />
+                            <Tooltip content={<ChartTooltipContent />} />
+                            <Bar dataKey="impact" fill="#2563eb" name="Nivel de Impacto" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-gray-500">
+                          No hay datos disponibles
+                        </div>
+                      )}
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="opportunity" className="m-0">
+              <Card className="h-full">
+                <CardHeader className="pb-2">
+                  <CardTitle>Áreas de Oportunidad</CardTitle>
+                  <CardDescription>Potencial por área estratégica</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] w-full">
+                    <ChartContainer
+                      config={{
+                        value: { color: "#2563eb" }
+                      }}
+                    >
+                      {opportunity_areas && opportunity_areas.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RadarChart outerRadius={130} data={opportunity_areas}>
+                            <PolarGrid />
+                            <PolarAngleAxis dataKey="area" />
+                            <PolarRadiusAxis domain={[0, 100]} />
+                            <Radar 
+                              name="Potencial" 
+                              dataKey="value" 
+                              stroke="#2563eb" 
+                              fill="#2563eb" 
+                              fillOpacity={0.6} 
+                            />
+                            <Tooltip content={<ChartTooltipContent />} />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-gray-500">
+                          No hay datos disponibles
+                        </div>
+                      )}
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="projection" className="m-0">
+              <Card className="h-full">
+                <CardHeader className="pb-2">
+                  <CardTitle>Proyección a 6 Meses</CardTitle>
+                  <CardDescription>Escenarios de evolución del mercado</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] w-full">
+                    <ChartContainer
+                      config={{
+                        baseline: { color: "#2563eb" },
+                        optimistic: { color: "#059669" },
+                        pessimistic: { color: "#dc2626" }
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={projectionData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis />
+                          <Tooltip content={<ChartTooltipContent />} />
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="baseline" 
+                            name="Escenario Base" 
+                            stroke="#2563eb" 
+                            strokeWidth={2} 
+                            dot={{ r: 4 }} 
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="optimistic" 
+                            name="Escenario Optimista" 
+                            stroke="#059669" 
+                            strokeWidth={1.5}
+                            strokeDasharray="5 5"
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="pessimistic" 
+                            name="Escenario Pesimista" 
+                            stroke="#dc2626" 
+                            strokeWidth={1.5}
+                            strokeDasharray="5 5"
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>
