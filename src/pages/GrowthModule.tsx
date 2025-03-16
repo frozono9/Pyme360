@@ -7,6 +7,7 @@ import { TrendingUp, BarChart2, ArrowUpRight, Users, Database } from "lucide-rea
 import { KpiPredictionEntry } from "@/components/growth/KpiPredictionEntry";
 import { KpiPredictor } from "@/components/growth/KpiPredictor";
 import MarketTrendsAnalysis from "@/components/growth/MarketTrendsAnalysis";
+import DataAnalysis from "@/components/growth/DataAnalysis";
 
 const GrowthModule = () => {
   return (
@@ -217,10 +218,7 @@ const DataAnalysisPage = () => {
           </button>
         </div>
         
-        <Card className="p-8 text-center">
-          <p className="text-gray-500 mb-4">Próximamente: Herramientas avanzadas de análisis de datos</p>
-          <p className="text-gray-400">Esta sección está en desarrollo</p>
-        </Card>
+        <DataAnalysis />
       </main>
       
       <Footer />
