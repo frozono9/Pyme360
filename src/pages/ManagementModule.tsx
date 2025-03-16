@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -49,7 +48,6 @@ import {
   Legend
 } from "recharts";
 
-// Importaciones de componentes
 import { KpiCard } from "@/components/management/KpiCard";
 import { ErpModuleCard } from "@/components/management/ErpModuleCard";
 import { EfficiencyCard } from "@/components/management/EfficiencyCard";
@@ -61,7 +59,6 @@ const ManagementModule = () => {
   const [error, setError] = useState(null);
   const { toast } = useToast();
   
-  // Fetch user data from MongoDB
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -88,23 +85,17 @@ const ManagementModule = () => {
     fetchUserData();
   }, [toast]);
 
-  // Calculate financial metrics from user data
   const calculateFinancialMetrics = () => {
     if (!userData) return null;
     
-    // Sales metrics
     const salesMetrics = calculateSalesMetrics(userData);
     
-    // Profit metrics
     const profitMetrics = calculateProfitMetrics(userData);
     
-    // Expense metrics
     const expenseMetrics = calculateExpenseMetrics(userData);
     
-    // Cash flow metrics
     const cashFlowMetrics = calculateCashFlowMetrics(userData);
     
-    // Revenue distribution
     const revenueDistribution = calculateRevenueDistribution(userData);
     
     return {
@@ -118,7 +109,6 @@ const ManagementModule = () => {
   
   const metrics = calculateFinancialMetrics();
 
-  // Format currency for display
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('es-CO', { 
       style: 'currency', 
@@ -127,7 +117,6 @@ const ManagementModule = () => {
     }).format(value);
   };
 
-  // Format percentage for display
   const formatPercentage = (value) => {
     return `${value.toFixed(1)}%`;
   };
@@ -137,9 +126,7 @@ const ManagementModule = () => {
       <Navbar />
       
       <main className="flex-grow bg-pyme-gray-light">
-        {/* Hero Section */}
         <section className="pt-24 pb-12 relative bg-gradient-to-b from-white to-pyme-gray-light overflow-hidden">
-          {/* Background decorative elements */}
           <div className="absolute inset-0">
             <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-bl from-pyme-blue/10 to-transparent blur-3xl"></div>
             <div className="absolute bottom-[10%] left-[5%] w-[30%] h-[30%] rounded-full bg-gradient-to-tr from-pyme-success/5 to-transparent blur-3xl"></div>
@@ -163,7 +150,6 @@ const ManagementModule = () => {
           </div>
         </section>
         
-        {/* ERP Comprehensive Dashboard */}
         <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <h2 className="text-2xl font-bold mb-6">ERP Simplificado</h2>
           
@@ -209,7 +195,6 @@ const ManagementModule = () => {
             </div>
           ) : metrics ? (
             <>
-              {/* Financial Overview */}
               <div className="mb-10">
                 <h3 className="text-xl font-semibold mb-4">Resumen Financiero</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 mb-8">
@@ -259,7 +244,6 @@ const ManagementModule = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                  {/* Sales Chart */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -319,7 +303,6 @@ const ManagementModule = () => {
                     </CardContent>
                   </Card>
                   
-                  {/* Revenue Distribution */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -359,7 +342,6 @@ const ManagementModule = () => {
                 </div>
               </div>
 
-              {/* Expanded Sales Section */}
               <div className="mb-10">
                 <h3 className="text-xl font-semibold mb-4">Gestión de Ventas</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
@@ -396,7 +378,6 @@ const ManagementModule = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                  {/* Sales Performance */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -424,7 +405,6 @@ const ManagementModule = () => {
                     </CardContent>
                   </Card>
                   
-                  {/* Top Products */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -452,7 +432,6 @@ const ManagementModule = () => {
                 </div>
               </div>
               
-              {/* Accounting and Finance - Expanded */}
               <div>
                 <h3 className="text-xl font-semibold mb-4">Contabilidad y Finanzas</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 mb-8">
@@ -494,7 +473,6 @@ const ManagementModule = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                  {/* Income vs Expenses */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -522,7 +500,6 @@ const ManagementModule = () => {
                     </CardContent>
                   </Card>
                   
-                  {/* Financial Efficiency */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">Indicadores Financieros</CardTitle>
@@ -556,9 +533,7 @@ const ManagementModule = () => {
                   </Card>
                 </div>
 
-                {/* Expense Analysis */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                  {/* Expense Categories */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -596,7 +571,6 @@ const ManagementModule = () => {
                     </CardContent>
                   </Card>
                   
-                  {/* Expense Trend */}
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -626,7 +600,6 @@ const ManagementModule = () => {
                   </Card>
                 </div>
 
-                {/* Tax Management */}
                 <div className="grid grid-cols-1 gap-6 mb-8">
                   <Card className="overflow-hidden border-none shadow-elevation">
                     <CardHeader className="pb-2">
@@ -673,13 +646,10 @@ const ManagementModule = () => {
   );
 };
 
-// Constants
 const PRODUCT_COLORS = ['#2563eb', '#0891b2', '#059669', '#65a30d', '#d97706'];
 const EXPENSE_COLORS = ['#f59e0b', '#2563eb', '#059669', '#dc2626', '#7c3aed'];
 
-// Funciones de cálculo basadas en DatabaseView.tsx
 function calculateSalesMetrics(userData) {
-  // Default result with no data
   const defaultResult = {
     hasSalesData: false,
     totalSales: 0,
@@ -692,7 +662,6 @@ function calculateSalesMetrics(userData) {
   
   if (!userData) return defaultResult;
   
-  // Check if sales data exists
   const ventasMensuales = userData.ventas_mensuales || {};
   const datosMensuales = ventasMensuales.datos_mensuales || [];
   
@@ -700,21 +669,17 @@ function calculateSalesMetrics(userData) {
     return defaultResult;
   }
   
-  // Get the most recent month
   const lastMonth = datosMensuales[0];
   
-  // Get previous month if available
   const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
   
   const totalSales = lastMonth.total || 0;
   const onlineSales = lastMonth.online || 0;
   const inStoreSales = lastMonth.tienda || 0;
   
-  // Calculate percentages
   const onlinePct = totalSales > 0 ? (onlineSales / totalSales) * 100 : 0;
   const inStorePct = totalSales > 0 ? (inStoreSales / totalSales) * 100 : 0;
   
-  // Calculate month-over-month change
   let salesChange = 0;
   if (prevMonth && prevMonth.total > 0) {
     salesChange = ((totalSales - prevMonth.total) / prevMonth.total) * 100;
@@ -732,7 +697,6 @@ function calculateSalesMetrics(userData) {
 }
 
 function calculateProfitMetrics(userData) {
-  // Default result with no data
   const defaultResult = {
     hasData: false,
     revenue: 0,
@@ -744,7 +708,6 @@ function calculateProfitMetrics(userData) {
   
   if (!userData) return defaultResult;
   
-  // Check if margin data exists
   const margenBeneficio = userData.margen_beneficio || {};
   const datosMensuales = margenBeneficio.datos_mensuales || [];
   
@@ -752,17 +715,14 @@ function calculateProfitMetrics(userData) {
     return defaultResult;
   }
   
-  // Get the most recent month
   const lastMonth = datosMensuales[0];
   
-  // Get previous month if available
   const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
   
   const revenue = lastMonth.ingresos || 0;
   const cogs = lastMonth.costo_ventas || 0;
   const opExpenses = lastMonth.gastos_operativos || 0;
   
-  // Calculate margins
   let grossMargin = lastMonth.margen_bruto !== undefined ? 
     (typeof lastMonth.margen_bruto === 'number' ? lastMonth.margen_bruto * 100 : parseFloat(lastMonth.margen_bruto) * 100) :
     (revenue > 0 ? ((revenue - cogs) / revenue) * 100 : 0);
@@ -771,7 +731,6 @@ function calculateProfitMetrics(userData) {
     (typeof lastMonth.margen_neto === 'number' ? lastMonth.margen_neto * 100 : parseFloat(lastMonth.margen_neto) * 100) :
     (revenue > 0 ? ((revenue - cogs - opExpenses) / revenue) * 100 : 0);
   
-  // Calculate month-over-month changes
   let grossMarginChange = 0;
   let netMarginChange = 0;
   
@@ -799,7 +758,6 @@ function calculateProfitMetrics(userData) {
 }
 
 function calculateExpenseMetrics(userData) {
-  // Default result with no data
   const defaultResult = {
     hasData: false,
     totalExpenses: 0,
@@ -812,7 +770,6 @@ function calculateExpenseMetrics(userData) {
   
   if (!userData) return defaultResult;
   
-  // Check if expense data exists
   const gastos = userData.gastos || {};
   const datosMensuales = gastos.datos_mensuales || [];
   
@@ -820,21 +777,17 @@ function calculateExpenseMetrics(userData) {
     return defaultResult;
   }
   
-  // Get the most recent month
   const lastMonth = datosMensuales[0];
   
-  // Get previous month if available
   const prevMonth = datosMensuales.length > 1 ? datosMensuales[1] : null;
   
   const totalExpenses = lastMonth.total || 0;
   const fixedExpenses = lastMonth.fijos || 0;
   const variableExpenses = lastMonth.variables || 0;
   
-  // Calculate percentages
   const fixedPct = totalExpenses > 0 ? (fixedExpenses / totalExpenses) * 100 : 0;
   const variablePct = totalExpenses > 0 ? (variableExpenses / totalExpenses) * 100 : 0;
   
-  // Calculate month-over-month change
   let expenseChange = 0;
   if (prevMonth && prevMonth.total > 0) {
     expenseChange = ((totalExpenses - prevMonth.total) / prevMonth.total) * 100;
@@ -852,7 +805,6 @@ function calculateExpenseMetrics(userData) {
 }
 
 function calculateCashFlowMetrics(userData) {
-  // Default result with no data
   const defaultResult = {
     hasData: false,
     beginningCash: 0,
@@ -865,7 +817,6 @@ function calculateCashFlowMetrics(userData) {
   
   if (!userData) return defaultResult;
   
-  // Check if cash flow data exists
   const flujoCaja = userData.flujo_caja || {};
   const datosMensuales = flujoCaja.datos_mensuales || [];
   
@@ -873,7 +824,6 @@ function calculateCashFlowMetrics(userData) {
     return defaultResult;
   }
   
-  // Get the most recent month
   const lastMonth = datosMensuales[0];
   
   const beginningCash = lastMonth.saldo_inicial || 0;
@@ -881,7 +831,6 @@ function calculateCashFlowMetrics(userData) {
   const cashDisbursements = lastMonth.egresos || 0;
   const endingCash = lastMonth.saldo_final || beginningCash + cashReceipts - cashDisbursements;
   
-  // Calculate cash flow change
   const cashFlowChange = endingCash - beginningCash;
   const cashFlowChangePct = beginningCash > 0 ? (cashFlowChange / beginningCash) * 100 : 0;
   
@@ -897,7 +846,6 @@ function calculateCashFlowMetrics(userData) {
 }
 
 function calculateRevenueDistribution(userData) {
-  // Default result with no data
   const defaultResult = {
     hasData: false,
     categories: []
@@ -905,7 +853,6 @@ function calculateRevenueDistribution(userData) {
   
   if (!userData) return defaultResult;
   
-  // Check if revenue distribution data exists
   const distribucionIngresos = userData.distribucion_ingresos || {};
   const porProducto = distribucionIngresos.por_producto || [];
   
@@ -913,7 +860,6 @@ function calculateRevenueDistribution(userData) {
     return defaultResult;
   }
   
-  // Map the product data to the categories
   const categories = porProducto.map((item) => {
     return {
       name: item.producto || 'Sin nombre',
@@ -922,7 +868,6 @@ function calculateRevenueDistribution(userData) {
     };
   });
   
-  // Sort by percentage (descending)
   categories.sort((a, b) => b.percentage - a.percentage);
   
   return {
@@ -931,7 +876,6 @@ function calculateRevenueDistribution(userData) {
   };
 }
 
-// Funciones de transformación de datos para gráficos
 function transformSalesData(userData) {
   if (!userData || !userData.ventas_mensuales || !userData.ventas_mensuales.datos_mensuales) {
     return [
@@ -950,9 +894,8 @@ function transformSalesData(userData) {
   ];
 
   const monthsData = userData.ventas_mensuales.datos_mensuales;
-  const targetMultiplier = 1.05; // Target is 5% higher than actual sales
+  const targetMultiplier = 1.05;
 
-  // Populate with real data if available
   monthsData.forEach((month, index) => {
     if (index < 12) {
       const quarterIndex = Math.floor(index / 3);
@@ -975,13 +918,11 @@ function transformProductData(userData) {
   
   const productsData = userData.distribucion_ingresos.por_producto;
   
-  // Transform the data
   const result = productsData.map(product => ({
     name: product.producto || 'Sin nombre',
     value: product.ingresos_anuales || 0
   }));
   
-  // If we have more than 4 products, group the smallest ones as "Otros"
   if (result.length > 4) {
     result.sort((a, b) => b.value - a.value);
     
@@ -1001,7 +942,6 @@ function transformTrendData(userData) {
     return [];
   }
 
-  // Default data
   const defaultMonths = [
     { name: 'Ene', ventas: 0, costos: 0 },
     { name: 'Feb', ventas: 0, costos: 0 },
@@ -1014,12 +954,10 @@ function transformTrendData(userData) {
   const ventasMensuales = userData.ventas_mensuales?.datos_mensuales || [];
   const gastosMensuales = userData.gastos?.datos_mensuales || [];
 
-  // Skip if not enough data
   if (ventasMensuales.length === 0 && gastosMensuales.length === 0) {
     return defaultMonths;
   }
 
-  // Populate with real data if available
   const result = defaultMonths.map((item, index) => {
     const ventas = index < ventasMensuales.length ? (ventasMensuales[index].total || 0) : 0;
     const costos = index < gastosMensuales.length ? (gastosMensuales[index].total || 0) : 0;
@@ -1047,13 +985,11 @@ function transformExpenseData(userData) {
 
   const expenseCategories = userData.gastos.categorias;
   
-  // Transform the data
   const result = Object.entries(expenseCategories).map(([key, value]) => ({
     name: key,
     value: value
   }));
   
-  // If we have less than 2 categories, add default data
   if (result.length < 2) {
     return [
       { name: 'Operativos', value: 35000 },
@@ -1088,7 +1024,6 @@ function transformExpenseTrendData(userData) {
   const expenseTrend = userData.gastos.tendencia_mensual;
   const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   
-  // Prepare the 12-month data array
   const data = Array(12).fill().map((_, i) => ({
     name: monthNames[i],
     operativos: 0,
@@ -1096,11 +1031,9 @@ function transformExpenseTrendData(userData) {
     marketing: 0
   }));
   
-  // Populate with real data if available
   Object.entries(expenseTrend).forEach(([month, categories]) => {
-    const monthIndex = parseInt(month) - 1; // Assuming month is 1-12
+    const monthIndex = parseInt(month) - 1;
     if (monthIndex >= 0 && monthIndex < 12) {
-      // Fix: Add type assertion for categories
       const typedCategories = categories as Record<string, number>;
       data[monthIndex].operativos = typedCategories.operativos || 0;
       data[monthIndex].administrativos = typedCategories.administrativos || 0;
@@ -1124,11 +1057,10 @@ function transformSalesPerformanceData(userData) {
   }
 
   const monthsData = userData.ventas_mensuales.datos_mensuales;
-  const targetMultiplier = 1.08; // Target is 8% higher than previous month
+  const targetMultiplier = 1.08;
 
   const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
   
-  // Prepare the data array
   const result = monthNames.map((name, index) => {
     let actual = 0;
     let target = 0;
@@ -1136,12 +1068,11 @@ function transformSalesPerformanceData(userData) {
     if (index < monthsData.length) {
       actual = monthsData[index].total || 0;
       
-      // Target is based on previous month's sales + targetMultiplier
       if (index > 0) {
         const prevMonthSales = monthsData[index - 1].total || 0;
         target = Math.round(prevMonthSales * targetMultiplier);
       } else {
-        target = Math.round(actual * 0.95); // For first month, target is 95% of actual
+        target = Math.round(actual * 0.95);
       }
     }
     
@@ -1164,20 +1095,16 @@ function transformTopProductsData(userData) {
 
   const topProducts = userData.productos_mas_vendidos.mes_actual;
   
-  // Transform the data
   const result = topProducts.map(product => ({
     name: product.nombre || 'Sin nombre',
     value: product.unidades || 0
   }));
   
-  // Sort by value (descending)
   result.sort((a, b) => b.value - a.value);
   
-  // Take top 5
   return result.slice(0, 5);
 }
 
-// Funciones auxiliares para obtener datos para los KPIs
 function getUserNewClients(userData) {
   if (!userData || !userData.clientes_nuevos) {
     return "24";
@@ -1344,7 +1271,7 @@ function getCashConversionCycleChange(userData) {
 
 function isPositiveCashCycleChange(userData) {
   if (!userData || !userData.indicadores_financieros || !userData.indicadores_financieros.ciclo_conversion) {
-    return false; // Con ciclo de conversión, es negativo si aumenta
+    return false;
   }
   
   return (userData.indicadores_financieros.ciclo_conversion.cambio_dias || 0) > 0;
@@ -1384,7 +1311,6 @@ function getTaxCalendar(userData) {
     "renta": "red"
   };
   
-  // Fix: Add argument to map function
   const result = vencimientos.map((tax) => {
     const tipo = tax.tipo ? tax.tipo.toLowerCase() : "";
     const color = colorMap[tipo] || "gray";
@@ -1401,8 +1327,7 @@ function getTaxCalendar(userData) {
     };
   });
   
-  return result.slice(0, 3); // Return top 3 tax deadlines
+  return result.slice(0, 3);
 }
 
 export default ManagementModule;
-
