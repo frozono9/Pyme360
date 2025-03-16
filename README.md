@@ -2,6 +2,8 @@
 
 ## Solución de Porks In Paris para el reto de PayRetailers
 
+12:30PM VIDEO: https://youtu.be/80YUyg1KEGg
+
 ### Contexto: La fragilidad de las PyMEs en Latinoamérica
 
 Las micro, pequeñas y medianas empresas (PyMEs) representan el 99% del tejido empresarial en Latinoamérica y generan alrededor del 61% del empleo formal. A pesar de su importancia, su contribución al PIB es solo del 25%, en comparación con el 56% en la Unión Europea. Esto refleja problemas estructurales como baja productividad, alta informalidad y dificultades para insertarse en cadenas de valor y mercados internacionales. Además, el 50% de las PyMEs desaparece en sus primeros dos años de existencia.
