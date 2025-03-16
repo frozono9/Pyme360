@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -21,7 +20,6 @@ const Certification = () => {
   const [trustLevel, setTrustLevel] = useState("");
   const [nextLevel, setNextLevel] = useState("");
   const [certificationData, setCertificationData] = useState([]);
-  const [historicalScores, setHistoricalScores] = useState([]);
   const [sliderValues, setSliderValues] = useState({
     pagos: 85,
     fiscal: 70,
@@ -71,14 +69,6 @@ const Certification = () => {
             { name: 'Sostenibilidad', score: components.sostenibilidad?.puntuacion || 0, fullMark: 100 },
           ];
           setCertificationData(radarData);
-          
-          // Parse historical data
-          const historical = trustScoreData.historico || [];
-          const chartData = historical.slice(-6).map(item => ({
-            month: item.etiqueta?.split(' ')[0] || '',
-            score: item.puntuacion || 0
-          }));
-          setHistoricalScores(chartData);
           
           // Set initial slider values based on components
           setSliderValues({
@@ -258,17 +248,6 @@ const Certification = () => {
     }
   };
   
-  // Chart config for historical data
-  const chartConfig = {
-    score: {
-      label: "Score",
-      theme: {
-        light: "#7E69AB",
-        dark: "#9b87f5"
-      },
-    },
-  };
-  
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
@@ -438,36 +417,7 @@ const Certification = () => {
             </CardContent>
           </Card>
           
-          <Card className="col-span-1 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">
-                Evolución Histórica
-              </CardTitle>
-              <CardDescription>Últimos 6 meses</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[230px]">
-              <ChartContainer 
-                config={chartConfig}
-                className="h-[230px]"
-              >
-                {historicalScores.length > 0 ? (
-                  <BarChart data={historicalScores}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis domain={[40, 100]} />
-                    <Tooltip />
-                    <Bar dataKey="score" name="score" fill="#7E69AB" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-pyme-gray-dark">No hay datos históricos disponibles</p>
-                  </div>
-                )}
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          
-          <Card className="col-span-1 shadow-md hover:shadow-lg transition-shadow">
+          <Card className="col-span-1 lg:col-span-2 shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-xl">Simulador</CardTitle>
@@ -541,6 +491,39 @@ const Certification = () => {
                       <span>Sin cambios respecto a tu score actual</span>
                     )}
                   </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <h4 className="text-sm font-medium mb-1">Impacto en calificación</h4>
+                    <p className="text-xs text-gray-600">Mejorar tus pagos a tiempo en 10% podría incrementar tu score total en hasta 5 puntos.</p>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <h4 className="text-sm font-medium mb-1">Próximo nivel</h4>
+                    <p className="text-xs text-gray-600">Te faltan {getThresholdForLevel(nextLevel) - estimatedScore} puntos para alcanzar nivel {nextLevel}.</p>
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <h4 className="font-medium text-blue-800 mb-2 flex items-center">
+                    <Info className="h-4 w-4 mr-1" />
+                    Plan de Acción Sugerido
+                  </h4>
+                  <ul className="text-sm text-blue-800 space-y-2">
+                    <li className="flex items-start">
+                      <Check className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
+                      <span>Mejora tu puntualidad de pagos a proveedores</span>
+                    </li>
+                    <li className="flex items-start">
+                      <Check className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
+                      <span>Actualiza tu documentación fiscal</span>
+                    </li>
+                    <li className="flex items-start">
+                      <Check className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
+                      <span>Implementa prácticas de sostenibilidad</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -699,3 +682,4 @@ const Certification = () => {
 };
 
 export default Certification;
+
