@@ -1100,9 +1100,11 @@ function transformExpenseTrendData(userData) {
   Object.entries(expenseTrend).forEach(([month, categories]) => {
     const monthIndex = parseInt(month) - 1; // Assuming month is 1-12
     if (monthIndex >= 0 && monthIndex < 12) {
-      data[monthIndex].operativos = categories.operativos || 0;
-      data[monthIndex].administrativos = categories.administrativos || 0;
-      data[monthIndex].marketing = categories.marketing || 0;
+      // Fix: Add type assertion for categories
+      const typedCategories = categories as Record<string, number>;
+      data[monthIndex].operativos = typedCategories.operativos || 0;
+      data[monthIndex].administrativos = typedCategories.administrativos || 0;
+      data[monthIndex].marketing = typedCategories.marketing || 0;
     }
   });
   
@@ -1382,7 +1384,8 @@ function getTaxCalendar(userData) {
     "renta": "red"
   };
   
-  const result = vencimientos.map(tax => {
+  // Fix: Add argument to map function
+  const result = vencimientos.map((tax) => {
     const tipo = tax.tipo ? tax.tipo.toLowerCase() : "";
     const color = colorMap[tipo] || "gray";
     
