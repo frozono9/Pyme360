@@ -338,13 +338,13 @@ def analizar_datos_pyme_mejorado(dataframe, target_variable, tipo_problema='clas
 
     return resultados
 
-# Ejemplo de uso (con la función mejorada):
-df = pd.read_csv('pruebas_sigma/train.csv')
-resultados_mejorado = analizar_datos_pyme_mejorado(df, 'Survived', tipo_problema='clasificacion', max_features_vis=7, top_n_features_insight=5) # Ejemplo con parámetros ajustados
-print(json.dumps(resultados_mejorado, indent=2, ensure_ascii=False))
-# Guardar resultados en un archivo JSON
-output_path = '/Users/nicolasrosales/Desktop/prueba json/pruebas_sigma/resultados_analisis.json'
-with open(output_path, 'w', encoding='utf-8') as f:
-    json.dump(resultados_mejorado, f, ensure_ascii=False, indent=2)
+# # Ejemplo de uso (con la función mejorada):
+# df = pd.read_csv('pruebas_sigma/train.csv')
+# resultados_mejorado = analizar_datos_pyme_mejorado(df, 'Survived', tipo_problema='clasificacion', max_features_vis=7, top_n_features_insight=5) # Ejemplo con parámetros ajustados
+# print(json.dumps(resultados_mejorado, indent=2, ensure_ascii=False))
+# # Guardar resultados en un archivo JSON
+# output_path = '/Users/nicolasrosales/Desktop/prueba json/pruebas_sigma/resultados_analisis.json'
+# with open(output_path, 'w', encoding='utf-8') as f:
+#     json.dump(resultados_mejorado, f, ensure_ascii=False, indent=2)
 
-print(f"Resultados guardados en {output_path}")
+# print(f"Resultados guardados en {output_path}")

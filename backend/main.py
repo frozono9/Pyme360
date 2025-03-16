@@ -563,7 +563,7 @@ async def analyze_data(
             temp_file.write(content)
         
         # Cargar el script analizador_importancias.py dinámicamente
-        spec = importlib.util.spec_from_file_location("analizador_importancias", "backend/analizador_importancias.py")
+        spec = importlib.util.spec_from_file_location("analizador_importancias", "analizador_importancias.py")
         analizador_module = importlib.util.module_from_spec(spec)
         sys.modules["analizador_importancias"] = analizador_module
         spec.loader.exec_module(analizador_module)
