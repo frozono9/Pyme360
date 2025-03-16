@@ -34,6 +34,7 @@ def calculate_payment_history_score(historial_crediticio: Dict) -> Dict:
     if total_payments == 0:
         score_value = 65  # Puntuación predeterminada
         percentage = 100
+        on_time_payments = 0
     else:
         on_time_payments = total_payments - late_payments
         percentage = (on_time_payments / total_payments) * 100
