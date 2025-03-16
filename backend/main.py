@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -487,6 +486,32 @@ async def predict_kpi(
     except Exception as e:
         print(f"Error al generar predicción de KPI: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al generar predicción de KPI: {str(e)}")
+
+# Nuevo endpoint para consultar al asistente de documentación
+@app.post("/api/documentation-assistant")
+async def query_documentation_assistant(
+    question: dict,
+    current_user: dict = Depends(auth.get_current_user)
+):
+    try:
+        from agents.agentedocumentacion import query
+        
+        # Obtener datos del usuario de MongoDB para pasarlos al asistente
+        user_data = json.dumps(serialize_mongo_document(current_user))
+        
+        # Enviar la consulta al asistente IA
+        response = query(question.get("question", ""))
+        
+        # Extraer solo el texto de la respuesta
+        if isinstance(response, dict) and "text" in response:
+            response_text = response.get("text", "")
+        else:
+            response_text = str(response)
+        
+        return {"response": response_text}
+    except Exception as e:
+        print(f"Error al consultar al asistente de documentación: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al consultar al asistente de documentación: {str(e)}")
 
 
 if __name__ == "__main__":
