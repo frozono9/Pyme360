@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,58 +10,255 @@ import { Slider } from "@/components/ui/slider";
 import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { Shield, Medal, Award, CrownIcon, Info, TrendingUp, Clock, FileCheck, Building, Users, Briefcase, CreditCard, BadgeCheck, Check, AlertTriangle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import api from "@/api";
 
 const Certification = () => {
   const navigate = useNavigate();
-  const [currentScore, setCurrentScore] = useState(68);
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [currentScore, setCurrentScore] = useState(0);
+  const [trustLevel, setTrustLevel] = useState("");
+  const [nextLevel, setNextLevel] = useState("");
+  const [certificationData, setCertificationData] = useState([]);
+  const [historicalScores, setHistoricalScores] = useState([]);
+  const [sliderValues, setSliderValues] = useState({
+    pagos: 85,
+    fiscal: 70,
+    crecimiento: 60
+  });
+  const [estimatedScore, setEstimatedScore] = useState(0);
+  const [scoreDifference, setScoreDifference] = useState(0);
   
-  // Example certification data
-  const certificationData = [
-    { name: 'Cumplimiento Fiscal', score: 75, fullMark: 100 },
-    { name: 'Prácticas Laborales', score: 82, fullMark: 100 },
-    { name: 'Estabilidad Financiera', score: 60, fullMark: 100 },
-    { name: 'Puntualidad de Pagos', score: 90, fullMark: 100 },
-    { name: 'Innovación', score: 45, fullMark: 100 },
-    { name: 'Sostenibilidad', score: 55, fullMark: 100 },
-  ];
+  useEffect(() => {
+    const fetchTrustScoreData = async () => {
+      setLoading(true);
+      try {
+        const trustScoreData = await api.getTrustScore();
+        if (trustScoreData) {
+          const score = trustScoreData.calificacion_global || 0;
+          setCurrentScore(score);
+          
+          // Determine trust level based on score
+          let level = "Bronce";
+          let next = "Plata";
+          
+          if (score >= 90) {
+            level = "Platino";
+            next = "Máximo";
+          } else if (score >= 80) {
+            level = "Oro";
+            next = "Platino";
+          } else if (score >= 70) {
+            level = "Plata";
+            next = "Oro";
+          } else if (score >= 60) {
+            level = "Bronce";
+            next = "Plata";
+          }
+          
+          setTrustLevel(level);
+          setNextLevel(next);
+          
+          // Get component data for the radar chart
+          const components = trustScoreData.componentes || {};
+          const radarData = [
+            { name: 'Cumplimiento Fiscal', score: components.cumplimiento_fiscal?.puntuacion || 0, fullMark: 100 },
+            { name: 'Prácticas Laborales', score: components.practicas_laborales?.puntuacion || 0, fullMark: 100 },
+            { name: 'Estabilidad Financiera', score: components.estabilidad_financiera?.puntuacion || 0, fullMark: 100 },
+            { name: 'Puntualidad de Pagos', score: components.puntualidad_pagos?.puntuacion || 0, fullMark: 100 },
+            { name: 'Innovación', score: components.innovacion?.puntuacion || 0, fullMark: 100 },
+            { name: 'Sostenibilidad', score: components.sostenibilidad?.puntuacion || 0, fullMark: 100 },
+          ];
+          setCertificationData(radarData);
+          
+          // Parse historical data
+          const historical = trustScoreData.historico || [];
+          const chartData = historical.slice(-6).map(item => ({
+            month: item.etiqueta?.split(' ')[0] || '',
+            score: item.puntuacion || 0
+          }));
+          setHistoricalScores(chartData);
+          
+          // Set initial slider values based on components
+          setSliderValues({
+            pagos: components.puntualidad_pagos?.puntuacion || 85,
+            fiscal: components.cumplimiento_fiscal?.puntuacion || 70,
+            crecimiento: components.estabilidad_financiera?.puntuacion || 60
+          });
+          
+          // Calculate initial estimated score
+          const initialEstimate = Math.round((
+            (components.puntualidad_pagos?.puntuacion || 85) + 
+            (components.cumplimiento_fiscal?.puntuacion || 70) + 
+            (components.estabilidad_financiera?.puntuacion || 60)
+          ) / 3);
+          setEstimatedScore(initialEstimate);
+          setScoreDifference(initialEstimate - score);
+        }
+      } catch (error) {
+        console.error("Error fetching trust score data:", error);
+        toast({
+          variant: "destructive",
+          title: "Error de datos",
+          description: "No se pudieron cargar los datos de certificación",
+        });
+        
+        // Set default values if API fails
+        setCurrentScore(68);
+        setTrustLevel("Plata");
+        setNextLevel("Oro");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTrustScoreData();
+  }, [toast]);
   
-  const historicalScores = [
-    { month: 'Ene', score: 52 },
-    { month: 'Feb', score: 55 },
-    { month: 'Mar', score: 58 },
-    { month: 'Abr', score: 62 },
-    { month: 'May', score: 65 },
-    { month: 'Jun', score: 68 },
-  ];
+  // Handle slider changes and recalculate estimated score
+  const handleSliderChange = (type, value) => {
+    const newValues = { ...sliderValues, [type]: value[0] };
+    setSliderValues(newValues);
+    
+    // Calculate new estimated score based on slider values
+    const newEstimate = Math.round((newValues.pagos + newValues.fiscal + newValues.crecimiento) / 3);
+    setEstimatedScore(newEstimate);
+    setScoreDifference(newEstimate - currentScore);
+  };
   
-  const recommendations = [
-    { 
-      id: 1, 
-      title: 'Mejora tus plazos de pago a proveedores', 
-      description: 'Reducir el plazo medio de pago en 5 días aumentaría tu score en 3 puntos.',
-      impact: 'alto',
-      difficulty: 'media',
-      icon: <Clock className="h-5 w-5" />
-    },
-    { 
-      id: 2, 
-      title: 'Actualiza tus certificaciones fiscales', 
-      description: 'Cargar tus certificados de estar al corriente aumentaría tu score en 4 puntos.',
-      impact: 'alto',
-      difficulty: 'baja',
-      icon: <FileCheck className="h-5 w-5" />
-    },
-    { 
-      id: 3, 
-      title: 'Completa tu perfil empresarial', 
-      description: 'Añadir información sobre prácticas de sostenibilidad mejoraría tu visibilidad.',
-      impact: 'medio',
-      difficulty: 'baja',
-      icon: <Building className="h-5 w-5" />
-    },
-  ];
+  // Generate recommendations based on certification data
+  const getRecommendations = () => {
+    const recommendations = [];
+    
+    if (certificationData.length > 0) {
+      // Find weakest areas
+      const sortedAreas = [...certificationData].sort((a, b) => a.score - b.score);
+      const weakestArea = sortedAreas[0];
+      const secondWeakestArea = sortedAreas[1];
+      
+      if (weakestArea.name === 'Puntualidad de Pagos') {
+        recommendations.push({ 
+          id: 1, 
+          title: 'Mejora tus plazos de pago a proveedores', 
+          description: 'Reducir el plazo medio de pago en 5 días aumentaría tu score en 3 puntos.',
+          impact: 'alto',
+          difficulty: 'media',
+          icon: <Clock className="h-5 w-5" />
+        });
+      } else if (weakestArea.name === 'Cumplimiento Fiscal') {
+        recommendations.push({ 
+          id: 1, 
+          title: 'Actualiza tus certificaciones fiscales', 
+          description: 'Cargar tus certificados de estar al corriente aumentaría tu score en 4 puntos.',
+          impact: 'alto',
+          difficulty: 'baja',
+          icon: <FileCheck className="h-5 w-5" />
+        });
+      } else if (weakestArea.name === 'Sostenibilidad') {
+        recommendations.push({ 
+          id: 1, 
+          title: 'Implementa prácticas sostenibles', 
+          description: 'Crear un plan de sostenibilidad ambiental mejoraría tu score en 5 puntos.',
+          impact: 'alto',
+          difficulty: 'media',
+          icon: <Building className="h-5 w-5" />
+        });
+      }
+      
+      if (secondWeakestArea.name === 'Prácticas Laborales') {
+        recommendations.push({ 
+          id: 2, 
+          title: 'Mejora las condiciones laborales', 
+          description: 'Implementar un programa de bienestar para empleados aumentaría tu score en 3 puntos.',
+          impact: 'medio',
+          difficulty: 'media',
+          icon: <Users className="h-5 w-5" />
+        });
+      } else if (secondWeakestArea.name === 'Estabilidad Financiera') {
+        recommendations.push({ 
+          id: 2, 
+          title: 'Optimiza tu estructura financiera', 
+          description: 'Mejorar tu ratio de deuda/capital aumentaría tu score en 4 puntos.',
+          impact: 'alto',
+          difficulty: 'media',
+          icon: <CreditCard className="h-5 w-5" />
+        });
+      }
+      
+      // Always recommend profile completion
+      recommendations.push({ 
+        id: 3, 
+        title: 'Completa tu perfil empresarial', 
+        description: 'Añadir información sobre prácticas de sostenibilidad mejoraría tu visibilidad.',
+        impact: 'medio',
+        difficulty: 'baja',
+        icon: <Building className="h-5 w-5" />
+      });
+    } else {
+      // Default recommendations if no data
+      recommendations.push({ 
+        id: 1, 
+        title: 'Mejora tus plazos de pago a proveedores', 
+        description: 'Reducir el plazo medio de pago en 5 días aumentaría tu score en 3 puntos.',
+        impact: 'alto',
+        difficulty: 'media',
+        icon: <Clock className="h-5 w-5" />
+      });
+      
+      recommendations.push({ 
+        id: 2, 
+        title: 'Actualiza tus certificaciones fiscales', 
+        description: 'Cargar tus certificados de estar al corriente aumentaría tu score en 4 puntos.',
+        impact: 'alto',
+        difficulty: 'baja',
+        icon: <FileCheck className="h-5 w-5" />
+      });
+      
+      recommendations.push({ 
+        id: 3, 
+        title: 'Completa tu perfil empresarial', 
+        description: 'Añadir información sobre prácticas de sostenibilidad mejoraría tu visibilidad.',
+        impact: 'medio',
+        difficulty: 'baja',
+        icon: <Building className="h-5 w-5" />
+      });
+    }
+    
+    return recommendations;
+  };
   
-  // Custom chart config
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white">
+        <Navbar />
+        <div className="h-16"></div>
+        <div className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pyme-blue border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+            <p className="mt-4 text-pyme-gray-dark">Cargando datos de certificación...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+  
+  // Get recommendations based on current data
+  const recommendations = getRecommendations();
+  
+  // Calculate level thresholds for the progress bar
+  const getThresholdForLevel = (level) => {
+    switch (level) {
+      case "Bronce": return 50;
+      case "Plata": return 65;
+      case "Oro": return 80;
+      case "Platino": return 95;
+      default: return 0;
+    }
+  };
+  
+  // Chart config for historical data
   const chartConfig = {
     score: {
       label: "Score",
@@ -90,7 +288,7 @@ const Certification = () => {
           <Card className="col-span-1 shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl">Tu Score Actual</CardTitle>
-              <CardDescription>Categoría: Plata</CardDescription>
+              <CardDescription>Categoría: {trustLevel}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center items-center mb-4">
@@ -154,25 +352,31 @@ const Certification = () => {
               <CardDescription>Tus puntuaciones en cada área clave</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px]">
-              <RadarChart 
-                outerRadius={90} 
-                width={500} 
-                height={300} 
-                data={certificationData}
-                className="mx-auto"
-              >
-                <PolarGrid />
-                <PolarAngleAxis dataKey="name" />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar 
-                  name="Score" 
-                  dataKey="score" 
-                  stroke="#7E69AB" 
-                  fill="#7E69AB" 
-                  fillOpacity={0.5} 
-                />
-                <Tooltip />
-              </RadarChart>
+              {certificationData.length > 0 ? (
+                <RadarChart 
+                  outerRadius={90} 
+                  width={500} 
+                  height={300} 
+                  data={certificationData}
+                  className="mx-auto"
+                >
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="name" />
+                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                  <Radar 
+                    name="Score" 
+                    dataKey="score" 
+                    stroke="#7E69AB" 
+                    fill="#7E69AB" 
+                    fillOpacity={0.5} 
+                  />
+                  <Tooltip />
+                </RadarChart>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-pyme-gray-dark">No hay datos disponibles</p>
+                </div>  
+              )}
             </CardContent>
           </Card>
         </div>
@@ -246,13 +450,19 @@ const Certification = () => {
                 config={chartConfig}
                 className="h-[230px]"
               >
-                <BarChart data={historicalScores}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis domain={[40, 100]} />
-                  <Tooltip />
-                  <Bar dataKey="score" name="score" fill="#7E69AB" radius={[4, 4, 0, 0]} />
-                </BarChart>
+                {historicalScores.length > 0 ? (
+                  <BarChart data={historicalScores}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis domain={[40, 100]} />
+                    <Tooltip />
+                    <Bar dataKey="score" name="score" fill="#7E69AB" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-pyme-gray-dark">No hay datos históricos disponibles</p>
+                  </div>
+                )}
               </ChartContainer>
             </CardContent>
           </Card>
@@ -272,35 +482,64 @@ const Certification = () => {
                 <div>
                   <div className="flex justify-between mb-2">
                     <label className="text-sm font-medium">Pagos a tiempo</label>
-                    <span className="text-sm">85%</span>
+                    <span className="text-sm">{sliderValues.pagos}%</span>
                   </div>
-                  <Slider defaultValue={[85]} max={100} step={1} />
+                  <Slider 
+                    defaultValue={[sliderValues.pagos]} 
+                    value={[sliderValues.pagos]} 
+                    max={100} 
+                    step={1} 
+                    onValueChange={(value) => handleSliderChange('pagos', value)}
+                  />
                 </div>
                 
                 <div>
                   <div className="flex justify-between mb-2">
                     <label className="text-sm font-medium">Cumplimiento fiscal</label>
-                    <span className="text-sm">70%</span>
+                    <span className="text-sm">{sliderValues.fiscal}%</span>
                   </div>
-                  <Slider defaultValue={[70]} max={100} step={1} />
+                  <Slider 
+                    defaultValue={[sliderValues.fiscal]} 
+                    value={[sliderValues.fiscal]} 
+                    max={100} 
+                    step={1}
+                    onValueChange={(value) => handleSliderChange('fiscal', value)}
+                  />
                 </div>
                 
                 <div>
                   <div className="flex justify-between mb-2">
                     <label className="text-sm font-medium">Crecimiento sostenible</label>
-                    <span className="text-sm">60%</span>
+                    <span className="text-sm">{sliderValues.crecimiento}%</span>
                   </div>
-                  <Slider defaultValue={[60]} max={100} step={1} />
+                  <Slider 
+                    defaultValue={[sliderValues.crecimiento]} 
+                    value={[sliderValues.crecimiento]} 
+                    max={100} 
+                    step={1}
+                    onValueChange={(value) => handleSliderChange('crecimiento', value)}
+                  />
                 </div>
                 
                 <div className="bg-pyme-blue/5 p-3 rounded-lg">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Score estimado:</span>
-                    <span className="text-lg font-bold text-pyme-blue">74</span>
+                    <span className="text-lg font-bold text-pyme-blue">{estimatedScore}</span>
                   </div>
                   <div className="text-xs text-pyme-gray-dark flex items-center mt-1">
-                    <TrendingUp className="h-3 w-3 mr-1 text-pyme-success" />
-                    <span>+6 puntos respecto a tu score actual</span>
+                    {scoreDifference > 0 ? (
+                      <>
+                        <TrendingUp className="h-3 w-3 mr-1 text-pyme-success" />
+                        <span>+{scoreDifference} puntos respecto a tu score actual</span>
+                      </>
+                    ) : scoreDifference < 0 ? (
+                      <>
+                        <TrendingUp className="h-3 w-3 mr-1 text-red-500 transform rotate-180" />
+                        <span>{scoreDifference} puntos respecto a tu score actual</span>
+                      </>
+                    ) : (
+                      <span>Sin cambios respecto a tu score actual</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -352,7 +591,7 @@ const Certification = () => {
         <Card className="mb-8 shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl">Beneficios de Tu Nivel Actual</CardTitle>
-            <CardDescription>Nivel Plata (68 puntos)</CardDescription>
+            <CardDescription>Nivel {trustLevel} ({currentScore} puntos)</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -360,7 +599,12 @@ const Certification = () => {
                 <Check className="h-5 w-5 text-pyme-success flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium">Tasas preferenciales</h3>
-                  <p className="text-sm text-pyme-gray-dark">Acceso a financiamiento con un 0.5% de descuento en tasas de interés</p>
+                  <p className="text-sm text-pyme-gray-dark">
+                    {trustLevel === "Platino" ? "Acceso a financiamiento con un 1.5% de descuento en tasas de interés" :
+                     trustLevel === "Oro" ? "Acceso a financiamiento con un 1% de descuento en tasas de interés" :
+                     trustLevel === "Plata" ? "Acceso a financiamiento con un 0.5% de descuento en tasas de interés" :
+                     "Acceso a financiamiento con un 0.2% de descuento en tasas de interés"}
+                  </p>
                 </div>
               </div>
               
@@ -376,7 +620,12 @@ const Certification = () => {
                 <Check className="h-5 w-5 text-pyme-success flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium">Visibilidad en marketplace</h3>
-                  <p className="text-sm text-pyme-gray-dark">Prioridad media en listados de búsqueda y posicionamiento</p>
+                  <p className="text-sm text-pyme-gray-dark">
+                    {trustLevel === "Platino" ? "Prioridad máxima en listados de búsqueda y posicionamiento" :
+                     trustLevel === "Oro" ? "Prioridad alta en listados de búsqueda y posicionamiento" :
+                     trustLevel === "Plata" ? "Prioridad media en listados de búsqueda y posicionamiento" :
+                     "Prioridad básica en listados de búsqueda y posicionamiento"}
+                  </p>
                 </div>
               </div>
               
@@ -384,17 +633,26 @@ const Certification = () => {
                 <Check className="h-5 w-5 text-pyme-success flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium">Redes de negocio</h3>
-                  <p className="text-sm text-pyme-gray-dark">Acceso a eventos de networking exclusivos trimestral</p>
+                  <p className="text-sm text-pyme-gray-dark">
+                    {trustLevel === "Platino" ? "Acceso a eventos de networking exclusivos mensual" :
+                     trustLevel === "Oro" ? "Acceso a eventos de networking exclusivos bimestral" :
+                     trustLevel === "Plata" ? "Acceso a eventos de networking exclusivos trimestral" :
+                     "Acceso a eventos de networking exclusivos semestral"}
+                  </p>
                 </div>
               </div>
               
-              <div className="flex items-start space-x-3">
-                <AlertTriangle className="h-5 w-5 text-pyme-warning flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-medium">Próximo nivel: Oro (80+ puntos)</h3>
-                  <p className="text-sm text-pyme-gray-dark">Te faltan 12 puntos para desbloquear beneficios adicionales</p>
+              {nextLevel !== "Máximo" && (
+                <div className="flex items-start space-x-3">
+                  <AlertTriangle className="h-5 w-5 text-pyme-warning flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-medium">Próximo nivel: {nextLevel} ({getThresholdForLevel(nextLevel)}+ puntos)</h3>
+                    <p className="text-sm text-pyme-gray-dark">
+                      Te faltan {getThresholdForLevel(nextLevel) - currentScore} puntos para desbloquear beneficios adicionales
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
