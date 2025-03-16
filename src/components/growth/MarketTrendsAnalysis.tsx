@@ -217,7 +217,8 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Tendencias de los últimos 12 meses</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
+                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
+                <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
                       sector: { color: "#2563eb" },
@@ -264,7 +265,8 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Nivel de influencia en el mercado</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
+                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
+                <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
                       impact: { color: "#2563eb" }
@@ -300,7 +302,8 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Potencial por área estratégica</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
+                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
+                <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
                       value: { color: "#2563eb" }
@@ -338,7 +341,8 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Escenarios de evolución del mercado</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
+                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
+                <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
                       baseline: { color: "#2563eb" },
@@ -384,12 +388,13 @@ const MarketTrendsAnalysis = () => {
           </TabsContent>
         </Tabs>
         
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-3">Recomendaciones Estratégicas</h3>
-          <ul className="space-y-2">
+        {/* Added more spacing (mt-12 instead of mt-8) and a clear separator */}
+        <div className="mt-12 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold mb-4">Recomendaciones Estratégicas</h3>
+          <ul className="space-y-3">
             {recommendations?.map((recommendation, index) => (
-              <li key={index} className="flex">
-                <span className="bg-pyme-blue text-white rounded-full h-6 w-6 flex items-center justify-center mr-2 flex-shrink-0">
+              <li key={index} className="flex items-start">
+                <span className="bg-pyme-blue text-white rounded-full h-6 w-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
                   {index + 1}
                 </span>
                 <p className="text-gray-700">{recommendation}</p>
