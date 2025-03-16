@@ -4,9 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ButtonCustom } from "@/components/ui/button-custom";
-import { Search, Filter, Users, User, MapPin, Briefcase, Camera, ImagePlus } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
+import { Search, Filter, Users, User, BadgeCheck, Star, MapPin, Briefcase } from "lucide-react";
 
 const EmployeeSearchModule = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,7 +96,7 @@ const EmployeeSearchModule = () => {
                   skills={["SEO", "SEM", "Redes Sociales", "Analítica Web"]}
                   experience={5}
                   matchScore={92}
-                  photoUrl="/assets/candidate1.jpg"
+                  isVerified={true}
                 />
                 
                 <CandidateCard 
@@ -108,7 +106,7 @@ const EmployeeSearchModule = () => {
                   skills={["React", "Node.js", "TypeScript", "MongoDB"]}
                   experience={3}
                   matchScore={88}
-                  photoUrl="/assets/candidate2.jpg"
+                  isVerified={true}
                 />
                 
                 <CandidateCard 
@@ -118,7 +116,7 @@ const EmployeeSearchModule = () => {
                   skills={["Contabilidad NIIF", "Impuestos", "Finanzas", "Auditoría"]}
                   experience={7}
                   matchScore={85}
-                  photoUrl=""
+                  isVerified={false}
                 />
                 
                 <CandidateCard 
@@ -128,7 +126,7 @@ const EmployeeSearchModule = () => {
                   skills={["Negociación", "CRM", "Liderazgo", "Desarrollo de Negocios"]}
                   experience={8}
                   matchScore={78}
-                  photoUrl=""
+                  isVerified={true}
                 />
               </div>
               
@@ -171,6 +169,48 @@ const EmployeeSearchModule = () => {
                 </ButtonCustom>
               </CardContent>
             </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Star className="mr-2 text-pyme-blue" size={18} />
+                  Beneficios Premium
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  <BenefitItem text="Acceso ilimitado a perfiles completos" />
+                  <BenefitItem text="Contacto directo con candidatos" />
+                  <BenefitItem text="Verificación avanzada de referencias" />
+                  <BenefitItem text="Evaluaciones psicométricas" />
+                  <BenefitItem text="Asistencia en entrevistas" />
+                </ul>
+                <ButtonCustom variant="default" className="w-full mt-4">
+                  Activar prueba gratuita
+                </ButtonCustom>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BadgeCheck className="mr-2 text-pyme-blue" size={18} />
+                  Verificación de Candidatos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Todos los perfiles verificados pasan por un riguroso proceso de validación de identidad, referencias y antecedentes.
+                </p>
+                <div className="flex items-center justify-center p-4 bg-green-50 rounded-lg border border-green-100">
+                  <BadgeCheck className="mr-2 text-green-600" size={24} />
+                  <div>
+                    <div className="font-medium">Mayor seguridad</div>
+                    <div className="text-sm text-gray-600">Contratación sin sorpresas</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
@@ -187,51 +227,16 @@ interface CandidateCardProps {
   skills: string[];
   experience: number;
   matchScore: number;
-  photoUrl?: string;
+  isVerified: boolean;
 }
 
-const CandidateCard = ({ name, title, location, skills, experience, matchScore, photoUrl }: CandidateCardProps) => {
-  const [photo, setPhoto] = useState<string | null>(photoUrl || null);
-  
-  // Función para manejar la carga de fotos
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setPhoto(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
+const CandidateCard = ({ name, title, location, skills, experience, matchScore, isVerified }: CandidateCardProps) => {
   return (
     <div className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
       <div className="flex flex-col sm:flex-row">
         <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4">
-          <div className="relative">
-            <Avatar className="w-20 h-20">
-              {photo ? (
-                <AvatarImage src={photo} alt={name} />
-              ) : (
-                <AvatarFallback className="bg-gray-200 text-gray-500">
-                  <User size={24} />
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <label 
-              htmlFor={`photo-upload-${name}`} 
-              className="absolute -bottom-2 -right-2 w-8 h-8 bg-pyme-blue text-white rounded-full flex items-center justify-center cursor-pointer hover:bg-pyme-blue-light transition-colors"
-            >
-              <Camera size={14} />
-              <Input 
-                id={`photo-upload-${name}`} 
-                type="file" 
-                accept="image/*" 
-                className="hidden" 
-                onChange={handlePhotoUpload}
-              />
-            </label>
+          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+            <User className="text-gray-500" size={24} />
           </div>
         </div>
         
@@ -240,6 +245,9 @@ const CandidateCard = ({ name, title, location, skills, experience, matchScore, 
             <div>
               <div className="flex items-center">
                 <h3 className="font-semibold text-lg">{name}</h3>
+                {isVerified && (
+                  <BadgeCheck size={16} className="ml-1 text-green-600" />
+                )}
               </div>
               <p className="text-pyme-blue font-medium">{title}</p>
             </div>
@@ -305,6 +313,19 @@ const ActiveJobItem = ({ title, applicants, isUrgent }: ActiveJobItemProps) => {
         )}
       </div>
     </div>
+  );
+};
+
+interface BenefitItemProps {
+  text: string;
+}
+
+const BenefitItem = ({ text }: BenefitItemProps) => {
+  return (
+    <li className="flex items-center">
+      <div className="mr-2 text-green-600">✓</div>
+      <span className="text-sm">{text}</span>
+    </li>
   );
 };
 

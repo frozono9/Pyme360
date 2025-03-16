@@ -9,37 +9,38 @@ def calculate_payment_history_score(historial_crediticio: Dict) -> Dict:
     """
     total_payments = 0
     late_payments = 0
+    on_time_payments = 0
     
     # Contar pagos de cuentas de crédito
     for cuenta in historial_crediticio.get("cuentas_credito", []):
-        historial_pagos = cuenta.get("historial_pagos", [])
-        total_payments += len(historial_pagos)
-        
-        # Contar pagos tardíos
-        for pago in historial_pagos:
-            if "atrasado" in pago.get("estado", "").lower():
-                late_payments += 1
+        total_cuenta = cuenta.get("total_pagos", 0)
+        total_payments += total_cuenta
+        late_cuenta = sum([
+            inc.get("cantidad", 0) 
+            for inc in cuenta.get("pagos_tardios", [])
+        ])
+        late_payments += late_cuenta
     
     # Contar pagos de proveedores
     for proveedor in historial_crediticio.get("credito_proveedores", []):
-        historial_pagos = proveedor.get("historial_pagos", [])
-        total_payments += len(historial_pagos)
-        
-        # Contar pagos tardíos
-        for pago in historial_pagos:
-            if "atrasado" in pago.get("estado", "").lower():
-                late_payments += 1
+        total_prov = proveedor.get("total_pagos", 0)
+        total_payments += total_prov
+        late_prov = sum([
+            inc.get("cantidad", 0) 
+            for inc in proveedor.get("pagos_tardios", [])
+        ])
+        late_payments += late_prov
     
     # Si no hay pagos registrados, asignar un valor predeterminado
     if total_payments == 0:
-        score_value = 65  # Puntuación predeterminada
-        percentage = 100
-        on_time_payments = 0
+        score_value = 50  # Puntuación neutral
+        percentage = 0
     else:
         on_time_payments = total_payments - late_payments
         percentage = (on_time_payments / total_payments) * 100
         
         # Convertir el porcentaje a una puntuación de 0-100
+        # 100% pagos a tiempo = 100 puntos, 90% = 85 puntos, etc.
         if percentage >= 98:
             score_value = 100
         elif percentage >= 95:
@@ -53,13 +54,33 @@ def calculate_payment_history_score(historial_crediticio: Dict) -> Dict:
         else:
             score_value = int(percentage / 2)  # Puntuación más baja para historial deficiente
     
+    # Crear datos para la gráfica de pagos (últimos 6 meses)
+    payment_chart_data = []
+    months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+    current_month = datetime.now().month - 1  # Índice 0-11
+    
+    for i in range(6):
+        month_index = (current_month - 5 + i) % 12
+        month_name = months[month_index]
+        
+        # Datos simulados para la gráfica
+        on_time = max(1, int((on_time_payments / 6) * (0.7 + 0.3 * i / 5)))
+        late = max(0, int((late_payments / 6) * (1.3 - 0.3 * i / 5)))
+        
+        payment_chart_data.append({
+            "month": month_name,
+            "A tiempo": on_time,
+            "Atrasados": late
+        })
+    
     return {
         "score": score_value,
         "percentage": percentage,
         "weight": 0.35,  # 35% del puntaje total
         "total_payments": total_payments,
         "on_time_payments": on_time_payments,
-        "late_payments": late_payments
+        "late_payments": late_payments,
+        "chart_data": payment_chart_data
     }
 
 # Función para calcular la utilización del crédito (25-30% del puntaje)
@@ -69,44 +90,56 @@ def calculate_credit_utilization_score(historial_crediticio: Dict) -> Dict:
     """
     total_debt = 0
     total_available = 0
+    accounts = []
     
     # Sumar deudas y límites de crédito
     for cuenta in historial_crediticio.get("cuentas_credito", []):
-        total_debt += cuenta.get("saldo_actual", 0)
-        total_available += cuenta.get("limite_credito", 0)
-    
-    # Añadir créditos de proveedores
-    for proveedor in historial_crediticio.get("credito_proveedores", []):
-        total_debt += proveedor.get("saldo_actual", 0)
-        total_available += proveedor.get("limite_credito", 0)
+        debt = cuenta.get("saldo_actual", 0)
+        limit = cuenta.get("limite_credito", 0)
+        total_debt += debt
+        total_available += limit
+        
+        if limit > 0:
+            utilization_pct = (debt / limit) * 100
+        else:
+            utilization_pct = 0
+            
+        accounts.append({
+            "name": cuenta.get("entidad", "Cuenta"),
+            "value": debt,
+            "limit": limit,
+            "utilization": utilization_pct
+        })
     
     # Si no hay crédito disponible, asignar un valor predeterminado
     if total_available == 0:
-        utilization_pct = 0
+        utilization = 0
         score_value = 50  # Puntuación neutral
     else:
-        utilization_pct = (total_debt / total_available) * 100
+        utilization = (total_debt / total_available) * 100
         
         # Convertir la utilización a una puntuación
-        if utilization_pct <= 10:
+        # Menos del 10% = excelente, más del 80% = malo
+        if utilization <= 10:
             score_value = 100
-        elif utilization_pct <= 30:
+        elif utilization <= 30:
             score_value = 90
-        elif utilization_pct <= 50:
+        elif utilization <= 50:
             score_value = 75
-        elif utilization_pct <= 70:
+        elif utilization <= 70:
             score_value = 60
-        elif utilization_pct <= 90:
+        elif utilization <= 90:
             score_value = 40
         else:
             score_value = 20
     
     return {
         "score": score_value,
-        "utilization": utilization_pct,
+        "utilization": utilization,
         "weight": 0.30,  # 30% del puntaje total
         "total_debt": total_debt,
-        "total_available": total_available
+        "total_available": total_available,
+        "accounts": accounts
     }
 
 # Función para calcular la antigüedad crediticia (15% del puntaje)
@@ -169,16 +202,23 @@ def calculate_credit_mix_score(historial_crediticio: Dict) -> Dict:
     Calcula la puntuación basada en la mezcla de diferentes tipos de crédito.
     """
     credit_types = set()
+    type_counts = {}
     
     # Identificar tipos únicos de crédito
     for cuenta in historial_crediticio.get("cuentas_credito", []):
-        if "tipo" in cuenta:
-            credit_types.add(cuenta["tipo"])
+        if "tipo_credito" in cuenta:
+            credit_type = cuenta["tipo_credito"]
+            credit_types.add(credit_type)
+            
+            type_counts[credit_type] = type_counts.get(credit_type, 0) + 1
     
     # Añadir créditos de proveedores como un tipo distinto
     if historial_crediticio.get("credito_proveedores", []):
-        credit_types.add("Crédito Comercial")
+        credit_type = "Crédito Comercial"
+        credit_types.add(credit_type)
+        type_counts[credit_type] = len(historial_crediticio.get("credito_proveedores", []))
     
+    # Contar tipos únicos de crédito
     num_types = len(credit_types)
     
     # Convertir cantidad de tipos a una puntuación
@@ -193,11 +233,18 @@ def calculate_credit_mix_score(historial_crediticio: Dict) -> Dict:
     else:
         score_value = 50  # Sin historial crediticio
     
+    # Preparar datos para la gráfica
+    type_counts_data = [
+        {"name": credit_type, "value": count}
+        for credit_type, count in type_counts.items()
+    ]
+    
     return {
         "score": score_value,
         "num_types": num_types,
         "types": list(credit_types),
-        "weight": 0.10  # 10% del puntaje total
+        "weight": 0.10,  # 10% del puntaje total
+        "type_counts": type_counts_data
     }
 
 # Función para calcular nuevas solicitudes de crédito (10% del puntaje)
