@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, Bell, Award, AlertCircle, Flag, MapPin, Check, Milestone, CheckCircle2, AlertTriangle, Calendar, BadgeCheck, GraduationCap, Zap, Rocket, ArrowRight } from "lucide-react";
+import { BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, Bell, Award, AlertCircle, Flag, MapPin, Check, Milestone, CheckCircle2, AlertTriangle, Calendar, BadgeCheck, GraduationCap, Zap, Rocket, ArrowRight } from "lucide-react";
 import api from "@/api";
 import { Progress } from "@/components/ui/progress";
 
@@ -131,7 +130,6 @@ const Dashboard = () => {
         });
       }
       
-      // Generar pasos del roadmap basados en los datos
       generateRoadmapSteps(creditScoreData?.score, trustScoreData?.calificacion_global);
       
     } catch (error) {
@@ -146,11 +144,9 @@ const Dashboard = () => {
     }
   };
 
-  // Función para generar los pasos del roadmap basados en los datos de la empresa
   const generateRoadmapSteps = (creditScore = 0, trustScore = 0) => {
     const steps: RoadmapStep[] = [];
     
-    // Paso 1: Siempre es completar el perfil empresarial
     steps.push({
       id: 1,
       title: "Completar Perfil Empresarial",
@@ -162,7 +158,6 @@ const Dashboard = () => {
       percentComplete: Math.min(100, Math.round(trustScore * 1.5))
     });
     
-    // Paso 2: Evaluación crediticia
     steps.push({
       id: 2,
       title: "Evaluación Crediticia Completa",
@@ -174,7 +169,6 @@ const Dashboard = () => {
       percentComplete: Math.min(100, Math.round((creditScore / 850) * 100))
     });
     
-    // Paso 3: Implementación de gestión financiera
     const financeCompletionPercent = creditScore > 700 ? 85 : creditScore > 600 ? 60 : creditScore > 500 ? 40 : 20;
     steps.push({
       id: 3,
@@ -187,7 +181,6 @@ const Dashboard = () => {
       percentComplete: financeCompletionPercent
     });
     
-    // Paso 4: Cumplimiento regulatorio y fiscal
     const compliancePercent = trustScore > 80 ? 90 : trustScore > 70 ? 75 : trustScore > 60 ? 50 : trustScore > 50 ? 30 : 10;
     steps.push({
       id: 4,
@@ -200,7 +193,6 @@ const Dashboard = () => {
       percentComplete: compliancePercent
     });
     
-    // Paso 5: Optimización operativa
     const operationsPercent = (creditScore + (trustScore * 5)) / 12;
     steps.push({
       id: 5,
@@ -213,7 +205,6 @@ const Dashboard = () => {
       percentComplete: Math.min(100, Math.round(operationsPercent))
     });
     
-    // Paso 6: Crecimiento y expansión
     steps.push({
       id: 6,
       title: "Estrategia de Crecimiento",
@@ -225,7 +216,6 @@ const Dashboard = () => {
       percentComplete: Math.min(100, Math.round(trustScore - 10))
     });
     
-    // Paso 7: Innovación y digitalización
     steps.push({
       id: 7,
       title: "Innovación y Digitalización",
@@ -233,11 +223,10 @@ const Dashboard = () => {
       status: trustScore > 85 ? 'in-progress' : 'pending',
       priority: 'medium',
       icon: <Rocket className="text-indigo-500" />,
-      linkTo: '/crecimiento',
+      linkTo: '/crecimiento/predictor',
       percentComplete: Math.max(0, Math.min(100, Math.round(trustScore - 30)))
     });
     
-    // Paso 8: Certificación PyME360 Platino
     steps.push({
       id: 8,
       title: "Certificación PyME360 Platino",
@@ -273,15 +262,6 @@ const Dashboard = () => {
       navigate("/acceso");
     }
   }, [navigate, toast]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("pyme360-user");
-    toast({
-      title: "Sesión cerrada",
-      description: "Has cerrado sesión correctamente",
-    });
-    navigate("/");
-  };
 
   const getScoreBgColor = (score: number) => {
     if (score >= 750) return "from-green-100 to-green-200";
@@ -344,31 +324,6 @@ const Dashboard = () => {
     }
   };
 
-  const renderAuthButton = () => {
-    if (!username) {
-      return (
-        <ButtonCustom 
-          variant="outline" 
-          onClick={() => navigate("/acceso")}
-          leftIcon={<LogOut size={18} />}
-          className="self-start md:self-auto"
-        >
-          Iniciar sesión
-        </ButtonCustom>
-      );
-    }
-    return (
-      <ButtonCustom 
-        variant="outline" 
-        onClick={handleLogout}
-        leftIcon={<LogOut size={18} />}
-        className="self-start md:self-auto"
-      >
-        Cerrar sesión
-      </ButtonCustom>
-    );
-  };
-
   const renderDashboard = () => {
     if (!creditScore || !trustScore || !activeDebts) {
       return <div className="flex items-center justify-center min-h-screen">
@@ -386,11 +341,13 @@ const Dashboard = () => {
 
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div>
-            {renderAuthButton()}
-          </div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Dashboard Empresarial
+          </h1>
+          <p className="text-gray-600">
+            Supervisa el progreso y la salud de tu empresa
+          </p>
         </div>
           
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -485,15 +442,12 @@ const Dashboard = () => {
           <Card className="border-none shadow-lg">
             <CardContent className="p-6">
               <div className="relative">
-                {/* Línea vertical de progreso */}
                 <div className="absolute left-4 top-4 bottom-6 w-0.5 bg-gray-200 z-0"></div>
                 
-                {/* Pasos del roadmap */}
                 <div className="space-y-8">
                   {roadmapSteps.map((step, index) => (
                     <div key={step.id} className="relative z-10">
                       <div className="flex items-start">
-                        {/* Punto indicador en la línea */}
                         <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
                           step.status === 'completed' ? 'bg-green-500' :
                           step.status === 'in-progress' ? 'bg-blue-500' : 'bg-gray-300'
@@ -501,7 +455,6 @@ const Dashboard = () => {
                           {step.status === 'completed' ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
                         </div>
                         
-                        {/* Contenido del paso */}
                         <div className="ml-4 flex-grow">
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
                             <div className="flex items-center gap-2">
@@ -527,7 +480,6 @@ const Dashboard = () => {
                           
                           <p className="text-gray-600 mb-3">{step.description}</p>
                           
-                          {/* Barra de progreso */}
                           {step.percentComplete !== undefined && (
                             <div className="mb-3">
                               <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -546,7 +498,6 @@ const Dashboard = () => {
                             </div>
                           )}
                           
-                          {/* Botón de acción */}
                           <ButtonCustom
                             variant={step.status === 'pending' ? "outline" : "default"}
                             size="sm"
