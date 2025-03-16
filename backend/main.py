@@ -1,20 +1,9 @@
-from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
-from pymongo import MongoClient
-from dotenv import load_dotenv
-import os
-from bson.objectid import ObjectId
-from datetime import datetime, timezone
-from typing import List, Optional
-from pydantic import BaseModel
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
-import auth
-import json
-from models import UserCreate, UserLogin
-from fastapi.encoders import jsonable_encoder
-import score_calculator
-import random
+import os
+import tempfile
+import shutil
+from backend.analizador_importancias import handle_api_request
 
 # Cargar variables de entorno
 load_dotenv()
@@ -537,6 +526,59 @@ async def query_market_trends(
     except Exception as e:
         print(f"Error al consultar tendencias de mercado: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al consultar tendencias de mercado: {str(e)}")
+
+# Nuevo endpoint para analizar datos
+@app.post("/api/analyze-data")
+async def analyze_data(
+    file: UploadFile = File(...),
+    target_variable: str = Form(...),
+    tipo_problema: str = Form(...)
+):
+    """
+    API endpoint for analyzing CSV data
+    """
+    # Create a temporary file to save the uploaded CSV
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv")
+    try:
+        # Save the uploaded file
+        with temp_file as f:
+            shutil.copyfileobj(file.file, f)
+        
+        # Process the file with the analyzer
+        results = handle_api_request(
+            file_path=temp_file.name,
+            target_variable=target_variable,
+            tipo_problema=tipo_problema
+        )
+        
+        # Check for errors
+        if 'error' in results and not results.get('columnas_disponibles'):
+            raise HTTPException(status_code=400, detail=results['error'])
+            
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # Clean up the temporary file
+        os.unlink(temp_file.name)
+
+# Nuevo endpoint para obtener análisis avanzado
+@app.post("/api/enhanced-analysis")
+async def get_enhanced_analysis(analysis_data: dict):
+    """
+    API endpoint for getting enhanced analysis from the raw analysis data
+    """
+    try:
+        # Extract the enhanced analysis from the raw data
+        if 'enhanced_analysis' in analysis_data:
+            return analysis_data['enhanced_analysis']
+        else:
+            raise HTTPException(
+                status_code=400, 
+                detail="Enhanced analysis not found in the provided data. Ensure the analysis was completed successfully."
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

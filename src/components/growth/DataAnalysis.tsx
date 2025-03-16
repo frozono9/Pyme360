@@ -1,6 +1,5 @@
 
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { 
   Card, 
   CardContent, 
@@ -14,7 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, FileUp, FilePlus2, AlertCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, FileUp, FilePlus2, AlertCircle, BarChart3, PieChart, LineChart } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "react-toastify";
 
 const DataAnalysis = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -22,8 +24,12 @@ const DataAnalysis = () => {
   const [csvData, setCsvData] = useState<string[][]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<string>("");
+  const [analysisType, setAnalysisType] = useState<"clasificacion" | "regresion">("clasificacion");
   const [previewRows, setPreviewRows] = useState<number>(5);
   const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [enhancedAnalysis, setEnhancedAnalysis] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,14 +83,190 @@ const DataAnalysis = () => {
     setSelectedColumn(value);
   };
 
+  const handleAnalysisTypeSelect = (value: "clasificacion" | "regresion") => {
+    setAnalysisType(value);
+  };
+
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
 
-  const handleAnalyze = () => {
-    // This will be implemented in the next step
-    console.log("Analyzing column:", selectedColumn);
-    // We'll add the analysis functionality later
+  const handleAnalyze = async () => {
+    if (!file || !selectedColumn) {
+      toast.error("Por favor, selecciona un archivo y una columna para analizar");
+      return;
+    }
+
+    setLoading(true);
+    setAnalysisResult(null);
+    setEnhancedAnalysis(null);
+
+    try {
+      // Create FormData for sending the file
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('target_variable', selectedColumn);
+      formData.append('tipo_problema', analysisType);
+
+      // Send the data to the backend API
+      const response = await fetch('/api/analyze-data', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error en el análisis: ${response.statusText}`);
+      }
+
+      // Get the analysis results
+      const data = await response.json();
+      setAnalysisResult(data);
+
+      // Get the enhanced analysis from the AI agent
+      const enhancedResponse = await fetch('/api/enhanced-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ analysis_data: data }),
+      });
+
+      if (!enhancedResponse.ok) {
+        throw new Error(`Error en el análisis avanzado: ${enhancedResponse.statusText}`);
+      }
+
+      const enhancedData = await enhancedResponse.json();
+      setEnhancedAnalysis(enhancedData);
+      
+      toast.success("Análisis completado con éxito");
+    } catch (error) {
+      console.error("Error analyzing data:", error);
+      setError(error instanceof Error ? error.message : "Error desconocido al analizar los datos");
+      toast.error("Error al analizar los datos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderCharts = () => {
+    if (!enhancedAnalysis) return null;
+
+    return (
+      <div className="space-y-6">
+        <Tabs defaultValue="importancia" className="w-full">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="importancia">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Importancia
+            </TabsTrigger>
+            <TabsTrigger value="distribucion">
+              <PieChart className="h-4 w-4 mr-2" />
+              Distribución
+            </TabsTrigger>
+            <TabsTrigger value="faltantes">
+              <LineChart className="h-4 w-4 mr-2" />
+              Datos Faltantes
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="importancia" className="border rounded-lg p-4">
+            {enhancedAnalysis.importancia_features ? (
+              <div>
+                <h3 className="text-lg font-medium mb-2">Importancia de Características</h3>
+                <div className="h-96 w-full">
+                  {/* Chart placeholder - will be rendered with the actual chart library */}
+                  <div className="bg-gray-100 h-full w-full flex items-center justify-center rounded-md">
+                    <pre className="text-xs overflow-auto p-4 h-full w-full">
+                      {JSON.stringify(enhancedAnalysis.importancia_features, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">No hay datos de importancia disponibles</div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="distribucion" className="border rounded-lg p-4">
+            {enhancedAnalysis.distribucion_target ? (
+              <div>
+                <h3 className="text-lg font-medium mb-2">Distribución de la Variable Objetivo</h3>
+                <div className="h-96 w-full">
+                  <div className="bg-gray-100 h-full w-full flex items-center justify-center rounded-md">
+                    <pre className="text-xs overflow-auto p-4 h-full w-full">
+                      {JSON.stringify(enhancedAnalysis.distribucion_target, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">No hay datos de distribución disponibles</div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="faltantes" className="border rounded-lg p-4">
+            {enhancedAnalysis.valores_faltantes ? (
+              <div>
+                <h3 className="text-lg font-medium mb-2">Valores Faltantes</h3>
+                <div className="h-96 w-full">
+                  <div className="bg-gray-100 h-full w-full flex items-center justify-center rounded-md">
+                    <pre className="text-xs overflow-auto p-4 h-full w-full">
+                      {JSON.stringify(enhancedAnalysis.valores_faltantes, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">No hay datos de valores faltantes disponibles</div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  };
+
+  const renderRecommendations = () => {
+    if (!enhancedAnalysis || !enhancedAnalysis.recomendaciones) return null;
+
+    return (
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Recomendaciones para tu PyME</CardTitle>
+          <CardDescription>Basadas en el análisis de tus datos</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {enhancedAnalysis.recomendaciones.map((recomendacion: string, index: number) => (
+              <li key={index} className="bg-amber-50 p-3 rounded-md border border-amber-100">
+                {recomendacion}
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderInsights = () => {
+    if (!analysisResult || !analysisResult.insights) return null;
+
+    return (
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Insights del Análisis</CardTitle>
+          <CardDescription>Descubrimientos clave de tus datos</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {analysisResult.insights.map((insight: string, index: number) => (
+              <li key={index} className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                {insight}
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
@@ -146,20 +328,35 @@ const DataAnalysis = () => {
 
             {headers.length > 0 && (
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="column-select">Selecciona la columna a analizar</Label>
-                  <Select value={selectedColumn} onValueChange={handleColumnSelect}>
-                    <SelectTrigger id="column-select" className="w-full">
-                      <SelectValue placeholder="Selecciona una columna" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {headers.map((header, index) => (
-                        <SelectItem key={index} value={header}>
-                          {header}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="column-select">Selecciona la columna a analizar</Label>
+                    <Select value={selectedColumn} onValueChange={handleColumnSelect}>
+                      <SelectTrigger id="column-select" className="w-full">
+                        <SelectValue placeholder="Selecciona una columna" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {headers.map((header, index) => (
+                          <SelectItem key={index} value={header}>
+                            {header}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="analysis-type">Tipo de análisis</Label>
+                    <Select value={analysisType} onValueChange={handleAnalysisTypeSelect}>
+                      <SelectTrigger id="analysis-type" className="w-full">
+                        <SelectValue placeholder="Selecciona tipo de análisis" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="clasificacion">Clasificación</SelectItem>
+                        <SelectItem value="regresion">Regresión</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -208,15 +405,94 @@ const DataAnalysis = () => {
           <CardFooter className="flex justify-end">
             <Button 
               onClick={handleAnalyze}
-              disabled={!selectedColumn}
+              disabled={!selectedColumn || loading}
               className="bg-amber-600 hover:bg-amber-700"
             >
-              <FilePlus2 className="mr-2 h-5 w-5" />
-              Analizar datos
+              {loading ? (
+                <>
+                  <Skeleton className="h-5 w-5 rounded-full mr-2 animate-spin" />
+                  Analizando...
+                </>
+              ) : (
+                <>
+                  <FilePlus2 className="mr-2 h-5 w-5" />
+                  Analizar datos
+                </>
+              )}
             </Button>
           </CardFooter>
         )}
       </Card>
+
+      {loading && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <Skeleton className="h-[300px] w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Display analysis results */}
+      {enhancedAnalysis && !loading && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Resultados del Análisis</CardTitle>
+            <CardDescription>
+              Aquí se muestran los resultados del análisis de tus datos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {renderCharts()}
+              {renderRecommendations()}
+              {renderInsights()}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Display raw JSON for debugging/transparency */}
+      {(analysisResult || enhancedAnalysis) && !loading && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Datos JSON Completos</CardTitle>
+            <CardDescription>
+              Visualización técnica de los resultados del análisis
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="primary" className="w-full">
+              <TabsList className="grid grid-cols-2">
+                <TabsTrigger value="primary">Análisis Primario</TabsTrigger>
+                <TabsTrigger value="enhanced">Análisis Mejorado (IA)</TabsTrigger>
+              </TabsList>
+              <TabsContent value="primary" className="border rounded-md p-4 mt-4">
+                <div className="max-h-96 overflow-y-auto">
+                  <pre className="text-xs whitespace-pre-wrap">
+                    {analysisResult ? JSON.stringify(analysisResult, null, 2) : "No hay datos disponibles"}
+                  </pre>
+                </div>
+              </TabsContent>
+              <TabsContent value="enhanced" className="border rounded-md p-4 mt-4">
+                <div className="max-h-96 overflow-y-auto">
+                  <pre className="text-xs whitespace-pre-wrap">
+                    {enhancedAnalysis ? JSON.stringify(enhancedAnalysis, null, 2) : "No hay datos disponibles"}
+                  </pre>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
