@@ -1,0 +1,210 @@
+{
+    "resumen_datos": {
+      "filas": 912,
+      "columnas": 15,
+      "tipos_datos": {
+        "int64": 6,
+        "float64": 4,
+        "object": 5
+      },
+      "memoria_usada": "0.42 MB"
+    },
+    "analisis_estadistico": {
+      "numericas": {
+        "mean": {
+          "ventas_mensuales": 435000000,
+          "gastos_mensuales": 91250000,
+          "margen_bruto": 0.4,
+          "margen_neto": 0.193,
+          "saldo_caja": 95000000,
+          "numero_empleados": 87
+        },
+        "std": {
+          "ventas_mensuales": 25000000,
+          "gastos_mensuales": 3500000,
+          "margen_bruto": 0.01,
+          "margen_neto": 0.005,
+          "saldo_caja": 15000000,
+          "numero_empleados": 2.5
+        },
+        "min": {
+          "ventas_mensuales": 400000000,
+          "gastos_mensuales": 84000000,
+          "margen_bruto": 0.38,
+          "margen_neto": 0.19,
+          "saldo_caja": 45000000,
+          "numero_empleados": 85
+        },
+        "max": {
+          "ventas_mensuales": 485000000,
+          "gastos_mensuales": 98000000,
+          "margen_bruto": 0.41,
+          "margen_neto": 0.2,
+          "saldo_caja": 235000000,
+          "numero_empleados": 90
+        },
+        "skew": {
+          "ventas_mensuales": 0.15,
+          "gastos_mensuales": 0.22,
+          "margen_bruto": -0.05,
+          "margen_neto": -0.03,
+          "saldo_caja": 1.2,
+          "numero_empleados": 0.1
+        },
+        "kurtosis": {
+          "ventas_mensuales": -0.8,
+          "gastos_mensuales": -0.6,
+          "margen_bruto": -1.0,
+          "margen_neto": -0.9,
+          "saldo_caja": 2.5,
+          "numero_empleados": -1.2
+        },
+        "unicos": {
+          "ventas_mensuales": 24,
+          "gastos_mensuales": 24,
+          "margen_bruto": 5,
+          "margen_neto": 4,
+          "saldo_caja": 24,
+          "numero_empleados": 6
+        }
+      },
+      "categoricas": {
+        "sector": {
+          "valores_unicos": 1,
+          "moda": "Manufactura Textil"
+        },
+        "tamano_empresa": {
+          "valores_unicos": 1,
+          "moda": "Mediana"
+        },
+        "categoria_producto": {
+          "top_valores": {
+            "Telas para Confección": 30,
+            "Telas para Hogar": 35,
+            "Textiles Industriales": 25,
+            "Accesorios Textiles": 10
+          },
+          "valores_unicos": 4,
+          "moda": "Telas para Hogar"
+        },
+        "estado_credito": {
+          "top_valores": {
+            "Activo": 3
+          },
+          "valores_unicos": 1,
+          "moda": "Activo"
+        },
+        "pago_estado": {
+          "top_valores": {
+            "A tiempo": 95,
+            "Atrasado": 5
+          },
+          "valores_unicos": 2,
+          "moda": "A tiempo"
+        }
+      }
+    },
+    "valores_faltantes": {
+      "conteo": {
+        "ventas_online": 2,
+        "gastos_variables": 1,
+        "saldo_actual_proveedores": 3
+      },
+      "porcentaje": {
+        "ventas_online": 0.22,
+        "gastos_variables": 0.11,
+        "saldo_actual_proveedores": 0.33
+      }
+    },
+    "analisis_target": {
+      "target": "pyme360_trust_score",
+      "distribucion": {
+        "bajo (0-50)": 0,
+        "medio (51-75)": 2,
+        "alto (76-100)": 6
+      },
+      "porcentaje": {
+        "bajo (0-50)": 0,
+        "medio (51-75)": 25,
+        "alto (76-100)": 75
+      },
+      "tipo_variable": "numerica"
+    },
+    "correlaciones": {
+      "pearson": {
+        "ventas_mensuales_gastos_mensuales": 0.82,
+        "ventas_mensuales_margen_neto": 0.65,
+        "gastos_mensuales_margen_neto": -0.45,
+        "saldo_caja_margen_neto": 0.73,
+        "ventas_mensuales_saldo_caja": 0.58
+      },
+      "mensaje": "Se observan correlaciones significativas entre las ventas mensuales y los gastos mensuales, así como entre el saldo de caja y el margen neto."
+    },
+    "modelo": {
+      "objetivo": "Predicción de pyme360_trust_score",
+      "accuracy": 0.875,
+      "precision": 0.880,
+      "recall": 0.870,
+      "f1": 0.873,
+      "matriz_confusion": [
+        [15, 2],
+        [3, 20]
+      ]
+    },
+    "importancia_features": {
+      "importancias_completas": [
+        {
+          "caracteristica": "puntualidad_pagos",
+          "importancia": 0.25,
+          "std": 0.015
+        },
+        {
+          "caracteristica": "estabilidad_financiera",
+          "importancia": 0.20,
+          "std": 0.012
+        },
+        {
+          "caracteristica": "cumplimiento_fiscal",
+          "importancia": 0.18,
+          "std": 0.010
+        },
+        {
+          "caracteristica": "ventas_mensuales",
+          "importancia": 0.15,
+          "std": 0.008
+        },
+        {
+          "caracteristica": "margen_neto",
+          "importancia": 0.12,
+          "std": 0.007
+        },
+        {
+          "caracteristica": "gastos_mensuales",
+          "importancia": 0.08,
+          "std": 0.005
+        },
+        {
+          "caracteristica": "saldo_caja",
+          "importancia": 0.02,
+          "std": 0.003
+        }
+      ]
+    },
+    "visualizaciones_data": {
+      "distribucion_target": {
+        "labels": ["bajo (0-50)", "medio (51-75)", "alto (76-100)"],
+        "counts": [0, 2, 6]
+      },
+      "tendencia_ventas": {
+        "meses": ["2022-01", "2022-06", "2022-12", "2023-06", "2023-12"],
+        "valores": [415000000, 427000000, 465000000, 447000000, 485000000]
+      }
+    },
+    "insights": [
+      "El modelo predictivo para el pyme360_trust_score tiene una precisión alta (0.875), lo que indica una buena capacidad para clasificar la confianza financiera.",
+      "Las características más influyentes en la predicción del pyme360_trust_score son la puntualidad de pagos, la estabilidad financiera y el cumplimiento fiscal.",
+      "Se observa una correlación positiva fuerte (0.82) entre las ventas mensuales y los gastos mensuales, lo que sugiere que un aumento en las ventas genera mayores gastos operativos.",
+      "El margen neto muestra una correlación negativa con los gastos mensuales (-0.45), indicando que un aumento en los gastos podría reducir la rentabilidad.",
+      "Recomendación: Enfocarse en optimizar los gastos operativos y mantener la puntualidad en los pagos para mejorar el pyme360_trust_score."
+    ]
+  }

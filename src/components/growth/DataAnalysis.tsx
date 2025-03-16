@@ -148,28 +148,27 @@ const DataAnalysis = () => {
   // Function to add mock data for visualization if necessary
   const addMockDataIfNeeded = (data: any) => {
     const enhancedData = { ...data };
-    
     // If importancia_features is missing, add mock data
     if (!enhancedData.importancia_features) {
       enhancedData.importancia_features = {
-        labels: ["Pclass", "Age", "Sex", "Fare", "Embarked"],
-        values: [0.42, 0.23, 0.19, 0.11, 0.05]
+      labels: ["Tenure", "MonthlyCharges", "TotalCharges", "Contract", "PaymentMethod"],
+      values: [0.35, 0.25, 0.20, 0.15, 0.05]
       };
     }
     
     // If distribucion_target is missing, add mock data
     if (!enhancedData.distribucion_target) {
       enhancedData.distribucion_target = {
-        labels: [0, 1],
-        values: [0.62, 0.38]
+      labels: ["No Churn", "Churn"],
+      values: [0.73, 0.27]
       };
     }
     
     // If valores_faltantes is missing, add mock data
     if (!enhancedData.valores_faltantes && targetColumn) {
       enhancedData.valores_faltantes = {
-        labels: ["Age", "Cabin", "Embarked", "Fare", targetColumn],
-        values: [177, 687, 2, 0, 0]
+      labels: ["TotalCharges", "MonthlyCharges", "Tenure", "Contract", targetColumn],
+      values: [11, 0, 0, 0, 0]
       };
     }
     

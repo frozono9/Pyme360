@@ -1,69 +1,73 @@
-# Welcome to your Lovable project
+# UAB_HACKATHON
 
-## Project info
+## Solución de Porks In Paris para el reto de PayRetailers
 
-**URL**: https://lovable.dev/projects/3dfa1511-83c0-458c-9894-6042dd5102cb
+### Contexto: La fragilidad de las PyMEs en Latinoamérica
 
-## How can I edit this code?
+Las micro, pequeñas y medianas empresas (PyMEs) representan el 99% del tejido empresarial en Latinoamérica y generan alrededor del 61% del empleo formal. A pesar de su importancia, su contribución al PIB es solo del 25%, en comparación con el 56% en la Unión Europea. Esto refleja problemas estructurales como baja productividad, alta informalidad y dificultades para insertarse en cadenas de valor y mercados internacionales. Además, el 50% de las PyMEs desaparece en sus primeros dos años de existencia.
 
-There are several ways of editing your application.
+![Datos PyMes Latam](image.png)
 
-**Use Lovable**
+### Problemas estructurales de las PyMEs en la región
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3dfa1511-83c0-458c-9894-6042dd5102cb) and start prompting.
+De acuerdo con el informe de la CEPAL, las PyMEs enfrentan diversos desafíos:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Falta de acceso a financiamiento:** Dificultades para obtener crédito por falta de garantías y altas tasas de interés.
+- **Baja digitalización y tecnología obsoleta:** Muchas PyMEs operan con tecnología desactualizada y sin acceso a herramientas digitales.
+- **Desconexión con cadenas productivas:** Pocas logran integrarse en redes de proveedores o exportar, limitando su crecimiento.
+- **Fragmentación del apoyo institucional:** Las políticas de fomento son dispersas y carecen de coordinación y evaluación de impacto.
 
-**Use your preferred IDE**
+### Nuestra Solución: Plataforma de IA Responsable para PyMEs
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+![Dashboard](dashboard.png)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Para abordar estos desafíos, proponemos una plataforma basada en inteligencia artificial (IA) responsable que brinde apoyo estratégico a las PyMEs mediante:
 
-Follow these steps:
+#### 1. Acceso a financiamiento inteligente
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+La IA analiza datos financieros y operativos de las PyMEs para generar perfiles de riesgo más precisos, permitiendo que bancos e inversores ofrezcan créditos con condiciones adaptadas a cada empresa.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+![Financiamiento Inteligente](financiamiento.png)
 
-# Step 3: Install the necessary dependencies.
-npm i
+#### 2. Gestión empresarial y digitalización
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+La plataforma ofrece herramientas para la automatización, análisis de datos y apoyo en la toma de decisiones, con el objetivo de mejorar la eficiencia y competitividad de las PyMEs.
 
-**Edit a file directly in GitHub**
+![Gestion](gestion1.png)
+![Gestion](gestion2.png)
+![Gestion](gestion3.png)
+![Gestion](image-1.png)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+#### 3. Crecimiento y escalabilidad, predicción de KPIs, tendencias de mercado, análisis de datos y búsqueda de empleados
 
-**Use GitHub Codespaces**
+A través de modelos inteligentes , ayudamos a las PyMEs a identificar oportunidades de negocio, predecir KPIs clave, analizar tendencias de mercado y optimizar la búsqueda de empleados para fomentar su crecimiento y escalabilidad.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
 
-## What technologies are used for this project?
+#### 4. Sistema de trust score personalizado
 
-This project is built with .
+Se ofrece un sistema de trust score personalizado que incluye la evolución histórica, distribución por categorías y otros parámetros relevantes, para proporcionar una evaluación detallada y adaptada a las necesidades de cada PyME.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+![alt text](image-6.png)
 
-## How can I deploy this project?
+#### 5. Fomento de una IA responsable y transparente
 
-Simply open [Lovable](https://lovable.dev/projects/3dfa1511-83c0-458c-9894-6042dd5102cb) and click on Share -> Publish.
+Garantizamos el uso ético de la IA, evitando sesgos algorítmicos y asegurando la protección de datos de las PyMEs.
 
-## I want to use a custom domain - is that possible?
+![alt text](image-7.png)
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### Impacto Esperado
+
+El desarrollo de esta plataforma podría transformar el ecosistema de las PyMEs en Latinoamérica:
+
+- **Reducción de la mortalidad empresarial** mediante herramientas de gestión y financiamiento adaptadas.
+- **Aumento de la productividad** facilitando la digitalización e integración en mercados dinámicos.
+- **Generación de empleo y crecimiento económico sostenible,** fortaleciendo a las PyMEs como motores de desarrollo.
+
+### Conclusión
+
+Nuestra solución basada en IA responsable tiene el potencial de transformar la realidad de las PyMEs latinoamericanas, brindándoles herramientas para mejorar su productividad, sostenibilidad y acceso a financiamiento. Con un enfoque integral y transparente, buscamos impulsar el crecimiento económico y la formalización del sector PyME en la región.
+
