@@ -1,4 +1,3 @@
-
 const BASE_URL = "http://localhost:8000";
 
 async function testMongoConnection(testInput) {
@@ -191,6 +190,7 @@ async function getCreditScore() {
       throw new Error('Usuario no autenticado');
     }
 
+    console.log("Solicitando Credit Score a la API...");
     const response = await fetch(`${BASE_URL}/api/credit-score`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -198,31 +198,15 @@ async function getCreditScore() {
     });
 
     if (!response.ok) {
+      console.error("Error en respuesta de credit-score:", response.status);
       const errorData = await response.json();
       throw new Error(errorData.detail || 'Error al obtener puntuación crediticia');
     }
 
     const data = await response.json();
-    console.log("Credit score data received:", data);
+    console.log("Datos de Credit Score recibidos:", data);
     
-    // Ensure the data has the necessary structure
-    if (!data.components) {
-      data.components = {};
-    }
-    
-    // Make sure all component objects exist
-    const componentTypes = ['payment_history', 'credit_utilization', 'history_length', 'credit_mix', 'new_applications'];
-    componentTypes.forEach(type => {
-      if (!data.components[type]) {
-        data.components[type] = { score: 0, data: {} };
-      }
-      
-      // Ensure the data property exists
-      if (!data.components[type].data) {
-        data.components[type].data = {};
-      }
-    });
-    
+    // No aplicamos ninguna transformación, devolvemos exactamente lo que nos da el backend
     return data;
   } catch (error) {
     console.error('Error al obtener puntuación crediticia:', error);
@@ -234,87 +218,62 @@ async function getCreditScore() {
         components: {
           payment_history: { 
             score: 90, 
-            data: {
-              percentage: 95,
-              totalPayments: 48,
-              onTimePayments: 46,
-              latePayments: 2,
-              chartData: [
-                { month: "1/2023", "A tiempo": 3, "Atrasados": 0 },
-                { month: "2/2023", "A tiempo": 4, "Atrasados": 0 },
-                { month: "3/2023", "A tiempo": 3, "Atrasados": 1 },
-                { month: "4/2023", "A tiempo": 4, "Atrasados": 0 },
-                { month: "5/2023", "A tiempo": 4, "Atrasados": 0 },
-                { month: "6/2023", "A tiempo": 3, "Atrasados": 1 }
-              ]
-            }
+            percentage: 95,
+            total_payments: 48,
+            on_time_payments: 46,
+            late_payments: 2,
+            chart_data: [
+              { month: "1/2023", "A tiempo": 3, "Atrasados": 0 },
+              { month: "2/2023", "A tiempo": 4, "Atrasados": 0 },
+              { month: "3/2023", "A tiempo": 3, "Atrasados": 1 },
+              { month: "4/2023", "A tiempo": 4, "Atrasados": 0 },
+              { month: "5/2023", "A tiempo": 4, "Atrasados": 0 },
+              { month: "6/2023", "A tiempo": 3, "Atrasados": 1 }
+            ]
           },
           credit_utilization: { 
             score: 85, 
-            data: {
-              utilization: 25,
-              totalDebt: 25000,
-              totalAvailable: 100000,
-              utilizationByAccount: [
-                { name: "Banco A", value: 15000, limit: 50000, utilization: 30 },
-                { name: "Banco B", value: 10000, limit: 50000, utilization: 20 }
-              ],
-              colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d']
-            }
+            utilization: 25,
+            total_debt: 25000,
+            total_available: 100000,
+            accounts: [
+              { name: "Banco A", value: 15000, limit: 50000, utilization: 30 },
+              { name: "Banco B", value: 10000, limit: 50000, utilization: 20 }
+            ]
           },
           history_length: { 
             score: 80, 
-            data: {
-              averageAge: 4.5,
-              numAccounts: 3,
-              accountAges: [
-                { entidad: "Banco A", years: 6.2 },
-                { entidad: "Banco B", years: 4.1 },
-                { entidad: "Financiera C", years: 3.2 }
-              ],
-              chartData: [
-                { name: "Banco A", años: 6.2 },
-                { name: "Banco B", años: 4.1 },
-                { name: "Financiera C", años: 3.2 }
-              ]
-            }
+            average_age: 4.5,
+            num_accounts: 3,
+            accounts: [
+              { name: "Banco A", years: 6.2 },
+              { name: "Banco B", years: 4.1 },
+              { name: "Financiera C", years: 3.2 }
+            ]
           },
           credit_mix: { 
             score: 90, 
-            data: {
-              numTypes: 3,
-              types: ["Hipoteca", "Tarjeta de Crédito", "Préstamo Personal"],
-              typeCounts: { "Hipoteca": 1, "Tarjeta de Crédito": 2, "Préstamo Personal": 1 },
-              chartData: [
-                { name: "Hipoteca", value: 1 },
-                { name: "Tarjeta de Crédito", value: 2 },
-                { name: "Préstamo Personal", value: 1 }
-              ],
-              colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
-            }
+            num_types: 3,
+            types: ["Hipoteca", "Tarjeta de Crédito", "Préstamo Personal"],
+            type_counts: [
+              { name: "Hipoteca", value: 1 },
+              { name: "Tarjeta de Crédito", value: 2 },
+              { name: "Préstamo Personal", value: 1 }
+            ]
           },
           new_applications: { 
             score: 90, 
-            data: {
-              numIncidents: 1,
-              totalAmount: 5000,
-              incidents: [
-                { 
-                  tipo: "Solicitud reciente", 
-                  entidad: "Banco Nacional", 
-                  fecha: "2023-05-15", 
-                  monto: 5000, 
-                  estado: "Aprobado" 
-                }
-              ],
-              incidentsByType: { "Solicitud reciente": 1 },
-              chartData: [
-                { name: "Solicitud reciente", value: 1 }
-              ],
-              colors: ['#FF5252', '#FF7F7F', '#FFACAC', '#FFC4C4']
-            }
+            recent_applications: 1
           }
         },
+        history: [
+          { month: "Ene", score: 680 },
+          { month: "Feb", score: 690 },
+          { month: "Mar", score: 695 },
+          { month: "Abr", score: 700 },
+          { month: "May", score: 710 },
+          { month: "Jun", score: 720 }
+        ],
         nivel: {
           nivel: "Bueno",
           color: "bg-gradient-to-r from-sky-400 to-blue-500",
@@ -322,6 +281,7 @@ async function getCreditScore() {
         }
       };
     }
+    
     throw error;
   }
 }

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -25,77 +24,40 @@ interface CreditScoreCalculatorProps {
 }
 
 export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ creditData }) => {
-  // Usamos directamente los datos que vienen de la API (desde /database)
-  // en lugar de calcularlos con score_calculator.py
-  const finalScore = creditData?.score || 0;
+  console.log("DATOS RECIBIDOS EN CALCULATOR:", creditData);
   
-  // Determinar el nivel de crédito basado en el score
-  const getScoreLevel = (score: number) => {
-    if (score >= 750) {
-      return {
-        nivel: "Excelente",
-        color: "bg-gradient-to-r from-emerald-400 to-green-500",
-        description: "Tu puntaje te posiciona entre el 10% superior, calificando para las mejores tasas y condiciones crediticias."
-      };
-    } else if (score >= 670) {
-      return {
-        nivel: "Bueno",
-        color: "bg-gradient-to-r from-sky-400 to-blue-500",
-        description: "Tu puntaje está por encima del promedio, lo que te permite acceder a condiciones crediticias favorables."
-      };
-    } else if (score >= 580) {
-      return {
-        nivel: "Regular",
-        color: "bg-gradient-to-r from-amber-400 to-yellow-500",
-        description: "Tu puntaje está cerca del promedio. Aún tienes oportunidades de mejora para acceder a mejores condiciones crediticias."
-      };
-    } else if (score >= 500) {
-      return {
-        nivel: "Bajo",
-        color: "bg-gradient-to-r from-orange-400 to-amber-500",
-        description: "Tu puntaje está por debajo del promedio. Podrías enfrentar dificultades para obtener nuevos créditos sin garantías adicionales."
-      };
-    } else {
-      return {
-        nivel: "Pobre",
-        color: "bg-gradient-to-r from-red-400 to-rose-500",
-        description: "Tu puntaje es considerablemente bajo. Te recomendamos enfocarte en mejorar tu historial de pagos y reducir tus deudas actuales."
-      };
-    }
+  // IMPORTANTE: Usamos SOLO los datos que vienen directamente de la API
+  const finalScore = creditData?.score || 0;
+  const scoreLevel = creditData?.nivel || { 
+    nivel: "Sin datos", 
+    color: "bg-gradient-to-r from-gray-400 to-gray-500", 
+    description: "No hay suficiente información" 
   };
-
-  const scoreLevel = creditData?.nivel || getScoreLevel(finalScore);
   const scoreHistory = creditData?.history || [];
 
-  // Componentes del credit score desde la API
+  // Componentes del credit score directamente de la API
   const components = creditData?.components || {};
   
-  // Componentes individuales con valores por defecto para evitar errores
-  const paymentHistory = components?.payment_history || {};
-  const creditUtilization = components?.credit_utilization || {};
-  const historyLength = components?.history_length || {};
-  const creditMix = components?.credit_mix || {};
-  const newApplications = components?.new_applications || {};
+  // Acceder a los componentes individuales
+  const paymentHistory = components.payment_history || { score: 0, data: {} };
+  const creditUtilization = components.credit_utilization || { score: 0, data: {} };
+  const historyLength = components.history_length || { score: 0, data: {} };
+  const creditMix = components.credit_mix || { score: 0, data: {} };
+  const newApplications = components.new_applications || { score: 0, data: {} };
 
-  // Log para debuggear
-  console.log("Credit data en CreditScoreCalculator:", creditData);
-
-  // Helper function para asegurar que hay valores disponibles o usar valores por defecto
+  // Helper functions
   const safeValue = (value: any, defaultValue: any = 0) => {
     return value !== undefined && value !== null ? value : defaultValue;
   };
 
-  // Helper function para formatear porcentajes de forma segura
   const formatPercentage = (value: any) => {
     return safeValue(value, 0).toFixed(1);
   };
 
-  // Helper function para formatear moneda de forma segura
   const formatCurrency = (value: any) => {
     return safeValue(value, 0).toLocaleString();
   };
 
-  // Function para obtener la clase de color basada en el valor del score
   const getScoreColorClass = (score: number) => {
     if (score >= 80) return "bg-green-500 text-white";
     if (score >= 60) return "bg-blue-500 text-white";
@@ -286,7 +248,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
                       dataKey="value"
                     >
                       {creditUtilization.accounts.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'][index % 6]} />
+                        <Cell key={`cell-${index}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'][index % 6]} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => `$${Number(value || 0).toLocaleString()}`} />
