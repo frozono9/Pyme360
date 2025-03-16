@@ -26,7 +26,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
   // Extract target distribution data if available
   const targetDistributionData = React.useMemo(() => {
     if (data?.distribucion_target?.labels && data?.distribucion_target?.values) {
-      return data.distribucion_target.labels.map((label: string, index: number) => ({
+      return data.distribucion_target.labels.map((label: string | number, index: number) => ({
         name: typeof label === 'number' ? (label === 1 ? 'Positivo' : 'Negativo') : label,
         value: data.distribucion_target.values[index]
       }));
@@ -40,7 +40,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
       return data.valores_faltantes.labels.map((label: string, index: number) => ({
         name: label,
         value: data.valores_faltantes.values[index]
-      }));
+      })).sort((a: any, b: any) => b.value - a.value).slice(0, 10); // Top 10 missing values
     }
     return [];
   }, [data]);
@@ -48,6 +48,13 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
   if (!data) {
     return <div className="p-4 text-center">No hay datos disponibles para visualizar</div>;
   }
+
+  // Log the data to see what's available
+  console.log("Visualization data:", { 
+    featureImportance: featureImportanceData, 
+    targetDistribution: targetDistributionData, 
+    missingValues: missingValuesData 
+  });
 
   return (
     <div className="space-y-8">
@@ -70,7 +77,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
                   interval={0}
                 />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value) => [value.toFixed(3), 'Importancia']} />
                 <Legend />
                 <Bar dataKey="value" fill="#8884d8" name="Importancia" />
               </BarChart>
@@ -100,7 +107,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value, name) => [`${value}`, `${name}`]} />
+                <Tooltip formatter={(value) => [`${value}`, 'Cantidad']} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -133,6 +140,17 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      )}
+
+      {/* If no charts are displayed, show a message */}
+      {featureImportanceData.length === 0 && 
+       targetDistributionData.length === 0 && 
+       missingValuesData.length === 0 && (
+        <div className="text-center p-8 border rounded-lg bg-gray-50">
+          <p className="text-gray-500">
+            No hay datos suficientes para mostrar visualizaciones. Por favor, asegúrate de que el análisis ha generado datos de visualización.
+          </p>
         </div>
       )}
     </div>
