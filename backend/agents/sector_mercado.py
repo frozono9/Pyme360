@@ -17,17 +17,22 @@ def query(user_message, sector_cliente):
     }
     
     try:
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(API_URL, json=payload, timeout=30)  # Added timeout
         response.raise_for_status()  # Esto lanzará una excepción para códigos de estado HTTP 4xx/5xx
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error al hacer la solicitud: {e}")
         return {"text": f"Lo siento, ha ocurrido un error: {str(e)}"}
+    except json.JSONDecodeError as e:
+        print(f"Error al decodificar la respuesta JSON: {e}")
+        return {"text": "Lo siento, la respuesta del servidor no es válida"}
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return {"text": f"Lo siento, ha ocurrido un error inesperado: {str(e)}"}
 
 # Esta parte solo se ejecuta si el script se corre directamente (para pruebas)
 if __name__ == "__main__":
     input_person = "¿Podrías mostrarme un análisis de mi sector?"
-    
     
     # Hacer la petición a Flowise
     output = query(input_person, sector_cliente)
