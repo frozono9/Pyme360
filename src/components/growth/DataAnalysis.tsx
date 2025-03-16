@@ -115,7 +115,8 @@ const DataAnalysis = () => {
       formData.append('target_column', selectedColumn);
       
       // Llamar a la API del backend para analizar_importancias.py
-      const response = await fetch('/api/analyze', {
+      const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
+      const response = await fetch(`${baseUrl}/api/analyze`, {
         method: 'POST',
         body: formData,
       });
@@ -129,7 +130,7 @@ const DataAnalysis = () => {
       setLoadingProgress(98);
       
       // Llamar al segundo endpoint que utiliza importancias.py
-      const importanciasResponse = await fetch('/api/importancias', {
+      const importanciasResponse = await fetch(`${baseUrl}/api/importancias`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -435,4 +436,3 @@ const DataAnalysis = () => {
 };
 
 export default DataAnalysis;
-
