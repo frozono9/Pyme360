@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, CreditCard, BarChart2, ShieldCheck, TrendingUp, Search, FileText, Building, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -40,7 +39,7 @@ const ModulesSection = () => {
       id: 'financiamiento',
       title: 'Financiamiento Inteligente',
       icon: <CreditCard className="h-5 w-5" />,
-      route: '/financiamiento',
+      route: '/registro',
       description: 'Evaluación crediticia alternativa y conexión automatizada con fuentes de financiamiento adaptadas al perfil real de tu empresa.',
       features: [
         'AI Credit Score con evaluación integral',
@@ -52,17 +51,17 @@ const ModulesSection = () => {
         { 
           name: "Credit Score", 
           description: "Evaluación crediticia basada en desempeño real de tu negocio", 
-          route: "/credit-score" 
+          route: "/registro" 
         },
         { 
           name: "Marketplace de Financiamiento", 
           description: "Conexión con múltiples fuentes de capital", 
-          route: "/marketplace-financiamiento" 
+          route: "/registro" 
         },
         { 
           name: "Preparación para Financiamiento", 
           description: "Generación de documentación necesaria", 
-          route: "/preparacion-financiamiento" 
+          route: "/registro" 
         }
       ]
     },
@@ -70,7 +69,7 @@ const ModulesSection = () => {
       id: 'gestion',
       title: 'Gestión Empresarial y Financiera',
       icon: <BarChart2 className="h-5 w-5" />,
-      route: '/gestion',
+      route: '/registro',
       description: 'Plataforma integrada para administrar todos los aspectos de tu negocio con asistencia de IA que te ayuda a tomar mejores decisiones.',
       features: [
         'ERP simplificado con IA para control operativo',
@@ -82,17 +81,17 @@ const ModulesSection = () => {
         { 
           name: "ERP Simplificado con IA", 
           description: "Gestión integral de recursos empresariales", 
-          route: "/erp" 
+          route: "/registro" 
         },
         { 
           name: "Dashboard Inteligente", 
           description: "Visualización de KPIs y análisis de tendencias", 
-          route: "/dashboard-inteligente" 
+          route: "/registro" 
         },
         { 
           name: "Búsqueda de Empleados", 
           description: "Herramientas para reclutar y gestionar talento", 
-          route: "/busqueda-empleados" 
+          route: "/registro" 
         }
       ]
     },
@@ -100,7 +99,7 @@ const ModulesSection = () => {
       id: 'cumplimiento',
       title: 'Cumplimiento Regulatorio',
       icon: <ShieldCheck className="h-5 w-5" />,
-      route: '/cumplimiento',
+      route: '/registro',
       description: 'Automatización del seguimiento y cumplimiento de obligaciones fiscales, laborales y administrativas según la normativa de tu país.',
       features: [
         'Automatización de conformidad regulatoria',
@@ -112,17 +111,17 @@ const ModulesSection = () => {
         { 
           name: "Automatización de Conformidad", 
           description: "Calendario de obligaciones y generación de documentos legales", 
-          route: "/conformidad" 
+          route: "/registro" 
         },
         { 
           name: "Centro de Recursos Legales", 
           description: "Base de conocimiento de regulaciones por país", 
-          route: "/recursos-legales" 
+          route: "/registro" 
         },
         { 
           name: "Gestión de Trámites", 
           description: "Seguimiento y digitalización de procesos gubernamentales", 
-          route: "/gestion-tramites" 
+          route: "/registro" 
         }
       ]
     },
@@ -130,7 +129,7 @@ const ModulesSection = () => {
       id: 'crecimiento',
       title: 'Crecimiento y Escalabilidad',
       icon: <TrendingUp className="h-5 w-5" />,
-      route: '/crecimiento',
+      route: '/registro',
       description: 'Herramientas de análisis de mercado y oportunidades de expansión, con capacitación personalizada para potenciar tu crecimiento.',
       features: [
         'Análisis de mercado impulsado por IA',
@@ -142,17 +141,17 @@ const ModulesSection = () => {
         { 
           name: "Análisis de Mercado con IA", 
           description: "Identificación de tendencias y oportunidades", 
-          route: "/analisis-mercado" 
+          route: "/registro" 
         },
         { 
           name: "Estrategias de Expansión", 
           description: "Análisis de nuevos mercados y viabilidad", 
-          route: "/estrategias-expansion" 
+          route: "/registro" 
         },
         { 
           name: "Optimización de Operaciones", 
           description: "Automatización de procesos y gestión eficiente", 
-          route: "/optimizacion-operaciones" 
+          route: "/registro" 
         }
       ]
     },
@@ -160,7 +159,7 @@ const ModulesSection = () => {
       id: 'empleados',
       title: 'Búsqueda de Empleados',
       icon: <Users className="h-5 w-5" />,
-      route: '/busqueda-empleados',
+      route: '/registro',
       description: 'Encuentra y contrata al talento perfecto para tu empresa con nuestra plataforma especializada de reclutamiento y selección.',
       features: [
         'Búsqueda inteligente de candidatos',
@@ -172,17 +171,17 @@ const ModulesSection = () => {
         { 
           name: "Búsqueda de Talento", 
           description: "Encontrar candidatos que se ajusten a tus necesidades", 
-          route: "/busqueda-talento" 
+          route: "/registro" 
         },
         { 
           name: "Gestión de Entrevistas", 
           description: "Organización y seguimiento del proceso de selección", 
-          route: "/gestion-entrevistas" 
+          route: "/registro" 
         },
         { 
           name: "Verificación de Candidatos", 
           description: "Validación de credenciales y referencias", 
-          route: "/verificacion-candidatos" 
+          route: "/registro" 
         }
       ]
     }
@@ -247,7 +246,7 @@ const ModulesSection = () => {
               </div>
               
               <Link 
-                to={modules[activeTab].route}
+                to="/registro"
                 className="inline-flex items-center px-6 py-3 rounded-lg font-medium text-white bg-gradient-to-r from-pyme-blue to-pyme-blue-light shadow-md hover:shadow-lg hover:from-pyme-blue-dark hover:to-pyme-blue transform hover:-translate-y-0.5 transition-all"
               >
                 Explorar {modules[activeTab].title} <ArrowRight className="ml-2 h-4 w-4" />
@@ -259,7 +258,7 @@ const ModulesSection = () => {
                 {modules[activeTab].submodules.map((submodule, index) => (
                   <Link 
                     key={index}
-                    to={submodule.route}
+                    to="/registro"
                     className="glass-card p-5 block hover:shadow-elevation transition-all duration-300"
                   >
                     <div className="flex items-center">
