@@ -25,7 +25,9 @@ interface CreditScoreCalculatorProps {
 }
 
 export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ creditData }) => {
-  console.log("DATOS RECIBIDOS EN CALCULATOR:", creditData);
+  console.log("DATOS RECIBIDOS EN CALCULATOR (componente):", creditData);
+  console.log("¿Tiene payment_history?", !!creditData?.components?.payment_history);
+  console.log("¿Tiene credit_mix?", !!creditData?.components?.credit_mix);
   
   // Usamos SOLO los datos que vienen directamente de la API sin cálculos adicionales
   const finalScore = creditData?.score || 0;
@@ -41,11 +43,46 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
   const components = creditData?.components || {};
   
   // Acceder a los componentes individuales
-  const paymentHistory = components.payment_history || { score: 0, data: {} };
-  const creditUtilization = components.credit_utilization || { score: 0, data: {} };
-  const historyLength = components.history_length || { score: 0, data: {} };
-  const creditMix = components.credit_mix || { score: 0, data: {} };
-  const newApplications = components.new_applications || { score: 0, data: {} };
+  const paymentHistory = components.payment_history || { 
+    score: 0, 
+    percentage: 0,
+    total_payments: 0,
+    on_time_payments: 0,
+    late_payments: 0,
+    weight: 0.35,
+    chart_data: []
+  };
+  
+  const creditUtilization = components.credit_utilization || { 
+    score: 0, 
+    utilization: 0,
+    total_debt: 0,
+    total_available: 0,
+    weight: 0.30,
+    accounts: []
+  };
+  
+  const historyLength = components.history_length || { 
+    score: 0, 
+    average_age: 0,
+    num_accounts: 0,
+    weight: 0.15,
+    accounts: []
+  };
+  
+  const creditMix = components.credit_mix || { 
+    score: 0, 
+    num_types: 0,
+    weight: 0.10,
+    types: [],
+    type_counts: []
+  };
+  
+  const newApplications = components.new_applications || { 
+    score: 0, 
+    weight: 0.10,
+    recent_applications: 0
+  };
 
   // Helper functions
   const safeValue = (value: any, defaultValue: any = 0) => {

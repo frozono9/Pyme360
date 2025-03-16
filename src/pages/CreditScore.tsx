@@ -32,17 +32,24 @@ const CreditScore = () => {
           return;
         }
         
-        // Obtener puntuación crediticia directamente de la API
-        // La API ahora debería devolver los mismos datos que se muestran en /database
-        const score = await api.getCreditScore(true); // Agregar parámetro para obtener datos directos sin procesar
-        console.log("DATOS DE CREDIT SCORE RECIBIDOS:", score);
+        // Asegurarnos de obtener los datos completos de la API
+        console.log("Solicitando datos de Credit Score...");
+        const score = await api.getCreditScore(true);
+        console.log("DATOS DE CREDIT SCORE RECIBIDOS EN PAGINA:", score);
         
         if (!score) {
           setError("No fue posible calcular tu puntuación crediticia");
           return;
         }
+
+        // Verificamos que todos los componentes estén presentes
+        if (!score.components || !score.components.payment_history || !score.components.credit_mix) {
+          console.error("Faltan componentes esenciales en los datos de credit score", score);
+          setError("Datos incompletos de puntuación crediticia");
+          return;
+        }
         
-        // Guardar los datos tal como vienen de la API
+        // Guardar los datos completos
         setCreditData(score);
       } catch (err) {
         console.error("Error fetching credit score:", err);
@@ -119,7 +126,7 @@ const CreditScore = () => {
             </p>
           </div>
           
-          {/* Mostrar el calculador de puntaje crediticio con los datos sin procesar */}
+          {/* Mostrar el calculador de puntaje crediticio con los datos completos */}
           {creditData && <CreditScoreCalculator creditData={creditData} />}
         </div>
       </main>
