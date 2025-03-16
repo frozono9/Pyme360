@@ -36,12 +36,14 @@ const MarketTrendsAnalysis = () => {
     queryKey: ["marketTrends"],
     queryFn: () => fetchMarketTrends(""),
     staleTime: 1000 * 60 * 5, // 5 minutos
-    onError: (error) => {
-      toast({
-        title: "Error al cargar tendencias",
-        description: "No se pudieron obtener los datos de tendencias de mercado",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error al cargar tendencias",
+          description: "No se pudieron obtener los datos de tendencias de mercado",
+          variant: "destructive",
+        });
+      }
     }
   });
 
