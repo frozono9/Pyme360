@@ -1,9 +1,8 @@
-
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ButtonCustom } from "@/components/ui/button-custom";
-import { ArrowRight, CreditCard, Building, FileText, PieChart, BarChart, Award } from "lucide-react";
+import { ArrowRight, CreditCard, Building, Bot, PieChart, BarChart, Award } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -62,13 +61,13 @@ const FinancingModule = () => {
               />
               
               <DashboardCard 
-                icon={<FileText className="h-10 w-10 text-pyme-warning" />}
-                title="Preparación de Documentos"
-                description="Documentación asistida para solicitudes"
-                linkTo="/financiamiento/preparacion"
+                icon={<Bot className="h-10 w-10 text-pyme-warning" />}
+                title="Asesor IA Personalizado"
+                description="Consultas y recomendaciones de financiamiento"
+                linkTo="/financiamiento/asesor-ia"
                 metrics={[
-                  { label: "Tiempo de Preparación", value: "-60%" },
-                  { label: "Tasa de Aprobación", value: "+35%" }
+                  { label: "Respuestas Precisas", value: "+90%" },
+                  { label: "Recomendaciones", value: "Personalizadas" }
                 ]}
               />
             </div>

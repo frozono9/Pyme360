@@ -14,6 +14,7 @@ import ComplianceModule from "@/pages/ComplianceModule";
 import GrowthModule from "@/pages/GrowthModule";
 import FinancingPreparation from "@/pages/FinancingPreparation";
 import FinancingMarketplace from "@/pages/FinancingMarketplace";
+import FinancingAiAdvisor from "@/pages/FinancingAiAdvisor";
 import CreditScore from "@/pages/CreditScore";
 import EmployeeSearchModule from "@/pages/EmployeeSearchModule";
 import DatabaseView from "@/pages/DatabaseView";
@@ -38,6 +39,7 @@ function App() {
           <Route path="/financiamiento" element={<FinancingModule />} />
           <Route path="/financiamiento/preparacion" element={<FinancingPreparation />} />
           <Route path="/financiamiento/marketplace" element={<FinancingMarketplace />} />
+          <Route path="/financiamiento/asesor-ia" element={<FinancingAiAdvisor />} />
           <Route path="/financiamiento/credito" element={<CreditScore />} />
           <Route path="/cumplimiento" element={<ComplianceModule />} />
           <Route path="/crecimiento/*" element={<GrowthModule />} />
