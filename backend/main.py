@@ -19,7 +19,6 @@ import pandas as pd
 import importlib.util
 import sys
 import tempfile
-import traceback
 
 # Cargar variables de entorno
 load_dotenv()
@@ -29,8 +28,7 @@ app = FastAPI()
 origins = [
     "http://localhost:8000",
     "http://localhost:3000",
-    "http://localhost:8080",
-    "*"  # Permitir solicitudes de cualquier origen durante desarrollo
+    "http://localhost:8080"
 ]
 
 # Habilitar CORS
@@ -564,69 +562,25 @@ async def analyze_data(
             content = await file.read()
             temp_file.write(content)
         
-        print(f"Archivo temporal guardado en: {temp_file_path}")
-        print(f"Columna objetivo seleccionada: {target_column}")
-        
-        # Verificar que el archivo existe
-        if not os.path.exists(temp_file_path):
-            raise HTTPException(status_code=500, detail=f"Error: Archivo temporal no creado correctamente")
-        
-        # Verificar que el archivo de Python existe
-        script_path = os.path.join(os.path.dirname(__file__), "analizador_importancias.py")
-        if not os.path.exists(script_path):
-            raise HTTPException(status_code=500, detail=f"Error: No se encontró el script analizador_importancias.py en la ruta: {script_path}")
-        
         # Cargar el script analizador_importancias.py dinámicamente
-        try:
-            spec = importlib.util.spec_from_file_location("analizador_importancias", script_path)
-            analizador_module = importlib.util.module_from_spec(spec)
-            sys.modules["analizador_importancias"] = analizador_module
-            spec.loader.exec_module(analizador_module)
-            print("Módulo analizador_importancias cargado correctamente")
-        except Exception as e:
-            print(f"Error al cargar el módulo analizador_importancias: {str(e)}")
-            traceback.print_exc()
-            raise HTTPException(status_code=500, detail=f"Error al cargar el módulo analizador_importancias: {str(e)}")
+        spec = importlib.util.spec_from_file_location("analizador_importancias", "backend/analizador_importancias.py")
+        analizador_module = importlib.util.module_from_spec(spec)
+        sys.modules["analizador_importancias"] = analizador_module
+        spec.loader.exec_module(analizador_module)
         
         # Cargar el CSV con pandas
-        try:
-            df = pd.read_csv(temp_file_path)
-            print(f"CSV cargado con éxito. Forma: {df.shape}")
-        except Exception as e:
-            print(f"Error al leer el archivo CSV: {str(e)}")
-            traceback.print_exc()
-            raise HTTPException(status_code=500, detail=f"Error al leer el archivo CSV: {str(e)}")
-        
-        # Verificar que la columna objetivo existe en el DataFrame
-        if target_column not in df.columns:
-            available_columns = ", ".join(df.columns.tolist())
-            error_msg = f"La columna objetivo '{target_column}' no existe en el CSV. Columnas disponibles: {available_columns}"
-            print(error_msg)
-            raise HTTPException(status_code=400, detail=error_msg)
+        df = pd.read_csv(temp_file_path)
         
         # Llamar a la función de análisis
-        try:
-            print("Iniciando análisis de datos...")
-            result = analizador_module.analizar_datos_pyme_mejorado(df, target_column)
-            print("Análisis completado con éxito")
-        except Exception as e:
-            print(f"Error durante el análisis de datos: {str(e)}")
-            traceback.print_exc()
-            raise HTTPException(status_code=500, detail=f"Error durante el análisis de datos: {str(e)}")
+        result = analizador_module.analizar_datos_pyme_mejorado(df, target_column)
         
         # Eliminar el archivo temporal
-        try:
-            os.unlink(temp_file_path)
-            print(f"Archivo temporal eliminado: {temp_file_path}")
-        except Exception as e:
-            print(f"Advertencia: No se pudo eliminar el archivo temporal: {str(e)}")
+        os.unlink(temp_file_path)
         
         return result
-    except HTTPException as he:
-        # Reraise HTTP exceptions
-        raise he
     except Exception as e:
-        print(f"Error no controlado al analizar datos: {str(e)}")
+        print(f"Error al analizar datos: {str(e)}")
+        import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error al analizar datos: {str(e)}")
 
@@ -637,13 +591,7 @@ async def process_importancias(request: ImportanciasRequest):
         print(f"Procesando datos para importancias.py con columna objetivo: {request.target_column}")
         
         # Importar el módulo de importancias.py
-        try:
-            from agents import importancias
-            print("Módulo importancias.py cargado correctamente")
-        except Exception as e:
-            print(f"Error al cargar el módulo importancias.py: {str(e)}")
-            traceback.print_exc()
-            raise HTTPException(status_code=500, detail=f"Error al cargar el módulo importancias.py: {str(e)}")
+        from agents import importancias
         
         # Convertir los datos analizados a una cadena JSON
         analyzed_data_json = json.dumps(request.analyzed_data)
@@ -665,15 +613,8 @@ async def process_importancias(request: ImportanciasRequest):
         El análisis revela información clave para optimizar el negocio.
         '''
         
-        try:
-            # Llamar a la función query del módulo importancias
-            print("Enviando petición a la función query de importancias.py")
-            result = importancias.query(request.target_column, analyzed_data_json, prompt)
-            print("Respuesta recibida de importancias.py")
-        except Exception as e:
-            print(f"Error al llamar a importancias.query: {str(e)}")
-            traceback.print_exc()
-            raise HTTPException(status_code=500, detail=f"Error al procesar con importancias.query: {str(e)}")
+        # Llamar a la función query del módulo importancias
+        result = importancias.query(request.target_column, analyzed_data_json, prompt)
         
         # Extraer y procesar la respuesta
         if isinstance(result, dict) and "text" in result:
@@ -681,7 +622,6 @@ async def process_importancias(request: ImportanciasRequest):
             try:
                 # Buscamos las secciones JSON en el texto de respuesta
                 text = result["text"]
-                print(f"Texto recibido de importancias.py: {text[:100]}...")  # Primeros 100 caracteres
                 
                 # Función para extraer bloques JSON del texto
                 def extract_json_blocks(text):
@@ -702,24 +642,18 @@ async def process_importancias(request: ImportanciasRequest):
                 
                 # Si no se encontraron bloques JSON válidos, devolver el texto completo
                 if not processed_data:
-                    print("No se encontraron bloques JSON válidos en la respuesta")
                     return {"response_text": text, "processed": False}
                 
-                print(f"Datos procesados correctamente, devolviendo {len(processed_data)} elementos")
                 return processed_data
             except Exception as json_err:
                 print(f"Error al procesar JSON en la respuesta: {str(json_err)}")
-                traceback.print_exc()
                 return {"response_text": result.get("text", ""), "processed": False}
         else:
-            print("La respuesta no tiene el formato esperado (dict con campo 'text')")
             return {"response": result, "processed": False}
             
-    except HTTPException as he:
-        # Reraise HTTP exceptions
-        raise he
     except Exception as e:
-        print(f"Error no controlado al procesar con importancias.py: {str(e)}")
+        print(f"Error al procesar con importancias.py: {str(e)}")
+        import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error al procesar con importancias.py: {str(e)}")
 
