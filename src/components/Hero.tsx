@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ArrowRight, BarChart2, Shield, LineChart, LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -58,7 +57,7 @@ const Hero = () => {
                 Comenzar ahora <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link 
-                to="/nosotros" 
+                to="/registro" 
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-pyme-gray-dark bg-white border border-pyme-gray-light hover:border-pyme-blue/20 hover:text-pyme-blue shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all"
               >
                 Conocer más
@@ -156,7 +155,7 @@ const Hero = () => {
                     </div>
                   </div>
                   
-                  <button className="w-full py-2 rounded-lg bg-pyme-blue hover:bg-pyme-blue-dark text-white text-sm font-medium transition-colors">
+                  <button onClick={() => window.location.href = '/registro'} className="w-full py-2 rounded-lg bg-pyme-blue hover:bg-pyme-blue-dark text-white text-sm font-medium transition-colors">
                     Ver Dashboard Completo
                   </button>
                 </div>
