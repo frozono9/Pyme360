@@ -1,7 +1,6 @@
 
 import { useEffect, useRef } from 'react';
-import { ArrowRight, Shield, Medal, Award, CrownIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Shield, Medal, Award, CrownIcon } from 'lucide-react';
 
 const CertificationSystem = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -102,14 +101,7 @@ const CertificationSystem = () => {
               </div>
             </div>
             
-            <div className="reveal-on-scroll">
-              <Link 
-                to="/certificacion" 
-                className="inline-flex items-center font-medium text-pyme-blue hover:text-pyme-blue-dark transition-colors"
-              >
-                Conocer más sobre la certificación <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
+            {/* Removed the "Conocer más sobre la certificación" link */}
           </div>
           
           <div className="reveal-on-scroll">

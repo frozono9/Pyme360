@@ -86,7 +86,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center group">
+            {/* Updated logo link to change based on authentication status */}
+            <Link to={isAuthenticated ? "/dashboard" : "/"} className="flex items-center group">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pyme-blue to-pyme-blue-light group-hover:from-pyme-blue-dark group-hover:to-pyme-blue transition-all duration-300">
                 PyME360
               </span>
