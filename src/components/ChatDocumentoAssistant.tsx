@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { ButtonCustom } from "@/components/ui/button-custom";
+import api from "@/api";
 
 interface Message {
   sender: "user" | "bot";
@@ -53,19 +54,7 @@ const ChatDocumentoAssistant = () => {
 
     try {
       // Llamar a la API
-      const response = await fetch("/api/documentation-assistant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ question: message }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await api.queryDocumentationAssistant(message);
       
       // Determinar si la respuesta contiene un documento generado
       const includesDocument = data.response.toLowerCase().includes("documento generado") || 

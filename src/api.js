@@ -414,6 +414,43 @@ async function queryGeneralAssistant(question) {
   }
 }
 
+async function queryDocumentationAssistant(question) {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${BASE_URL}/api/documentation-assistant`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al consultar al asistente de documentación');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al consultar al asistente de documentación:', error);
+    
+    // En modo desarrollo, devolver una respuesta simulada
+    if (process.env.NODE_ENV !== 'production') {
+      return {
+        response: `Simulación de respuesta para la consulta: "${question}"\n\nHe analizado tu solicitud y he preparado un documento para ayudarte con tu préstamo para reformar tu tienda. Basado en tu historial financiero y los datos disponibles, he creado una propuesta de financiamiento que incluye:\n\n1. Plan de negocio con justificación de la reforma\n2. Proyección de retorno de inversión\n3. Detalle de los costos estimados\n\nPuedes descargar el documento completo usando el botón a continuación.`
+      };
+    }
+    
+    throw error;
+  }
+}
+
 async function predictKpi(predictionParams) {
   try {
     const token = localStorage.getItem('token');
@@ -532,5 +569,6 @@ export default {
   getTrustScore,
   queryFinancingAssistant,
   queryGeneralAssistant,
-  predictKpi
+  predictKpi,
+  queryDocumentationAssistant
 }
