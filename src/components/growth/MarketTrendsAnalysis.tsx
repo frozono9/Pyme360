@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +9,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Loader2, TrendingUp, BarChart2, PieChart, RadarIcon, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-// Datos de fallback en caso de que la API falle
 const mockTrendsData = {
   sector: "Tecnología",
   text: "El sector de tecnología muestra un crecimiento sostenido con oportunidades en innovación digital y servicios cloud.",
@@ -49,18 +47,10 @@ const mockTrendsData = {
       baseline: [93, 95, 97, 99, 101, 103],
       optimistic: [93, 96, 99, 103, 107, 112],
       pessimistic: [93, 92, 91, 92, 93, 94]
-    },
-    recommendations: [
-      "Invertir en capacitación en nuevas tecnologías para el personal",
-      "Desarrollar soluciones basadas en datos e inteligencia artificial",
-      "Fortalecer la seguridad informática de tus sistemas",
-      "Explorar oportunidades de expansión en mercados emergentes",
-      "Adoptar metodologías ágiles para mejorar la velocidad de innovación"
-    ]
+    }
   }
 };
 
-// Función para consultar al API de tendencias
 const fetchMarketTrends = async (question: string) => {
   try {
     const response = await fetch("/api/market-trends", {
@@ -93,7 +83,7 @@ const MarketTrendsAnalysis = () => {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["marketTrends"],
     queryFn: () => fetchMarketTrends(""),
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 1000 * 60 * 5,
     meta: {
       onError: () => {
         toast({
@@ -106,7 +96,6 @@ const MarketTrendsAnalysis = () => {
     retry: 1
   });
 
-  // Usar datos mock si no hay datos o si hay error
   const trendsData = data || mockTrendsData;
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
@@ -147,9 +136,8 @@ const MarketTrendsAnalysis = () => {
   }
 
   const { text, trends_data } = trendsData;
-  const { sector, historic, impact_factors, opportunity_areas, projection, recommendations } = trends_data || {};
+  const { sector, historic, impact_factors, opportunity_areas, projection } = trends_data || {};
 
-  // Asegurar que historic.dates existe y convertir a array si es necesario
   const historicDates = historic?.dates || [];
   const historicData = historicDates.map((date, index) => ({
     date,
@@ -159,7 +147,6 @@ const MarketTrendsAnalysis = () => {
     ...(historic?.subsectors?.[2] ? { [historic.subsectors[2].name]: historic.subsectors[2].data[index] } : {})
   }));
 
-  // Preparar datos de proyección
   const projectionDates = projection?.dates || [];
   const projectionData = projectionDates.map((date, index) => ({
     date,
@@ -217,7 +204,6 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Tendencias de los últimos 12 meses</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
                 <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
@@ -265,7 +251,6 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Nivel de influencia en el mercado</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
                 <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
@@ -302,7 +287,6 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Potencial por área estratégica</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
                 <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
@@ -341,7 +325,6 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Escenarios de evolución del mercado</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Adjusted height from h-80 to h-64 to prevent overflow */}
                 <div className="h-64 md:h-72">
                   <ChartContainer
                     config={{
@@ -387,21 +370,6 @@ const MarketTrendsAnalysis = () => {
             </Card>
           </TabsContent>
         </Tabs>
-        
-        {/* Added more spacing (mt-12 instead of mt-8) and a clear separator */}
-        <div className="mt-12 pt-6 border-t border-gray-200">
-          <h3 className="text-lg font-semibold mb-4">Recomendaciones Estratégicas</h3>
-          <ul className="space-y-3">
-            {recommendations?.map((recommendation, index) => (
-              <li key={index} className="flex items-start">
-                <span className="bg-pyme-blue text-white rounded-full h-6 w-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
-                  {index + 1}
-                </span>
-                <p className="text-gray-700">{recommendation}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </div>
   );
