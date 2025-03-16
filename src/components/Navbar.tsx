@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, LayoutDashboard, DollarSign, FileText, TrendingUp, Award } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, DollarSign, FileText, TrendingUp, Award, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -120,6 +121,12 @@ const Navbar = () => {
                     Crecimiento
                   </div>
                 </NavLink>
+                <NavLink to="/busqueda-empleados">
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-1" />
+                    Búsqueda de Empleados
+                  </div>
+                </NavLink>
                 <NavLink to="/certificacion">
                   <div className="flex items-center">
                     <Award className="h-4 w-4 mr-1" />
@@ -217,6 +224,13 @@ const Navbar = () => {
               >
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Crecimiento
+              </Link>
+              <Link 
+                to="/busqueda-empleados" 
+                className="flex items-center px-3 py-2 text-base font-medium text-pyme-gray-dark hover:text-pyme-blue transition-colors"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Búsqueda de Empleados
               </Link>
               <Link 
                 to="/certificacion" 

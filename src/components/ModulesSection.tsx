@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, CreditCard, BarChart2, ShieldCheck, TrendingUp, Search, FileText, Building } from 'lucide-react';
+import { ArrowRight, CreditCard, BarChart2, ShieldCheck, TrendingUp, Search, FileText, Building, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ModulesSection = () => {
@@ -153,6 +153,36 @@ const ModulesSection = () => {
           name: "Optimización de Operaciones", 
           description: "Automatización de procesos y gestión eficiente", 
           route: "/optimizacion-operaciones" 
+        }
+      ]
+    },
+    {
+      id: 'empleados',
+      title: 'Búsqueda de Empleados',
+      icon: <Users className="h-5 w-5" />,
+      route: '/busqueda-empleados',
+      description: 'Encuentra y contrata al talento perfecto para tu empresa con nuestra plataforma especializada de reclutamiento y selección.',
+      features: [
+        'Búsqueda inteligente de candidatos',
+        'Gestión de procesos de contratación',
+        'Verificación de referencias automatizada'
+      ],
+      image: './assets/employees-module.png',
+      submodules: [
+        { 
+          name: "Búsqueda de Talento", 
+          description: "Encontrar candidatos que se ajusten a tus necesidades", 
+          route: "/busqueda-talento" 
+        },
+        { 
+          name: "Gestión de Entrevistas", 
+          description: "Organización y seguimiento del proceso de selección", 
+          route: "/gestion-entrevistas" 
+        },
+        { 
+          name: "Verificación de Candidatos", 
+          description: "Validación de credenciales y referencias", 
+          route: "/verificacion-candidatos" 
         }
       ]
     }

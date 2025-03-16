@@ -157,8 +157,8 @@ const MarketTrendsAnalysis = () => {
   }));
 
   return (
-    // Añadimos clase con padding inferior para evitar superposición con el footer
-    <div className="space-y-6 mb-16">
+    // Increased bottom margin to ensure no footer overlap
+    <div className="space-y-6 mb-24">
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h2 className="text-xl font-bold mb-4 flex items-center">
           <TrendingUp className="mr-2 text-pyme-blue" />
@@ -206,8 +206,8 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Tendencias de los últimos 12 meses</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Reducimos la altura fija de los gráficos y utilizamos altura responsiva */}
-                <div className="h-[400px] max-h-[50vh]">
+                {/* Fixed height container to prevent layout shifts */}
+                <div className="h-[350px] w-full">
                   <ChartContainer
                     config={{
                       sector: { color: "#2563eb" },
@@ -256,7 +256,7 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Nivel de influencia en el mercado</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px] max-h-[50vh]">
+                <div className="h-[350px] w-full">
                   <ChartContainer
                     config={{
                       impact: { color: "#2563eb" }
@@ -294,7 +294,7 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Potencial por área estratégica</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px] max-h-[50vh]">
+                <div className="h-[350px] w-full">
                   <ChartContainer
                     config={{
                       value: { color: "#2563eb" }
@@ -334,7 +334,7 @@ const MarketTrendsAnalysis = () => {
                 <CardDescription>Escenarios de evolución del mercado</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px] max-h-[50vh]">
+                <div className="h-[350px] w-full">
                   <ChartContainer
                     config={{
                       baseline: { color: "#2563eb" },

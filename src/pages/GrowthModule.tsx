@@ -4,7 +4,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, BarChart2, ArrowUpRight } from "lucide-react";
+import { TrendingUp, BarChart2, ArrowUpRight, Users } from "lucide-react";
 import { KpiPredictionEntry } from "@/components/growth/KpiPredictionEntry";
 import { KpiPredictor } from "@/components/growth/KpiPredictor";
 import MarketTrendsAnalysis from "@/components/growth/MarketTrendsAnalysis";
@@ -40,8 +40,8 @@ const GrowthModuleMain = () => {
         </div>
 
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-t-4 border-t-blue-500">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="border-t-4 border-t-blue-500 md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <BarChart2 className="mr-2 text-blue-500" size={20} />
@@ -94,6 +94,22 @@ const GrowthModuleMain = () => {
                 </button>
               </CardContent>
             </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-none shadow-md">
+              <CardContent className="p-6">
+                <h3 className="text-2xl font-bold text-green-700 mb-3">Búsqueda de Empleados</h3>
+                <p className="text-green-900 mb-5">
+                  Encuentra el talento ideal para hacer crecer tu negocio con nuestra plataforma especializada de reclutamiento.
+                </p>
+                <button 
+                  onClick={() => navigate("/busqueda-empleados")}
+                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  Buscar empleados
+                </button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
@@ -130,8 +146,8 @@ const MarketTrendsPage = () => {
       {/* Espaciador para evitar que el navbar fijo se superponga al contenido */}
       <div className="h-16"></div>
       
-      {/* Añadimos pb-24 para garantizar espacio suficiente en la parte inferior */}
-      <main className="flex-1 py-8 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* Increased padding bottom to ensure no footer overlap */}
+      <main className="flex-1 py-8 pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
