@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, Bell, Award, AlertCircle } from "lucide-react";
+import { LogOut, BarChart2, Users, FileText, CreditCard, TrendingUp, Activity, Bell, Award, AlertCircle, Flag, MapPin, Check, Milestone, CheckCircle2, AlertTriangle, Calendar, BadgeCheck, GraduationCap, Zap, Rocket, ArrowRight } from "lucide-react";
 import api from "@/api";
 import { Progress } from "@/components/ui/progress";
 
@@ -35,6 +35,17 @@ interface ActiveDebtsData {
   growthRate: number;
 }
 
+interface RoadmapStep {
+  id: number;
+  title: string;
+  description: string;
+  status: 'completed' | 'in-progress' | 'pending';
+  priority: 'high' | 'medium' | 'low';
+  icon: React.ReactNode;
+  linkTo: string;
+  percentComplete?: number;
+}
+
 const Dashboard = () => {
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -54,6 +65,7 @@ const Dashboard = () => {
     total: 0,
     growthRate: 0,
   });
+  const [roadmapSteps, setRoadmapSteps] = useState<RoadmapStep[]>([]);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -119,6 +131,9 @@ const Dashboard = () => {
         });
       }
       
+      // Generar pasos del roadmap basados en los datos
+      generateRoadmapSteps(creditScoreData?.score, trustScoreData?.calificacion_global);
+      
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast({
@@ -129,6 +144,112 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función para generar los pasos del roadmap basados en los datos de la empresa
+  const generateRoadmapSteps = (creditScore = 0, trustScore = 0) => {
+    const steps: RoadmapStep[] = [];
+    
+    // Paso 1: Siempre es completar el perfil empresarial
+    steps.push({
+      id: 1,
+      title: "Completar Perfil Empresarial",
+      description: "Añade toda la información básica de tu empresa para desbloquear análisis personalizados.",
+      status: trustScore > 30 ? 'completed' : 'in-progress',
+      priority: 'high',
+      icon: <BadgeCheck className="text-blue-500" />,
+      linkTo: '/certificacion',
+      percentComplete: Math.min(100, Math.round(trustScore * 1.5))
+    });
+    
+    // Paso 2: Evaluación crediticia
+    steps.push({
+      id: 2,
+      title: "Evaluación Crediticia Completa",
+      description: "Sube tus estados financieros para obtener tu AI Credit Score y acceder a mejores oportunidades de financiamiento.",
+      status: creditScore > 600 ? 'completed' : creditScore > 400 ? 'in-progress' : 'pending',
+      priority: creditScore < 600 ? 'high' : 'medium',
+      icon: <CreditCard className="text-purple-500" />,
+      linkTo: '/financiamiento/credito',
+      percentComplete: Math.min(100, Math.round((creditScore / 850) * 100))
+    });
+    
+    // Paso 3: Implementación de gestión financiera
+    const financeCompletionPercent = creditScore > 700 ? 85 : creditScore > 600 ? 60 : creditScore > 500 ? 40 : 20;
+    steps.push({
+      id: 3,
+      title: "Implementar Gestión Financiera",
+      description: "Configura tu sistema de control de flujo de caja y automatiza la gestión financiera.",
+      status: financeCompletionPercent > 80 ? 'completed' : financeCompletionPercent > 30 ? 'in-progress' : 'pending',
+      priority: financeCompletionPercent < 50 ? 'high' : 'medium',
+      icon: <BarChart2 className="text-blue-500" />,
+      linkTo: '/gestion',
+      percentComplete: financeCompletionPercent
+    });
+    
+    // Paso 4: Cumplimiento regulatorio y fiscal
+    const compliancePercent = trustScore > 80 ? 90 : trustScore > 70 ? 75 : trustScore > 60 ? 50 : trustScore > 50 ? 30 : 10;
+    steps.push({
+      id: 4,
+      title: "Cumplimiento Regulatorio y Fiscal",
+      description: "Asegúrate de cumplir con todas las obligaciones legales y fiscales para evitar multas y problemas legales.",
+      status: compliancePercent > 80 ? 'completed' : compliancePercent > 30 ? 'in-progress' : 'pending',
+      priority: compliancePercent < 50 ? 'high' : 'medium',
+      icon: <FileText className="text-amber-500" />,
+      linkTo: '/certificacion',
+      percentComplete: compliancePercent
+    });
+    
+    // Paso 5: Optimización operativa
+    const operationsPercent = (creditScore + (trustScore * 5)) / 12;
+    steps.push({
+      id: 5,
+      title: "Optimización Operativa",
+      description: "Implementa procesos eficientes y automatizados para reducir costos y aumentar la productividad.",
+      status: operationsPercent > 80 ? 'completed' : operationsPercent > 40 ? 'in-progress' : 'pending',
+      priority: 'medium',
+      icon: <Zap className="text-green-500" />,
+      linkTo: '/gestion',
+      percentComplete: Math.min(100, Math.round(operationsPercent))
+    });
+    
+    // Paso 6: Crecimiento y expansión
+    steps.push({
+      id: 6,
+      title: "Estrategia de Crecimiento",
+      description: "Analiza oportunidades de mercado, planifica la expansión y optimiza tu estrategia de crecimiento.",
+      status: trustScore > 75 ? 'in-progress' : 'pending',
+      priority: 'medium',
+      icon: <TrendingUp className="text-green-500" />,
+      linkTo: '/crecimiento',
+      percentComplete: Math.min(100, Math.round(trustScore - 10))
+    });
+    
+    // Paso 7: Innovación y digitalización
+    steps.push({
+      id: 7,
+      title: "Innovación y Digitalización",
+      description: "Implementa nuevas tecnologías y digitaliza procesos para mantener la competitividad en el mercado.",
+      status: trustScore > 85 ? 'in-progress' : 'pending',
+      priority: 'medium',
+      icon: <Rocket className="text-indigo-500" />,
+      linkTo: '/crecimiento',
+      percentComplete: Math.max(0, Math.min(100, Math.round(trustScore - 30)))
+    });
+    
+    // Paso 8: Certificación PyME360 Platino
+    steps.push({
+      id: 8,
+      title: "Certificación PyME360 Platino",
+      description: "Alcanza el máximo nivel de certificación empresarial para acceder a beneficios exclusivos y posicionamiento premium.",
+      status: trustScore >= 90 ? 'completed' : trustScore > 75 ? 'in-progress' : 'pending',
+      priority: trustScore > 70 ? 'medium' : 'low',
+      icon: <Award className="text-yellow-500" />,
+      linkTo: '/certificacion',
+      percentComplete: Math.min(100, Math.round(trustScore))
+    });
+    
+    setRoadmapSteps(steps);
   };
 
   useEffect(() => {
@@ -193,6 +314,33 @@ const Dashboard = () => {
       case "Plata": return "bg-gray-200 text-gray-600";
       case "Bronce": return "bg-amber-200 text-amber-700";
       default: return "bg-red-200 text-red-600";
+    }
+  };
+
+  const getStatusColor = (status: RoadmapStep["status"]) => {
+    switch (status) {
+      case "completed": return "bg-green-100 text-green-800 border-green-300";
+      case "in-progress": return "bg-blue-100 text-blue-800 border-blue-300";
+      case "pending": return "bg-gray-100 text-gray-800 border-gray-300";
+      default: return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+  
+  const getPriorityColor = (priority: RoadmapStep["priority"]) => {
+    switch (priority) {
+      case "high": return "bg-red-100 text-red-800 border-red-300";
+      case "medium": return "bg-amber-100 text-amber-800 border-amber-300";
+      case "low": return "bg-green-100 text-green-800 border-green-300";
+      default: return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+  
+  const getPriorityIcon = (priority: RoadmapStep["priority"]) => {
+    switch (priority) {
+      case "high": return <AlertTriangle className="w-4 h-4 text-red-600" />;
+      case "medium": return <AlertCircle className="w-4 h-4 text-amber-600" />;
+      case "low": return <Check className="w-4 h-4 text-green-600" />;
+      default: return null;
     }
   };
 
@@ -315,253 +463,110 @@ const Dashboard = () => {
           </Card>
         </div>
         
-        <h2 className="text-xl font-semibold text-gray-800 mb-5">Módulos Principales</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="border-l-4 border-l-purple-500 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <CreditCard className="mr-2 text-purple-500" size={20} />
-                Financiamiento
-              </CardTitle>
-              <CardDescription>Acceso a capital y crédito</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">AI Credit Score:</span>
-                  <span className="text-sm font-bold text-purple-600">{creditScoreValue}/{maxCreditScore}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-purple-500 h-2 rounded-full" 
-                    style={{ width: `${(creditScoreValue / maxCreditScore) * 100}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  {creditScoreValue >= 750 ? "Calificación excelente - Elegible para las mejores tasas" :
-                   creditScoreValue >= 670 ? "Calificación buena - Elegible para mejores tasas" :
-                   creditScoreValue >= 580 ? "Calificación regular - Opciones de financiamiento limitadas" :
-                   "Calificación baja - Recomendamos mejorar antes de solicitar financiamiento"}
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <ButtonCustom 
-                variant="outline" 
-                size="sm" 
-                className="w-full hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                onClick={() => navigate('/financiamiento')}
-              >
-                Ver opciones de financiamiento
-              </ButtonCustom>
-            </CardFooter>
-          </Card>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-800">Roadmap Empresarial</h2>
+            <div className="flex items-center space-x-2">
+              <span className="flex items-center text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full border border-blue-300">
+                <Check className="w-3 h-3 mr-1" /> 
+                En progreso
+              </span>
+              <span className="flex items-center text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full border border-green-300">
+                <CheckCircle2 className="w-3 h-3 mr-1" /> 
+                Completado
+              </span>
+              <span className="flex items-center text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full border border-gray-300">
+                <Calendar className="w-3 h-3 mr-1" /> 
+                Pendiente
+              </span>
+            </div>
+          </div>
           
-          <Card className="border-l-4 border-l-blue-500 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <BarChart2 className="mr-2 text-blue-500" size={20} />
-                Gestión Empresarial
-              </CardTitle>
-              <CardDescription>Métricas clave de negocio</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Tareas completadas:</span>
-                  <span className="text-sm font-bold text-blue-600">
-                    {creditScoreValue >= 80 ? "9" : creditScoreValue >= 65 ? "7" : creditScoreValue >= 50 ? "5" : "3"}/10
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full" 
-                    style={{ width: `${creditScoreValue >= 80 ? 90 : creditScoreValue >= 65 ? 70 : creditScoreValue >= 50 ? 50 : 30}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  {creditScoreValue >= 80 ? "1 tarea pendiente - Sistema casi optimizado" :
-                   creditScoreValue >= 65 ? "3 tareas pendientes - Actualización de inventario requerida" :
-                   creditScoreValue >= 50 ? "5 tareas pendientes - Se requiere atención" :
-                   "7 tareas pendientes - Se requiere atención urgente"}
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <ButtonCustom 
-                variant="outline" 
-                size="sm" 
-                className="w-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                onClick={() => navigate('/gestion')}
-              >
-                Ver dashboard completo
-              </ButtonCustom>
-            </CardFooter>
-          </Card>
-          
-          <Card className="border-l-4 border-l-amber-500 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <FileText className="mr-2 text-amber-500" size={20} />
-                Cumplimiento
-              </CardTitle>
-              <CardDescription>Obligaciones regulatorias</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Próximo vencimiento:</span>
-                  <span className="text-sm font-bold text-amber-600">
-                    {creditScoreValue >= 70 ? "15" : creditScoreValue >= 50 ? "7" : "3"} días
-                  </span>
-                </div>
-                <div className="flex items-center mt-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-500 mr-2"></div>
-                  <span className="text-sm">Declaración de impuestos mensuales</span>
-                </div>
-                <div className="flex items-center mt-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                  <span className="text-sm">Reporte de nómina completado</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <ButtonCustom 
-                variant="outline" 
-                size="sm" 
-                className="w-full hover:bg-amber-50 hover:text-amber-600 transition-colors"
-                onClick={() => navigate('/cumplimiento')}
-              >
-                Ver calendario completo
-              </ButtonCustom>
-            </CardFooter>
-          </Card>
-          
-          <Card className="border-l-4 border-l-green-500 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <TrendingUp className="mr-2 text-green-500" size={20} />
-                Crecimiento
-              </CardTitle>
-              <CardDescription>Oportunidades de expansión</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Oportunidades:</span>
-                  <span className="text-sm font-bold text-green-600">
-                    {creditScoreValue >= 80 ? "5" : creditScoreValue >= 65 ? "3" : creditScoreValue >= 50 ? "2" : "1"} nuevas
-                  </span>
-                </div>
-                <div className="flex items-center mt-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                  <span className="text-sm">Expansión a mercado internacional</span>
-                </div>
-                <div className="flex items-center mt-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                  <span className="text-sm">Alianza estratégica disponible</span>
+          <Card className="border-none shadow-lg">
+            <CardContent className="p-6">
+              <div className="relative">
+                {/* Línea vertical de progreso */}
+                <div className="absolute left-4 top-4 bottom-6 w-0.5 bg-gray-200 z-0"></div>
+                
+                {/* Pasos del roadmap */}
+                <div className="space-y-8">
+                  {roadmapSteps.map((step, index) => (
+                    <div key={step.id} className="relative z-10">
+                      <div className="flex items-start">
+                        {/* Punto indicador en la línea */}
+                        <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
+                          step.status === 'completed' ? 'bg-green-500' :
+                          step.status === 'in-progress' ? 'bg-blue-500' : 'bg-gray-300'
+                        } text-white z-10`}>
+                          {step.status === 'completed' ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
+                        </div>
+                        
+                        {/* Contenido del paso */}
+                        <div className="ml-4 flex-grow">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="p-2 rounded-full bg-gray-100">
+                                {step.icon}
+                              </div>
+                              <h3 className="text-lg font-semibold">{step.title}</h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(step.status)}`}>
+                                {step.status === 'completed' ? 'Completado' : 
+                                 step.status === 'in-progress' ? 'En progreso' : 'Pendiente'}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded-full border flex items-center ${getPriorityColor(step.priority)}`}>
+                                {getPriorityIcon(step.priority)}
+                                <span className="ml-1">
+                                  {step.priority === 'high' ? 'Alta prioridad' : 
+                                   step.priority === 'medium' ? 'Prioridad media' : 'Prioridad baja'}
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <p className="text-gray-600 mb-3">{step.description}</p>
+                          
+                          {/* Barra de progreso */}
+                          {step.percentComplete !== undefined && (
+                            <div className="mb-3">
+                              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Progreso</span>
+                                <span>{step.percentComplete}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className={`h-2 rounded-full ${
+                                    step.status === 'completed' ? 'bg-green-500' :
+                                    step.status === 'in-progress' ? 'bg-blue-500' : 'bg-gray-400'
+                                  }`} 
+                                  style={{ width: `${step.percentComplete}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Botón de acción */}
+                          <ButtonCustom
+                            variant={step.status === 'pending' ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => navigate(step.linkTo)}
+                            rightIcon={<ArrowRight className="h-4 w-4" />}
+                            className={`mt-2 ${
+                              step.status === 'completed' ? 'bg-green-500 hover:bg-green-600' :
+                              step.status === 'in-progress' ? 'bg-blue-500 hover:bg-blue-600' : ''
+                            }`}
+                          >
+                            {step.status === 'completed' ? 'Ver detalles' :
+                             step.status === 'in-progress' ? 'Continuar' : 'Comenzar'}
+                          </ButtonCustom>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
-              <ButtonCustom 
-                variant="outline" 
-                size="sm" 
-                className="w-full hover:bg-green-50 hover:text-green-600 transition-colors"
-                onClick={() => navigate('/crecimiento')}
-              >
-                Explorar oportunidades
-              </ButtonCustom>
-            </CardFooter>
-          </Card>
-          
-          <Card className="border-l-4 border-l-indigo-500 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Users className="mr-2 text-indigo-500" size={20} />
-                Búsqueda de Empleados
-              </CardTitle>
-              <CardDescription>Encuentra el talento ideal</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium mr-2">Candidatos disponibles:</span>
-                  <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-semibold">
-                    {creditScoreValue >= 80 ? "48" : creditScoreValue >= 65 ? "24" : "12"} perfiles
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <div className="flex items-center mt-1">
-                    <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
-                    <span className="text-sm">Desarrollador Frontend (urgente)</span>
-                  </div>
-                  <div className="flex items-center mt-1">
-                    <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
-                    <span className="text-sm">Especialista en Marketing</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <ButtonCustom 
-                variant="outline" 
-                size="sm" 
-                className="w-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                onClick={() => navigate('/busqueda-empleados')}
-              >
-                Buscar candidatos
-              </ButtonCustom>
-            </CardFooter>
-          </Card>
-
-          <Card className="border-l-4 border-l-indigo-500 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Users className="mr-2 text-indigo-500" size={20} />
-                Certificación
-              </CardTitle>
-              <CardDescription>PyME360 Trust Score</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium mr-2">Puntuación actual:</span>
-                  <span className="text-sm font-bold text-indigo-600">{trustScore.score}/100</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="text-sm font-medium mr-2">Nivel actual:</span>
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${getTrustLevelColor(trustScore.level)}`}>
-                    {trustScore.level}
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>Progreso hacia {trustScore.nextLevel}:</span>
-                    <span>{Math.round(trustScore.percentage)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-indigo-500 h-2 rounded-full" 
-                      style={{ width: `${trustScore.percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  {Math.round((100 - trustScore.percentage) / 25)} criterios pendientes para alcanzar nivel {trustScore.nextLevel}
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <ButtonCustom 
-                variant="outline" 
-                size="sm" 
-                className="w-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                onClick={() => navigate('/certificacion')}
-              >
-                Mejorar certificación
-              </ButtonCustom>
-            </CardFooter>
           </Card>
         </div>
       </div>
