@@ -1,5 +1,6 @@
 
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { CheckCircle2, BarChart2, PieChart, ShieldCheck, TrendingUp, CreditCard } from 'lucide-react';
 
 const Features = () => {
@@ -118,9 +119,9 @@ const Features = () => {
                   Únete a las empresas que están transformando su operación y alcanzando nuevos niveles de éxito con PyME360.
                 </p>
               </div>
-              <button className="px-6 py-3 rounded-lg bg-white text-pyme-blue font-medium hover:bg-pyme-gray-light transition-colors">
+              <Link to="/registro" className="px-6 py-3 rounded-lg bg-white text-pyme-blue font-medium hover:bg-pyme-gray-light transition-colors">
                 Comenzar Ahora
-              </button>
+              </Link>
             </div>
           </div>
         </div>
