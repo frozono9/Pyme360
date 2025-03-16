@@ -7,13 +7,14 @@ from datetime import datetime, timedelta
 # Sector por defecto para pruebas
 sector_cliente = "Mercado de muelles"
 
-def query(user_message, sector_cliente):
+def query(user_message, sector_cliente, pais_cliente="México"):
     """
     Función para consultar tendencias de mercado.
     
     Args:
         user_message: Pregunta o consulta del usuario
         sector_cliente: Sector económico del cliente
+        pais_cliente: País donde opera el cliente
         
     Returns:
         dict: Contiene los datos de tendencias de mercado y análisis
@@ -22,12 +23,13 @@ def query(user_message, sector_cliente):
     
     # Si no hay un mensaje específico, usar una consulta predeterminada
     if not user_message or user_message.strip() == "":
-        user_message = f"Muestra un análisis de tendencias para el sector {sector_cliente}"
+        user_message = f"Muestra un análisis de tendencias para el sector {sector_cliente} en {pais_cliente}"
     
     payload = {
         "overrideConfig": {
             "promptValues": {
                 "sector_cliente": sector_cliente,
+                "pais_cliente": pais_cliente
             }
         },
         "question": user_message
@@ -41,7 +43,7 @@ def query(user_message, sector_cliente):
         
         # Si la respuesta contiene texto pero no datos estructurados,
         # generar datos simulados y añadirlos a la respuesta
-        trends_data = generate_market_trends_data(sector_cliente)
+        trends_data = generate_market_trends_data(sector_cliente, pais_cliente)
         
         # Combinar la respuesta de la API con los datos generados
         result = {
@@ -53,18 +55,19 @@ def query(user_message, sector_cliente):
     except Exception as e:
         print(f"Error al hacer la solicitud: {e}")
         # En caso de error, devolver solo datos simulados
-        trends_data = generate_market_trends_data(sector_cliente)
+        trends_data = generate_market_trends_data(sector_cliente, pais_cliente)
         return {
-            "text": f"Análisis de tendencias para el sector {sector_cliente}. Los datos son simulados debido a un error de conexión.",
+            "text": f"Análisis de tendencias para el sector {sector_cliente} en {pais_cliente}. Los datos son simulados debido a un error de conexión.",
             "trends_data": trends_data
         }
 
-def generate_market_trends_data(sector):
+def generate_market_trends_data(sector, pais="México"):
     """
     Genera datos simulados de tendencias de mercado para visualización.
     
     Args:
         sector: El sector económico para el que generar datos
+        pais: El país para el que generar datos
         
     Returns:
         dict: Datos simulados de tendencias de mercado
@@ -77,8 +80,20 @@ def generate_market_trends_data(sector):
     dates = [(current_date - timedelta(days=30*i)).strftime("%b %Y") for i in range(months)]
     dates.reverse()  # Ordenar cronológicamente
     
-    # Tendencia principal del sector (crecimiento base entre 1-5%)
-    base_growth = random.uniform(1, 5)
+    # Ajustar la tendencia base según el país
+    pais_factors = {
+        "México": 1.0,
+        "Colombia": 1.1,
+        "Chile": 1.2,
+        "Perú": 0.9,
+        "Argentina": 0.85,
+        "España": 1.15
+    }
+    
+    pais_factor = pais_factors.get(pais, 1.0)
+    
+    # Tendencia principal del sector (crecimiento base entre 1-5%, ajustado por país)
+    base_growth = random.uniform(1, 5) * pais_factor
     
     # Datos para gráfica de líneas (crecimiento del sector y subsectores)
     sector_trend = []
@@ -109,7 +124,7 @@ def generate_market_trends_data(sector):
         })
     
     # Datos para gráfica de barras (factores de impacto)
-    impact_factors = generate_impact_factors(sector)
+    impact_factors = generate_impact_factors(sector, pais)
     
     # Datos para gráfica de radar (oportunidades por área)
     opportunity_areas = generate_opportunity_areas(sector)
@@ -132,6 +147,7 @@ def generate_market_trends_data(sector):
     
     return {
         "sector": sector,
+        "pais": pais,
         "historic": {
             "dates": dates,
             "sector_trend": sector_trend,
@@ -145,7 +161,7 @@ def generate_market_trends_data(sector):
             "optimistic": optimistic_data,
             "pessimistic": pessimistic_data
         },
-        "recommendations": generate_recommendations(sector)
+        "recommendations": generate_recommendations(sector, pais)
     }
 
 def generate_subsectors(sector):
@@ -170,8 +186,8 @@ def generate_subsectors(sector):
     selected = random.sample(sector_mappings[sector], min(3, len(sector_mappings[sector])))
     return selected
 
-def generate_impact_factors(sector):
-    """Genera factores de impacto para el sector"""
+def generate_impact_factors(sector, pais="México"):
+    """Genera factores de impacto para el sector y país"""
     # Factores comunes para todos los sectores
     common_factors = [
         "Digitalización",
@@ -183,15 +199,31 @@ def generate_impact_factors(sector):
         "Cadena de suministro"
     ]
     
-    # Seleccionar 5 factores aleatoriamente
-    selected_factors = random.sample(common_factors, 5)
+    # Factores específicos por país
+    pais_factors = {
+        "México": ["T-MEC", "Nearshoring", "Economía circular"],
+        "Colombia": ["Acuerdos de paz", "Desarrollo sostenible", "Transformación digital"],
+        "Chile": ["Minería verde", "Energías renovables", "Comercio internacional"],
+        "Perú": ["Estabilidad macroeconómica", "Turismo sostenible", "Exportaciones"],
+        "Argentina": ["Mercado de capitales", "Desarrollo agropecuario", "Exportaciones"],
+        "España": ["Fondos europeos", "Turismo sostenible", "Economía verde"]
+    }
+    
+    # Obtener factores específicos del país
+    pais_specific = pais_factors.get(pais, [])
+    
+    # Combinar y seleccionar factores
+    all_factors = common_factors + pais_specific
+    selected_factors = random.sample(all_factors, min(5, len(all_factors)))
     
     # Asignar impactos (1-10)
     impact_data = []
     for factor in selected_factors:
+        # Los factores específicos del país tienden a tener mayor impacto
+        base_impact = 7 if factor in pais_specific else 5
         impact_data.append({
             "factor": factor,
-            "impact": random.randint(3, 10)
+            "impact": random.randint(base_impact, 10)
         })
     
     # Ordenar por impacto descendente
@@ -219,8 +251,9 @@ def generate_opportunity_areas(sector):
     
     return data
 
-def generate_recommendations(sector):
-    """Genera recomendaciones estratégicas basadas en el sector"""
+def generate_recommendations(sector, pais="México"):
+    """Genera recomendaciones estratégicas basadas en el sector y país"""
+    # Recomendaciones generales
     general_recommendations = [
         "Invertir en transformación digital para optimizar procesos internos y mejorar la experiencia del cliente.",
         "Desarrollar una estrategia de sostenibilidad que alinee los valores de la empresa con las expectativas del mercado.",
@@ -229,8 +262,52 @@ def generate_recommendations(sector):
         "Implementar programas de capacitación para adaptar el talento interno a las nuevas demandas del mercado."
     ]
     
-    # Seleccionar 3 recomendaciones aleatorias
-    selected = random.sample(general_recommendations, 3)
+    # Recomendaciones específicas por país
+    pais_recommendations = {
+        "México": [
+            "Aprovechar las oportunidades del nearshoring para captar clientes e inversiones de Estados Unidos.",
+            "Explorar programas gubernamentales de apoyo a PyMEs en el marco del T-MEC.",
+            "Reforzar la seguridad en la cadena logística para mejorar la competitividad internacional."
+        ],
+        "Colombia": [
+            "Integrar prácticas de sostenibilidad alineadas con los objetivos nacionales de desarrollo verde.",
+            "Invertir en tecnologías que mejoren la seguridad y trazabilidad de productos y servicios.",
+            "Explorar alianzas estratégicas con actores de la economía naranja para diversificar la oferta."
+        ],
+        "Chile": [
+            "Aprovechar los incentivos para la transformación digital de PyMEs ofrecidos por CORFO.",
+            "Explorar oportunidades en el mercado de energías renovables en rápido crecimiento.",
+            "Adoptar estándares internacionales que faciliten la exportación a mercados desarrollados."
+        ],
+        "España": [
+            "Postular a fondos Next Generation EU para proyectos de digitalización y sostenibilidad.",
+            "Adaptar la oferta para capitalizar el crecimiento del turismo sostenible y experiencial.",
+            "Explorar alianzas con empresas europeas para acceder a mercados del norte de Europa."
+        ]
+    }
+    
+    # Obtener recomendaciones específicas del país
+    specific_recs = pais_recommendations.get(pais, [])
+    
+    # Combinar y seleccionar recomendaciones (priorizar las específicas)
+    all_recs = specific_recs + general_recommendations
+    num_to_select = min(3, len(all_recs))
+    
+    # Asegurar al menos una recomendación específica del país si existe
+    if specific_recs and num_to_select > 0:
+        # Seleccionar al menos una recomendación específica
+        selected_specific = random.sample(specific_recs, min(1, len(specific_recs)))
+        # Completar con recomendaciones generales
+        remaining = num_to_select - len(selected_specific)
+        if remaining > 0:
+            selected_general = random.sample(general_recommendations, min(remaining, len(general_recommendations)))
+        else:
+            selected_general = []
+        selected = selected_specific + selected_general
+    else:
+        # Si no hay recomendaciones específicas, usar solo generales
+        selected = random.sample(general_recommendations, num_to_select)
+    
     return selected
 
 # Esta parte solo se ejecuta si el script se corre directamente (para pruebas)

@@ -481,6 +481,39 @@ async function predictKpi(predictionParams) {
   }
 }
 
+async function queryMarketTrends(question = "") {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    console.log("Solicitando análisis de tendencias a la API...");
+    const response = await fetch(`${BASE_URL}/api/market-trends`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question }),
+    });
+
+    if (!response.ok) {
+      console.error("Error en respuesta de market-trends:", response.status);
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error al obtener análisis de tendencias');
+    }
+
+    const data = await response.json();
+    console.log("Datos de tendencias recibidos:", data);
+    return data;
+  } catch (error) {
+    console.error('Error al obtener análisis de tendencias:', error);
+    throw error;
+  }
+}
+
 export default {
   testMongoConnection,
   registerUser,
@@ -494,5 +527,6 @@ export default {
   queryFinancingAssistant,
   queryGeneralAssistant,
   predictKpi,
-  queryDocumentationAssistant
+  queryDocumentationAssistant,
+  queryMarketTrends
 }

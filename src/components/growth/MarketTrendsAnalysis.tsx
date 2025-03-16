@@ -9,12 +9,14 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { Loader2, TrendingUp, BarChart2, PieChart, RadarIcon, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import api from "@/api";
 
 const mockTrendsData = {
   sector: "Tecnología",
   text: "El sector de tecnología muestra un crecimiento sostenido con oportunidades en innovación digital y servicios cloud.",
   trends_data: {
     sector: "Tecnología",
+    pais: "México",
     historic: {
       dates: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
       sector_trend: [65, 67, 70, 73, 72, 74, 78, 82, 85, 87, 90, 93],
@@ -52,30 +54,6 @@ const mockTrendsData = {
   }
 };
 
-const fetchMarketTrends = async (question: string) => {
-  try {
-    const response = await fetch("/api/market-trends", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question }),
-    });
-    
-    if (!response.ok) {
-      console.error("Error en la respuesta del API:", response.status, response.statusText);
-      throw new Error("Error al obtener tendencias de mercado");
-    }
-    
-    const data = await response.json();
-    console.log("Datos recibidos de la API:", data);
-    return data;
-  } catch (error) {
-    console.error("Error al hacer fetch de las tendencias:", error);
-    throw error;
-  }
-};
-
 const MarketTrendsAnalysis = () => {
   const [question, setQuestion] = useState("");
   const [activeTab, setActiveTab] = useState("historic");
@@ -83,7 +61,7 @@ const MarketTrendsAnalysis = () => {
   
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["marketTrends"],
-    queryFn: () => fetchMarketTrends(""),
+    queryFn: () => api.queryMarketTrends(""),
     staleTime: 1000 * 60 * 5,
     meta: {
       onError: () => {
@@ -137,7 +115,7 @@ const MarketTrendsAnalysis = () => {
   }
 
   const { text, trends_data } = trendsData;
-  const { sector, historic, impact_factors, opportunity_areas, projection } = trends_data || {};
+  const { sector, pais, historic, impact_factors, opportunity_areas, projection } = trends_data || {};
 
   const historicDates = historic?.dates || [];
   const historicData = historicDates.map((date, index) => ({
@@ -162,7 +140,7 @@ const MarketTrendsAnalysis = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h2 className="text-xl font-bold mb-4 flex items-center">
           <TrendingUp className="mr-2 text-pyme-blue" />
-          Análisis de Tendencias: {sector || "Tu Sector"}
+          Análisis de Tendencias: {sector || "Tu Sector"}{pais ? ` - ${pais}` : ''}
         </h2>
         <p className="text-gray-700 mb-6">{text}</p>
         
