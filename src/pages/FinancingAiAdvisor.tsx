@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/api";
@@ -105,74 +105,19 @@ const FinancingAiAdvisor = () => {
               )}
             </div>
             
-            <div>
+            <div className="lg:col-span-1">
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Tu perfil financiero</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">AI Credit Score</span>
-                      <span className="text-sm font-bold text-purple-600">82/100</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-purple-500 h-2 rounded-full" style={{ width: "82%" }}></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">Capacidad de pago</span>
-                      <span className="text-sm font-bold text-green-600">Buena</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: "75%" }}></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">Historial crediticio</span>
-                      <span className="text-sm font-bold text-blue-600">Excelente</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-blue-500 h-2 rounded-full" style={{ width: "90%" }}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4 border-t">
-                    <h4 className="text-sm font-medium mb-2">KPIs Empresariales</h4>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between">
-                        <span className="text-gray-600">Ingresos mensuales:</span>
-                        <span className="font-medium">$120,000</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span className="text-gray-600">Margen operativo:</span>
-                        <span className="font-medium">18%</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span className="text-gray-600">Ratio de deuda:</span>
-                        <span className="font-medium">0.4</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span className="text-gray-600">Antigüedad:</span>
-                        <span className="font-medium">3.5 años</span>
-                      </li>
+                <CardContent className="pt-6">
+                  <div className="p-4 bg-amber-50 rounded-lg border border-amber-100">
+                    <p className="text-sm font-medium text-amber-800 mb-2">Ejemplo de consultas:</p>
+                    <ul className="text-xs text-amber-700 space-y-2">
+                      <li>• "¿Qué opciones de financiamiento son adecuadas para una empresa como la mía?"</li>
+                      <li>• "Necesito un préstamo de $50,000 para expandir mi negocio, ¿cuáles son mis opciones?"</li>
+                      <li>• "¿Cómo puedo mejorar mi perfil crediticio para obtener mejores tasas?"</li>
                     </ul>
                   </div>
                 </CardContent>
               </Card>
-              
-              <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-100">
-                <p className="text-sm font-medium text-amber-800 mb-2">Ejemplo de consultas:</p>
-                <ul className="text-xs text-amber-700 space-y-2">
-                  <li>• "¿Qué opciones de financiamiento son adecuadas para una empresa como la mía?"</li>
-                  <li>• "Necesito un préstamo de $50,000 para expandir mi negocio, ¿cuáles son mis opciones?"</li>
-                  <li>• "¿Cómo puedo mejorar mi perfil crediticio para obtener mejores tasas?"</li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
