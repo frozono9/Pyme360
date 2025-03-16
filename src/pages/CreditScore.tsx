@@ -20,9 +20,12 @@ const CreditScore = () => {
     const fetchCreditData = async () => {
       try {
         setIsLoading(true);
+        
+        // Check if user is logged in
         const user = await api.getCurrentUser();
         
         if (!user) {
+          console.log("No user session found, redirecting to login");
           toast({
             title: "Acceso denegado",
             description: "Debes iniciar sesión para acceder a esta página",

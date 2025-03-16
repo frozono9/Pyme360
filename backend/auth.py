@@ -26,7 +26,7 @@ users_collection = db["users"]  # Colección de usuarios
 # Clave secreta para JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "UN_SECRETO_MUY_SEGURO")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # Extender a 60 minutos para dar más tiempo
 
 def verify_password(plain_password, hashed_password):
     try:
@@ -108,6 +108,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Token de autenticación inválido")
+    except jwt.ExpiredSignatureError:
+        print("Token expirado")
+        raise HTTPException(status_code=401, detail="Token de autenticación expirado")
     except jwt.PyJWTError as e:
         print(f"Error al decodificar JWT: {e}")
         raise HTTPException(status_code=401, detail="Token de autenticación inválido")
