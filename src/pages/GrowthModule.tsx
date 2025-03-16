@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Search, ArrowUpRight } from "lucide-react";
 import { KpiPredictionEntry } from "@/components/growth/KpiPredictionEntry";
 import { KpiPredictor } from "@/components/growth/KpiPredictor";
+import MarketTrendsAnalysis from "@/components/growth/MarketTrendsAnalysis";
 
 const GrowthModule = () => {
   const [activeTab, setActiveTab] = useState<string>("market-analysis");
@@ -16,6 +17,7 @@ const GrowthModule = () => {
     <Routes>
       <Route path="/" element={<GrowthModuleMain activeTab={activeTab} setActiveTab={setActiveTab} />} />
       <Route path="/predictor" element={<KpiPredictorPage />} />
+      <Route path="/market-trends" element={<MarketTrendsPage />} />
     </Routes>
   );
 };
@@ -26,6 +28,8 @@ interface GrowthModuleMainProps {
 }
 
 const GrowthModuleMain = ({ activeTab, setActiveTab }: GrowthModuleMainProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
@@ -51,6 +55,12 @@ const GrowthModuleMain = ({ activeTab, setActiveTab }: GrowthModuleMainProps) =>
             icon={<Search size={16} />}
             label="Análisis de Mercado IA"
           />
+          <TabButton 
+            active={activeTab === "market-trends"} 
+            onClick={() => navigate("/crecimiento/market-trends")}
+            icon={<TrendingUp size={16} />}
+            label="Tendencias de Mercado"
+          />
         </div>
 
         {/* Contenido según la tab seleccionada */}
@@ -72,6 +82,42 @@ const KpiPredictorPage = () => {
       
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <KpiPredictor />
+      </main>
+      
+      <Footer />
+    </div>
+  );
+};
+
+const MarketTrendsPage = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+      
+      {/* Espaciador para evitar que el navbar fijo se superponga al contenido */}
+      <div className="h-16"></div>
+      
+      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Tendencias de Mercado
+            </h1>
+            <p className="text-gray-600">
+              Análisis avanzado de tendencias en tu sector
+            </p>
+          </div>
+          <button 
+            onClick={() => navigate("/crecimiento")}
+            className="text-pyme-blue hover:underline flex items-center"
+          >
+            Volver a Crecimiento
+          </button>
+        </div>
+        
+        <MarketTrendsAnalysis />
       </main>
       
       <Footer />

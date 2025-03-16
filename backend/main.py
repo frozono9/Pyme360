@@ -513,6 +513,26 @@ async def query_documentation_assistant(
         print(f"Error al consultar al asistente de documentación: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al consultar al asistente de documentación: {str(e)}")
 
+# Nuevo endpoint para consultar al asistente de tendencias de mercado
+@app.post("/api/market-trends")
+async def query_market_trends(
+    question: dict,
+    current_user: dict = Depends(auth.get_current_user)
+):
+    try:
+        from agents.tendencias import query
+        
+        # Obtener datos del usuario de MongoDB para extraer el sector
+        info_general = current_user.get("informacion_general", {})
+        sector = info_general.get("sector", "Tecnología")
+        
+        # Enviar la consulta al asistente de tendencias
+        response = query(question.get("question", ""), sector)
+        
+        return response
+    except Exception as e:
+        print(f"Error al consultar tendencias de mercado: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al consultar tendencias de mercado: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
