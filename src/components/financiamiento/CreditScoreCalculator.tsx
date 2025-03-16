@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -26,7 +27,7 @@ interface CreditScoreCalculatorProps {
 export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ creditData }) => {
   console.log("DATOS RECIBIDOS EN CALCULATOR:", creditData);
   
-  // IMPORTANTE: Usamos SOLO los datos que vienen directamente de la API
+  // Usamos SOLO los datos que vienen directamente de la API sin cálculos adicionales
   const finalScore = creditData?.score || 0;
   const scoreLevel = creditData?.nivel || { 
     nivel: "Sin datos", 
@@ -34,6 +35,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
     description: "No hay suficiente información" 
   };
   const scoreHistory = creditData?.history || [];
+  const calculation = creditData?.calculation || { formula: "" };
 
   // Componentes del credit score directamente de la API
   const components = creditData?.components || {};
@@ -55,6 +57,9 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
   };
 
   const formatCurrency = (value: any) => {
+    if (value >= 1000000) {
+      return `${(safeValue(value, 0) / 1000000).toLocaleString()} M`;
+    }
     return safeValue(value, 0).toLocaleString();
   };
 
@@ -90,6 +95,13 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               </div>
               <Badge className="text-lg px-4 py-2" variant="secondary">{scoreLevel.nivel}</Badge>
               <p className="text-center text-muted-foreground max-w-xs">{scoreLevel.description}</p>
+              
+              {calculation && calculation.formula && (
+                <div className="bg-blue-50 p-2 rounded-md text-xs text-center text-blue-800 w-full mt-2">
+                  <p className="font-medium">Fórmula aplicada:</p>
+                  <p>{calculation.formula}</p>
+                </div>
+              )}
             </div>
             
             {/* Add score history chart */}
@@ -103,7 +115,10 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis domain={[300, 850]} />
+                    <YAxis domain={[
+                      Math.floor((Math.min(...scoreHistory.map(item => item.score)) - 20) / 10) * 10, 
+                      Math.ceil((Math.max(...scoreHistory.map(item => item.score)) + 20) / 10) * 10
+                    ]} />
                     <Tooltip />
                     <Area 
                       type="monotone" 
@@ -130,7 +145,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <div>
                 <CardTitle>Historial de Pagos</CardTitle>
                 <CardDescription>
-                  35% de tu puntaje - {safeValue(paymentHistory.score)} puntos
+                  {(paymentHistory.weight * 100).toFixed(0)}% de tu puntaje - {safeValue(paymentHistory.score)} puntos
                 </CardDescription>
               </div>
             </div>
@@ -191,7 +206,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <div>
                 <CardTitle>Utilización de Crédito</CardTitle>
                 <CardDescription>
-                  30% de tu puntaje - {safeValue(creditUtilization.score)} puntos
+                  {(creditUtilization.weight * 100).toFixed(0)}% de tu puntaje - {safeValue(creditUtilization.score)} puntos
                 </CardDescription>
               </div>
             </div>
@@ -242,7 +257,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name || 'N/A'}: ${((percent || 0) * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name || 'N/A'}`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
@@ -252,6 +267,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => `$${Number(value || 0).toLocaleString()}`} />
+                    <Legend />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -268,7 +284,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <div>
                 <CardTitle>Antigüedad Crediticia</CardTitle>
                 <CardDescription>
-                  15% de tu puntaje - {safeValue(historyLength.score)} puntos
+                  {(historyLength.weight * 100).toFixed(0)}% de tu puntaje - {safeValue(historyLength.score)} puntos
                 </CardDescription>
               </div>
             </div>
@@ -313,7 +329,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <div>
                 <CardTitle>Mezcla de Créditos</CardTitle>
                 <CardDescription>
-                  10% de tu puntaje - {safeValue(creditMix.score)} puntos
+                  {(creditMix.weight * 100).toFixed(0)}% de tu puntaje - {safeValue(creditMix.score)} puntos
                 </CardDescription>
               </div>
             </div>
@@ -344,7 +360,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name || 'N/A'}: ${((percent || 0) * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name || 'N/A'}`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
@@ -371,7 +387,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <div>
                 <CardTitle>Solicitudes Recientes</CardTitle>
                 <CardDescription>
-                  10% de tu puntaje - {safeValue(newApplications.score)} puntos
+                  {(newApplications.weight * 100).toFixed(0)}% de tu puntaje - {safeValue(newApplications.score)} puntos
                 </CardDescription>
               </div>
             </div>

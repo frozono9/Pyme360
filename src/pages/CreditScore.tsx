@@ -33,7 +33,8 @@ const CreditScore = () => {
         }
         
         // Obtener puntuación crediticia directamente de la API
-        const score = await api.getCreditScore();
+        // La API ahora debería devolver los mismos datos que se muestran en /database
+        const score = await api.getCreditScore(true); // Agregar parámetro para obtener datos directos sin procesar
         console.log("DATOS DE CREDIT SCORE RECIBIDOS:", score);
         
         if (!score) {
