@@ -752,4 +752,7 @@ function calculateProfitMetrics(userData) {
     revenue,
     grossMargin,
     netMargin,
-    grossMarginChange
+    grossMarginChange,
+    netMarginChange
+  };
+}
