@@ -130,7 +130,8 @@ const MarketTrendsPage = () => {
       {/* Espaciador para evitar que el navbar fijo se superponga al contenido */}
       <div className="h-16"></div>
       
-      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* Añadimos pb-24 para garantizar espacio suficiente en la parte inferior */}
+      <main className="flex-1 py-8 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
