@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -73,6 +72,15 @@ function transformSalesData(userData: any) {
 
 function transformProductData(userData: any) {
   if (!userData || !userData.distribucion_ingresos) {
+    return [
+      { name: 'Producto A', value: 0 },
+      { name: 'Producto B', value: 0 },
+      { name: 'Producto C', value: 0 }
+    ];
+  }
+  
+  if (!Array.isArray(userData.distribucion_ingresos)) {
+    console.warn('distribucion_ingresos is not an array in transformProductData:', userData.distribucion_ingresos);
     return [
       { name: 'Producto A', value: 0 },
       { name: 'Producto B', value: 0 },
@@ -267,6 +275,11 @@ function calculateRevenueDistribution(userData: any) {
     return [];
   }
   
+  if (!Array.isArray(userData.distribucion_ingresos)) {
+    console.warn('distribucion_ingresos is not an array:', userData.distribucion_ingresos);
+    return [];
+  }
+  
   return userData.distribucion_ingresos.map((item: any) => ({
     name: item.producto,
     value: item.valor || 0
@@ -444,7 +457,6 @@ function getTaxCalendar(userData: any) {
   }));
 }
 
-// Adding the missing calculateSalesMetrics function
 function calculateSalesMetrics(userData: any) {
   const defaultResult = {
     hasSalesData: false,
@@ -492,7 +504,6 @@ function calculateSalesMetrics(userData: any) {
   };
 }
 
-// Adding the missing calculateProfitMetrics function
 function calculateProfitMetrics(userData: any) {
   const defaultResult = {
     hasData: false,
