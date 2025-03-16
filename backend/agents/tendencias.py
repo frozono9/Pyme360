@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 # Sector por defecto para pruebas
 sector_cliente = "Mercado de muelles"
 
-def query(user_message, sector_cliente, pais_cliente="México"):
+def query(user_message, sector_cliente, pais_cliente):
     """
     Función para consultar tendencias de mercado.
     
@@ -61,7 +61,7 @@ def query(user_message, sector_cliente, pais_cliente="México"):
             "trends_data": trends_data
         }
 
-def generate_market_trends_data(sector, pais="México"):
+def generate_market_trends_data(sector, pais):
     """
     Genera datos simulados de tendencias de mercado para visualización.
     

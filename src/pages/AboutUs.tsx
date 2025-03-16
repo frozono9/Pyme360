@@ -30,7 +30,7 @@ const AboutUs = () => {
                 <span className="text-5xl">🐷</span>
               </div>
               <h3 className="text-xl font-bold text-pyme-navy">Alex</h3>
-              <p className="text-pyme-gray text-center mt-2">CEO & Fundador</p>
+              <p className="text-pyme-gray text-center mt-2">Latorre</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
                 Ingeniero y estudiante de primer curso de IA en la UPC.
               </p>
@@ -42,7 +42,7 @@ const AboutUs = () => {
                 <span className="text-5xl">🐷</span>
               </div>
               <h3 className="text-xl font-bold text-pyme-navy">Nicolas</h3>
-              <p className="text-pyme-gray text-center mt-2">CFO</p>
+              <p className="text-pyme-gray text-center mt-2">Rosales</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
                 Estudiante de primer curso de IA en la UPC.
               </p>
@@ -54,7 +54,7 @@ const AboutUs = () => {
                 <span className="text-5xl">🐷</span>
               </div>
               <h3 className="text-xl font-bold text-pyme-navy">Javier</h3>
-              <p className="text-pyme-gray text-center mt-2">CTO</p>
+              <p className="text-pyme-gray text-center mt-2">Aranda</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
                 Estudiante de primer curso de IA en la UPC.
               </p>
@@ -66,7 +66,7 @@ const AboutUs = () => {
                 <span className="text-5xl">🐷</span>
               </div>
               <h3 className="text-xl font-bold text-pyme-navy">Robert</h3>
-              <p className="text-pyme-gray text-center mt-2">COO</p>
+              <p className="text-pyme-gray text-center mt-2">Ostrozhinskiy</p>
               <p className="text-pyme-gray-dark text-center mt-4 text-sm">
                 Estudiante de primer curso de IA en la UPC.
               </p>

@@ -108,7 +108,7 @@ async def register(user_data: UserCreate):
         
         # Asegurarse de que la información general tenga el país
         if "informacion_general" in user_dict and "pais" not in user_dict["informacion_general"]:
-            user_dict["informacion_general"]["pais"] = ""
+            user_dict["informacion_general"]["pais"] = user_data.informacion_general.pais
         
         # Insertar el usuario en la base de datos
         result = user_collection.insert_one(user_dict)
@@ -529,9 +529,9 @@ async def query_market_trends(
         # Obtener datos del usuario de MongoDB para extraer el sector
         info_general = current_user.get("informacion_general", {})
         sector = info_general.get("sector", "Tecnología")
-        
+
         # Enviar la consulta al asistente de tendencias
-        response = query(question.get("question", ""), sector)
+        response = query(question.get("question", ""), sector, info_general.get("pais", "Latam"))
         
         return response
     except Exception as e:

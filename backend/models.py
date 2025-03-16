@@ -67,7 +67,7 @@ class InformacionGeneral(BaseModel):
     tamano_empresa: str
     numero_empleados: int
     representante_legal: str
-    contrasena: str
+    pais: str
 
 
 class DatosMensualesVentas(BaseModel):
