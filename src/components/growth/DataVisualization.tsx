@@ -77,7 +77,14 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
                   interval={0}
                 />
                 <YAxis />
-                <Tooltip formatter={(value) => [value.toFixed(3), 'Importancia']} />
+                <Tooltip 
+                  formatter={(value: any) => {
+                    // Safely handle different value types
+                    return typeof value === 'number' 
+                      ? [value.toFixed(3), 'Importancia'] 
+                      : [value, 'Importancia'];
+                  }} 
+                />
                 <Legend />
                 <Bar dataKey="value" fill="#8884d8" name="Importancia" />
               </BarChart>
@@ -107,7 +114,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [`${value}`, 'Cantidad']} />
+                <Tooltip formatter={(value: any) => [typeof value === 'number' ? `${value}` : value, 'Cantidad']} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
