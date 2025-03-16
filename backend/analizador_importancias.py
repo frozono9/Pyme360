@@ -9,7 +9,6 @@ from sklearn.metrics import classification_report, confusion_matrix, mean_square
 from sklearn.inspection import permutation_importance
 from sklearn.impute import SimpleImputer
 import json
-from backend.agents.importancias import query
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -242,6 +241,9 @@ def analizar_datos_pyme_mejorado(dataframe, target_variable, tipo_problema='clas
     # 7. IMPORTANCIA DE CARACTERÍSTICAS
     importancias = None # Initialize importancias to None
     try:
+            # Get the preprocessed test data
+            # Dentro del bloque try de "IMPORTANCIA DE CARACTERÍSTICAS":
+
         # Obtener nombres de características considerando el remainder
         preprocessor = pipeline.named_steps['preprocessor']
         feature_names = preprocessor.get_feature_names_out()
@@ -259,6 +261,7 @@ def analizar_datos_pyme_mejorado(dataframe, target_variable, tipo_problema='clas
             feature_names = [f'feature_{i}' for i in range(X_test_transformed.shape[1])]
 
         # Calcular importancia de permutación
+        # Dentro del bloque try, reducir n_repeats y usar paralelismo
         perm_importance = permutation_importance(
             pipeline.named_steps['model'], 
             X_test_transformed,
@@ -295,10 +298,12 @@ def analizar_datos_pyme_mejorado(dataframe, target_variable, tipo_problema='clas
         resultados['insights'].append("Considere enfocarse en estas características clave para análisis adicionales, ingeniería de características o recolección de datos.")
         # --- FIN DE MEJORAS EN INSIGHTS DE IMPORTANCIA DE FEATURES ---
 
+
     except Exception as e:
         resultados['importancia_features'] = {'error': str(e)}
         resultados['insights'].append(f"Error al calcular la importancia de las características: {str(e)}") # Insight de error más descriptivo
         print(f"Error in feature importance: {e}") # Print full error for debugging
+
 
     # 8. DATOS PARA VISUALIZACIÓN DE RELACIÓN FEATURE VS TARGET
     if importancias is not None and isinstance(importancias, pd.DataFrame): # Ensure importancias is DataFrame and not None
@@ -330,108 +335,16 @@ def analizar_datos_pyme_mejorado(dataframe, target_variable, tipo_problema='clas
     else:
         resultados['visualizaciones_data']['top_features_vs_target'] = {'mensaje': 'Importancia de características no calculada, no se puede generar visualización Feature vs Target'}
 
-    # After completing the analysis, get enhanced analysis from importancias.py
-    try:
-        # Convert resultados to JSON string for the importancias API
-        resultados_json = json.dumps(resultados)
-        
-        # Prepare the prompt for the AI
-        prompt = '''
-        Resultados del Análisis de Datos para la PyME
-        Visualizaciones para el Frontend
-        #### A) Importancia de las Características
-        Representa la relevancia de cada característica en la predicción del modelo.
-
-        {
-          "importancia_features": {
-            "labels": ["caracteristica1", "caracteristica2", "caracteristica3", "caracteristica4", "caracteristica5"],
-            "values": [0.067, 0.049, 0.043, 0.031, 0.028]
-          }
-        }
-
-
-        #### B) Distribución de la Variable Objetivo
-        Muestra la proporción de cada categoría en la variable objetivo.
-
-        {
-          "distribucion_target": {
-            "labels": ["Categoría 1", "Categoría 2"],
-            "values": [549, 342]
-          }
-        }
-
-
-        #### C) Valores Faltantes en la Base de Datos
-        Indica cuántos datos faltan por variable.
-
-        {
-          "valores_faltantes": {
-            "labels": ["Variable1", "Variable2", "Variable3"],
-            "values": [177, 687, 2]
-          }
-        }
-
-
-        Recomendaciones para Mejorar la PyME
-        El análisis revela información clave para optimizar el negocio:
-
-        {
-          "recomendaciones": [
-            "Recomendación 1 basada en los datos analizados.",
-            "Recomendación 2 basada en los datos analizados.",
-            "Recomendación 3 basada en los datos analizados."
-          ]
-        }
-        '''
-        
-        # Query the AI service for enhanced analysis
-        enhanced_analysis = query("Analiza estos datos y proporciona visualizaciones JSON para el frontend y recomendaciones para la PyME", 
-                                  resultados_json, prompt)
-        
-        # Add the enhanced analysis to the results
-        resultados['enhanced_analysis'] = enhanced_analysis
-        
-    except Exception as e:
-        resultados['enhanced_analysis'] = {'error': str(e)}
-        print(f"Error in enhanced analysis: {e}")
 
     return resultados
 
-# Create an API handler function for the backend
-def handle_api_request(file_path, target_variable, tipo_problema='clasificacion'):
-    """
-    API handler function for analyzing CSV data
-    
-    Args:
-        file_path: Path to the uploaded CSV file
-        target_variable: Name of the column to predict
-        tipo_problema: 'clasificacion' or 'regresion'
-        
-    Returns:
-        dict: Dictionary with analysis results
-    """
-    try:
-        # Analyze the data
-        results = analizar_datos_pyme_mejorado(
-            file_path, 
-            target_variable, 
-            tipo_problema=tipo_problema,
-            max_features_vis=10,
-            top_n_features_insight=5
-        )
-        return results
-    except Exception as e:
-        return {'error': str(e)}
+# Ejemplo de uso (con la función mejorada):
+df = pd.read_csv('pruebas_sigma/train.csv')
+resultados_mejorado = analizar_datos_pyme_mejorado(df, 'Survived', tipo_problema='clasificacion', max_features_vis=7, top_n_features_insight=5) # Ejemplo con parámetros ajustados
+print(json.dumps(resultados_mejorado, indent=2, ensure_ascii=False))
+# Guardar resultados en un archivo JSON
+output_path = '/Users/nicolasrosales/Desktop/prueba json/pruebas_sigma/resultados_analisis.json'
+with open(output_path, 'w', encoding='utf-8') as f:
+    json.dump(resultados_mejorado, f, ensure_ascii=False, indent=2)
 
-# This part only runs when the script is executed directly
-if __name__ == "__main__":
-    df = pd.read_csv('pruebas_sigma/train.csv')
-    resultados_mejorado = analizar_datos_pyme_mejorado(df, 'Survived', tipo_problema='clasificacion', 
-                                                      max_features_vis=7, top_n_features_insight=5)
-    print(json.dumps(resultados_mejorado, indent=2, ensure_ascii=False))
-    # Guardar resultados en un archivo JSON
-    output_path = '/Users/nicolasrosales/Desktop/prueba json/pruebas_sigma/resultados_analisis.json'
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(resultados_mejorado, f, ensure_ascii=False, indent=2)
-
-    print(f"Resultados guardados en {output_path}")
+print(f"Resultados guardados en {output_path}")
