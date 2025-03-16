@@ -14,10 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, FileUp, FilePlus2, AlertCircle, BarChart, PieChart, FileBarChart } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, FileUp, FilePlus2, AlertCircle } from "lucide-react";
 
 const DataAnalysis = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -27,10 +24,6 @@ const DataAnalysis = () => {
   const [selectedColumn, setSelectedColumn] = useState<string>("");
   const [previewRows, setPreviewRows] = useState<number>(5);
   const [error, setError] = useState<string>("");
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [loadingProgress, setLoadingProgress] = useState<number>(0);
-  const [analyzedData, setAnalyzedData] = useState<any>(null);
-  const [importanciaData, setImportanciaData] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,140 +81,10 @@ const DataAnalysis = () => {
     fileInputRef.current?.click();
   };
 
-  const handleAnalyze = async () => {
-    if (!file || !selectedColumn) {
-      setError("Debes seleccionar un archivo y una columna para analizar");
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setLoadingProgress(10);
-    
-    try {
-      // Simular progreso mientras se procesa
-      const progressInterval = setInterval(() => {
-        setLoadingProgress(prev => {
-          if (prev >= 95) {
-            clearInterval(progressInterval);
-            return 95;
-          }
-          return prev + 5;
-        });
-      }, 500);
-      
-      // Crear un FormData para enviar el archivo
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('target_column', selectedColumn);
-      
-      // Llamar a la API del backend para analizar_importancias.py
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error en la petición: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setAnalyzedData(data);
-      setLoadingProgress(98);
-      
-      // Llamar al segundo endpoint que utiliza importancias.py
-      const importanciasResponse = await fetch('/api/importancias', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          analyzed_data: data,
-          target_column: selectedColumn
-        }),
-      });
-      
-      if (!importanciasResponse.ok) {
-        throw new Error(`Error en la petición de importancias: ${importanciasResponse.status}`);
-      }
-      
-      const importanciaResult = await importanciasResponse.json();
-      setImportanciaData(importanciaResult);
-      
-      // Completar la barra de progreso
-      clearInterval(progressInterval);
-      setLoadingProgress(100);
-      
-      toast({
-        title: "Análisis completado",
-        description: "El análisis de datos ha sido completado exitosamente",
-      });
-    } catch (error) {
-      console.error("Error al analizar datos:", error);
-      setError(`Error al analizar datos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
-      toast({
-        variant: "destructive",
-        title: "Error de análisis",
-        description: "No se pudo completar el análisis de datos",
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const renderBarChart = (data: any, title: string) => {
-    if (!data || !data.labels || !data.values) return null;
-    
-    const maxValue = Math.max(...data.values);
-    
-    return (
-      <div className="space-y-2">
-        <h3 className="font-semibold text-base">{title}</h3>
-        <div className="space-y-2">
-          {data.labels.map((label: string, idx: number) => (
-            <div key={idx} className="space-y-1">
-              <div className="flex justify-between text-sm">
-                <span>{label}</span>
-                <span>{data.values[idx]}</span>
-              </div>
-              <Progress value={(data.values[idx] / maxValue) * 100} className="h-2" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderDistribution = (data: any) => {
-    if (!data || !data.labels || !data.values) return null;
-    
-    return (
-      <div className="space-y-3">
-        <h3 className="font-semibold text-base">Distribución de la Variable Objetivo</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {data.labels.map((label: string, idx: number) => (
-            <div key={idx} className="bg-blue-50 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold">{data.values[idx]}</div>
-              <div className="text-sm text-gray-600">{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderRecommendations = (recommendations: string[]) => {
-    if (!recommendations || !recommendations.length) return null;
-    
-    return (
-      <div className="space-y-3">
-        <h3 className="font-semibold text-base">Recomendaciones para Mejorar tu PyME</h3>
-        <ul className="space-y-2 list-disc pl-5">
-          {recommendations.map((rec, idx) => (
-            <li key={idx} className="text-sm">{rec}</li>
-          ))}
-        </ul>
-      </div>
-    );
+  const handleAnalyze = () => {
+    // This will be implemented in the next step
+    console.log("Analyzing column:", selectedColumn);
+    // We'll add the analysis functionality later
   };
 
   return (
@@ -339,23 +202,13 @@ const DataAnalysis = () => {
                 </div>
               </div>
             )}
-
-            {isAnalyzing && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Analizando datos...</span>
-                  <span>{loadingProgress}%</span>
-                </div>
-                <Progress value={loadingProgress} className="h-2" />
-              </div>
-            )}
           </div>
         </CardContent>
-        {csvData.length > 0 && !isAnalyzing && !importanciaData && (
+        {csvData.length > 0 && (
           <CardFooter className="flex justify-end">
             <Button 
               onClick={handleAnalyze}
-              disabled={!selectedColumn || isAnalyzing}
+              disabled={!selectedColumn}
               className="bg-amber-600 hover:bg-amber-700"
             >
               <FilePlus2 className="mr-2 h-5 w-5" />
@@ -364,75 +217,8 @@ const DataAnalysis = () => {
           </CardFooter>
         )}
       </Card>
-
-      {importanciaData && (
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">Resultados del Análisis</CardTitle>
-            <CardDescription>
-              Análisis detallado basado en tus datos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="visualizaciones" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6">
-                <TabsTrigger value="visualizaciones">
-                  <BarChart className="h-4 w-4 mr-2" />
-                  Visualizaciones
-                </TabsTrigger>
-                <TabsTrigger value="recomendaciones">
-                  <FileBarChart className="h-4 w-4 mr-2" />
-                  Recomendaciones
-                </TabsTrigger>
-                <TabsTrigger value="datos">
-                  <PieChart className="h-4 w-4 mr-2" />
-                  Datos
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="visualizaciones" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {importanciaData.importancia_features && 
-                    renderBarChart(importanciaData.importancia_features, "Importancia de las Características")}
-                  
-                  {importanciaData.distribucion_target && 
-                    renderDistribution(importanciaData.distribucion_target)}
-                  
-                  {importanciaData.valores_faltantes && 
-                    renderBarChart(importanciaData.valores_faltantes, "Valores Faltantes")}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="recomendaciones" className="space-y-6">
-                {importanciaData.recomendaciones && 
-                  renderRecommendations(importanciaData.recomendaciones)}
-              </TabsContent>
-
-              <TabsContent value="datos" className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <pre className="whitespace-pre-wrap text-xs overflow-auto max-h-96">
-                    {JSON.stringify(importanciaData, null, 2)}
-                  </pre>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-          <CardFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setImportanciaData(null);
-                setAnalyzedData(null);
-              }}
-            >
-              Volver al análisis
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
     </div>
   );
 };
 
 export default DataAnalysis;
-
