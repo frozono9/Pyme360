@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from 'react';
-import { CheckCircle2, BarChart2, PieChart, ShieldCheck, TrendingUp, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { CheckCircle2, BarChart2, PieChart, ShieldCheck, TrendingUp, CreditCard } from 'lucide-react';
 
 const Features = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
