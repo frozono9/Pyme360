@@ -106,6 +106,10 @@ async def register(user_data: UserCreate):
         user_dict = user_data.model_dump()
         user_dict["password"] = hashed_password
         
+        # Asegurarse de que la información general tenga el país
+        if "informacion_general" in user_dict and "pais" not in user_dict["informacion_general"]:
+            user_dict["informacion_general"]["pais"] = ""
+        
         # Insertar el usuario en la base de datos
         result = user_collection.insert_one(user_dict)
         
