@@ -15,6 +15,10 @@ from models import UserCreate, UserLogin
 from fastapi.encoders import jsonable_encoder
 import score_calculator
 import random
+import pandas as pd
+import importlib.util
+import sys
+import tempfile
 
 # Cargar variables de entorno
 load_dotenv()
@@ -54,6 +58,11 @@ class KpiPredictionRequest(BaseModel):
     include_seasonality: bool = False
     include_market_factors: bool = False
     show_confidence_interval: bool = True
+
+# Modelo para importancias
+class ImportanciasRequest(BaseModel):
+    analyzed_data: dict
+    target_column: str
 
 # Ruta de prueba
 @app.get("/")
@@ -537,6 +546,116 @@ async def query_market_trends(
     except Exception as e:
         print(f"Error al consultar tendencias de mercado: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al consultar tendencias de mercado: {str(e)}")
+
+# NUEVO ENDPOINT para análisis de datos
+@app.post("/api/analyze")
+async def analyze_data(
+    file: UploadFile = File(...), 
+    target_column: str = Form(...)
+):
+    try:
+        print(f"Recibiendo archivo para análisis: {file.filename}")
+        
+        # Guardar el archivo recibido en un archivo temporal
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as temp_file:
+            temp_file_path = temp_file.name
+            content = await file.read()
+            temp_file.write(content)
+        
+        # Cargar el script analizador_importancias.py dinámicamente
+        spec = importlib.util.spec_from_file_location("analizador_importancias", "backend/analizador_importancias.py")
+        analizador_module = importlib.util.module_from_spec(spec)
+        sys.modules["analizador_importancias"] = analizador_module
+        spec.loader.exec_module(analizador_module)
+        
+        # Cargar el CSV con pandas
+        df = pd.read_csv(temp_file_path)
+        
+        # Llamar a la función de análisis
+        result = analizador_module.analizar_datos_pyme_mejorado(df, target_column)
+        
+        # Eliminar el archivo temporal
+        os.unlink(temp_file_path)
+        
+        return result
+    except Exception as e:
+        print(f"Error al analizar datos: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error al analizar datos: {str(e)}")
+
+# NUEVO ENDPOINT para procesamiento con importancias.py
+@app.post("/api/importancias")
+async def process_importancias(request: ImportanciasRequest):
+    try:
+        print(f"Procesando datos para importancias.py con columna objetivo: {request.target_column}")
+        
+        # Importar el módulo de importancias.py
+        from agents import importancias
+        
+        # Convertir los datos analizados a una cadena JSON
+        analyzed_data_json = json.dumps(request.analyzed_data)
+        
+        # Crear el prompt base para el modelo
+        prompt = '''
+        Resultados del Análisis de Datos para la PyME
+        Visualizaciones para el Frontend
+        #### A) Importancia de las Características
+        Representa la relevancia de cada característica en la predicción del modelo.
+
+        #### B) Distribución de la Variable Objetivo
+        Muestra la proporción de cada categoría en la variable objetivo.
+
+        #### C) Valores Faltantes en la Base de Datos
+        Indica cuántos datos faltan por variable.
+
+        Recomendaciones para Mejorar la PyME
+        El análisis revela información clave para optimizar el negocio.
+        '''
+        
+        # Llamar a la función query del módulo importancias
+        result = importancias.query(request.target_column, analyzed_data_json, prompt)
+        
+        # Extraer y procesar la respuesta
+        if isinstance(result, dict) and "text" in result:
+            # Intentar analizar el contenido como JSON
+            try:
+                # Buscamos las secciones JSON en el texto de respuesta
+                text = result["text"]
+                
+                # Función para extraer bloques JSON del texto
+                def extract_json_blocks(text):
+                    import re
+                    json_pattern = r"\{[\s\S]*?\}"
+                    json_blocks = re.findall(json_pattern, text)
+                    
+                    result = {}
+                    for block in json_blocks:
+                        try:
+                            data = json.loads(block)
+                            result.update(data)
+                        except json.JSONDecodeError:
+                            continue
+                    return result
+                
+                processed_data = extract_json_blocks(text)
+                
+                # Si no se encontraron bloques JSON válidos, devolver el texto completo
+                if not processed_data:
+                    return {"response_text": text, "processed": False}
+                
+                return processed_data
+            except Exception as json_err:
+                print(f"Error al procesar JSON en la respuesta: {str(json_err)}")
+                return {"response_text": result.get("text", ""), "processed": False}
+        else:
+            return {"response": result, "processed": False}
+            
+    except Exception as e:
+        print(f"Error al procesar con importancias.py: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error al procesar con importancias.py: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
