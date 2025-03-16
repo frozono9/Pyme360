@@ -1,4 +1,3 @@
-
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,43 +10,48 @@ const FinancingMarketplace = () => {
 
   const mockFinancingOptions = [
     {
+      type: "Programas Gubernamentales",
+      icon: <Building className="h-10 w-10 text-amber-600" />,
+      color: "amber",
+      featured: true,
+      entities: [
+        { name: "Fondo Desarrollo PYME", rate: "4-7%", amount: "Hasta $1,500,000", term: "1-8 años" },
+        { name: "Impulso Emprendedor Regional", rate: "3-6%", amount: "Hasta $1,000,000", term: "1-5 años" },
+        { name: "Crédito ProExport", rate: "5-8%", amount: "Hasta $2,000,000", term: "2-10 años" },
+        { name: "Fondo Social Productivo", rate: "2-5%", amount: "Hasta $800,000", term: "1-6 años" },
+      ]
+    },
+    {
       type: "Bancos Tradicionales",
       icon: <Building className="h-10 w-10 text-blue-600" />,
       color: "blue",
+      featured: false,
       entities: [
-        { name: "Banco Nacional", rate: "12-15%", amount: "Hasta $2,000,000", term: "1-5 años" },
-        { name: "Banco Continental", rate: "11-14%", amount: "Hasta $1,500,000", term: "1-7 años" },
-        { name: "Banco Empresarial", rate: "13-16%", amount: "Hasta $3,000,000", term: "1-10 años" },
+        { name: "Banco Continental", rate: "12-15%", amount: "Hasta $2,000,000", term: "1-5 años" },
+        { name: "Banco Mercantil", rate: "11-14%", amount: "Hasta $1,500,000", term: "1-7 años" },
+        { name: "Banco Latinoamericano", rate: "13-16%", amount: "Hasta $3,000,000", term: "1-10 años" },
       ]
     },
     {
       type: "Plataformas Fintech",
       icon: <CreditCard className="h-10 w-10 text-purple-600" />,
       color: "purple",
+      featured: false,
       entities: [
-        { name: "FinCapital", rate: "14-17%", amount: "Hasta $800,000", term: "6 meses-3 años" },
-        { name: "CreditTech", rate: "15-18%", amount: "Hasta $500,000", term: "3 meses-2 años" },
-        { name: "DigiLoan", rate: "13-16%", amount: "Hasta $1,200,000", term: "1-4 años" },
+        { name: "FinanzDigital", rate: "14-17%", amount: "Hasta $800,000", term: "6 meses-3 años" },
+        { name: "CréditoTech", rate: "15-18%", amount: "Hasta $500,000", term: "3 meses-2 años" },
+        { name: "PrestamoRápido", rate: "13-16%", amount: "Hasta $1,200,000", term: "1-4 años" },
       ]
     },
     {
       type: "Inversionistas Privados",
       icon: <Users className="h-10 w-10 text-green-600" />,
       color: "green",
+      featured: false,
       entities: [
-        { name: "Growth Capital", rate: "Participación", amount: "Hasta $5,000,000", term: "Variable" },
-        { name: "Angel Investors", rate: "Participación", amount: "Hasta $1,000,000", term: "Variable" },
-        { name: "Business Partners", rate: "Participación", amount: "Hasta $3,000,000", term: "Variable" },
-      ]
-    },
-    {
-      type: "Programas Gubernamentales",
-      icon: <Building className="h-10 w-10 text-amber-600" />,
-      color: "amber",
-      entities: [
-        { name: "Fondo PyME", rate: "5-8%", amount: "Hasta $1,000,000", term: "1-7 años" },
-        { name: "Impulso Económico", rate: "3-6%", amount: "Hasta $800,000", term: "1-5 años" },
-        { name: "Crédito Empresarial", rate: "4-7%", amount: "Hasta $1,500,000", term: "1-8 años" },
+        { name: "Capital Semilla", rate: "Participación", amount: "Hasta $5,000,000", term: "Variable" },
+        { name: "Inversores Ángel", rate: "Participación", amount: "Hasta $1,000,000", term: "Variable" },
+        { name: "Asociados Estratégicos", rate: "Participación", amount: "Hasta $3,000,000", term: "Variable" },
       ]
     },
   ];
@@ -66,8 +70,51 @@ const FinancingMarketplace = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {mockFinancingOptions.map((option, index) => (
+          {/* Featured Government Programs Section */}
+          <div className="mb-10 bg-amber-50 p-6 rounded-xl border border-amber-200">
+            <div className="flex items-center mb-4">
+              <Building className="h-8 w-8 text-amber-600 mr-3" />
+              <h2 className="text-2xl font-bold text-amber-800">Programas Gubernamentales Destacados</h2>
+            </div>
+            <p className="text-amber-700 mb-6">
+              Los programas gubernamentales ofrecen las tasas más bajas y condiciones favorables para PyMEs en toda Latinoamérica. 
+              Nuestro sistema identifica los programas para los que calificas.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {mockFinancingOptions[0].entities.map((entity, entityIndex) => (
+                <div key={entityIndex} className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
+                  <div className="font-medium text-amber-800 text-lg mb-2">{entity.name}</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-amber-600 font-medium">Tasa:</span>
+                      <span className="font-bold text-amber-900">{entity.rate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-amber-600 font-medium">Monto:</span>
+                      <span>{entity.amount}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-amber-600 font-medium">Plazo:</span>
+                      <span>{entity.term}</span>
+                    </div>
+                  </div>
+                  <ButtonCustom 
+                    variant="default" 
+                    size="sm"
+                    className="w-full mt-4 bg-amber-500 hover:bg-amber-600"
+                  >
+                    Ver detalles
+                  </ButtonCustom>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Other Financing Options */}
+          <h2 className="text-2xl font-bold mb-6">Otras Opciones de Financiamiento</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {mockFinancingOptions.slice(1).map((option, index) => (
               <Card key={index} className={`border-l-4 border-${option.color}-500`}>
                 <CardHeader>
                   <div className="flex items-center gap-4">
@@ -80,7 +127,6 @@ const FinancingMarketplace = () => {
                         {option.type === "Bancos Tradicionales" && "Préstamos y líneas de crédito tradicionales"}
                         {option.type === "Plataformas Fintech" && "Soluciones digitales de financiamiento rápido"}
                         {option.type === "Inversionistas Privados" && "Capital a cambio de participación"}
-                        {option.type === "Programas Gubernamentales" && "Apoyo estatal con tasas preferenciales"}
                       </CardDescription>
                     </div>
                   </div>
