@@ -18,6 +18,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
+import { Award, CreditCard, Calendar, SlidersHorizontal, AlertTriangle } from 'lucide-react';
 
 interface CreditScoreCalculatorProps {
   creditData: any; // Data from API
@@ -54,26 +55,44 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
     return safeValue(value, 0).toLocaleString();
   };
 
+  // Function to get color class based on score value
+  const getScoreColorClass = (score: number) => {
+    if (score >= 80) return "bg-green-500 text-white";
+    if (score >= 60) return "bg-blue-500 text-white";
+    if (score >= 40) return "bg-yellow-500 text-white";
+    if (score >= 20) return "bg-orange-500 text-white";
+    return "bg-red-500 text-white";
+  };
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Puntuación Crediticia</CardTitle>
-          <CardDescription>
-            Basada en tu historial financiero, calculamos tu puntuación crediticia
-          </CardDescription>
+      <Card className="overflow-hidden border-t-4 border-t-blue-500 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-white to-blue-50">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="rounded-full p-2 bg-blue-100">
+              <Award className="h-6 w-6 text-blue-700" />
+            </div>
+            <div>
+              <CardTitle>Puntuación Crediticia</CardTitle>
+              <CardDescription>
+                Basada en tu historial financiero, calculamos tu puntuación crediticia
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className={`text-4xl font-bold rounded-full w-32 h-32 flex items-center justify-center ${scoreLevel.color} text-white`}>
-              {finalScore}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className={`text-4xl font-bold rounded-full w-36 h-36 flex items-center justify-center ${scoreLevel.color} shadow-lg transition-all duration-300 hover:scale-105`}>
+                {finalScore}
+              </div>
+              <Badge className="text-lg px-4 py-2" variant="secondary">{scoreLevel.nivel}</Badge>
+              <p className="text-center text-muted-foreground max-w-xs">{scoreLevel.description}</p>
             </div>
-            <Badge className="text-lg px-4 py-2" variant="secondary">{scoreLevel.nivel}</Badge>
-            <p className="text-center text-muted-foreground">{scoreLevel.description}</p>
             
             {/* Add score history chart */}
             {scoreHistory && scoreHistory.length > 0 && (
-              <div className="w-full h-48 mt-6">
+              <div className="w-full md:w-2/3 h-48 mt-6">
                 <h3 className="text-sm font-medium mb-2 text-center">Historial de puntuación</h3>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
@@ -100,12 +119,19 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Historial de Pagos</CardTitle>
-            <CardDescription>
-              35% de tu puntaje - {safeValue(paymentHistory.score)} puntos
-            </CardDescription>
+        <Card className="shadow-md hover:shadow-lg transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-white to-blue-50">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full p-2 bg-blue-100">
+                <CreditCard className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle>Historial de Pagos</CardTitle>
+                <CardDescription>
+                  35% de tu puntaje - {safeValue(paymentHistory.score)} puntos
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
@@ -113,15 +139,23 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
                 <span>Porcentaje de pagos a tiempo:</span>
                 <span className="font-medium">{formatPercentage(paymentHistory.percentage)}%</span>
               </div>
-              <Progress value={safeValue(paymentHistory.percentage)} className="h-2" />
+              <div className="relative pt-1">
+                <Progress 
+                  value={safeValue(paymentHistory.percentage)} 
+                  className={`h-2 ${safeValue(paymentHistory.percentage) >= 80 ? "bg-green-500" : 
+                    safeValue(paymentHistory.percentage) >= 60 ? "bg-blue-500" : 
+                    safeValue(paymentHistory.percentage) >= 40 ? "bg-yellow-500" : 
+                    safeValue(paymentHistory.percentage) >= 20 ? "bg-orange-500" : "bg-red-500"}`} 
+                />
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="bg-green-50 border border-green-100 rounded-md p-3">
+              <div className="bg-green-50 border border-green-100 rounded-md p-3 shadow-sm">
                 <div className="text-sm text-muted-foreground">Pagos a tiempo</div>
                 <div className="text-xl font-semibold text-green-600">{safeValue(paymentHistory.on_time_payments)}</div>
               </div>
-              <div className="bg-red-50 border border-red-100 rounded-md p-3">
+              <div className="bg-red-50 border border-red-100 rounded-md p-3 shadow-sm">
                 <div className="text-sm text-muted-foreground">Pagos atrasados</div>
                 <div className="text-xl font-semibold text-red-600">{safeValue(paymentHistory.late_payments)}</div>
               </div>
@@ -146,12 +180,19 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Utilización de Crédito</CardTitle>
-            <CardDescription>
-              30% de tu puntaje - {safeValue(creditUtilization.score)} puntos
-            </CardDescription>
+        <Card className="shadow-md hover:shadow-lg transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-white to-blue-50">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full p-2 bg-blue-100">
+                <SlidersHorizontal className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle>Utilización de Crédito</CardTitle>
+                <CardDescription>
+                  30% de tu puntaje - {safeValue(creditUtilization.score)} puntos
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
@@ -179,11 +220,11 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-md p-3">
+              <div className="bg-blue-50 border border-blue-100 rounded-md p-3 shadow-sm">
                 <div className="text-sm text-muted-foreground">Deuda Total</div>
                 <div className="text-xl font-semibold text-blue-600">${formatCurrency(creditUtilization.total_debt)}</div>
               </div>
-              <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3">
+              <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3 shadow-sm">
                 <div className="text-sm text-muted-foreground">Crédito Disponible</div>
                 <div className="text-xl font-semibold text-indigo-600">${formatCurrency(creditUtilization.total_available)}</div>
               </div>
@@ -216,12 +257,19 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Antigüedad Crediticia</CardTitle>
-            <CardDescription>
-              15% de tu puntaje - {safeValue(historyLength.score)} puntos
-            </CardDescription>
+        <Card className="shadow-md hover:shadow-lg transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-white to-blue-50">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full p-2 bg-blue-100">
+                <Calendar className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle>Antigüedad Crediticia</CardTitle>
+                <CardDescription>
+                  15% de tu puntaje - {safeValue(historyLength.score)} puntos
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
@@ -232,7 +280,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <Progress value={Math.min(safeValue(historyLength.average_age) * 10, 100)} className="h-2" />
             </div>
             
-            <div className="bg-purple-50 border border-purple-100 rounded-md p-3 mb-4">
+            <div className="bg-purple-50 border border-purple-100 rounded-md p-3 mb-4 shadow-sm">
               <div className="text-sm text-muted-foreground">Número de cuentas</div>
               <div className="text-xl font-semibold text-purple-600">{safeValue(historyLength.num_accounts)}</div>
             </div>
@@ -254,12 +302,19 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Mezcla de Créditos</CardTitle>
-            <CardDescription>
-              10% de tu puntaje - {safeValue(creditMix.score)} puntos
-            </CardDescription>
+        <Card className="shadow-md hover:shadow-lg transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-white to-blue-50">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full p-2 bg-blue-100">
+                <AlertTriangle className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle>Mezcla de Créditos</CardTitle>
+                <CardDescription>
+                  10% de tu puntaje - {safeValue(creditMix.score)} puntos
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
@@ -270,7 +325,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
               <Progress value={safeValue(creditMix.num_types) * 25} className="h-2" />
             </div>
             
-            <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3 mb-4">
+            <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3 mb-4 shadow-sm">
               <div className="text-sm text-muted-foreground">Diversidad crediticia</div>
               <div className="text-lg font-medium text-indigo-600">
                 {creditMix.types && Array.isArray(creditMix.types) ? creditMix.types.join(', ') : 'N/A'}
@@ -305,12 +360,19 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Solicitudes Recientes</CardTitle>
-            <CardDescription>
-              10% de tu puntaje - {safeValue(newApplications.score)} puntos
-            </CardDescription>
+        <Card className="md:col-span-2 shadow-md hover:shadow-lg transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-white to-blue-50">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full p-2 bg-blue-100">
+                <AlertTriangle className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle>Solicitudes Recientes</CardTitle>
+                <CardDescription>
+                  10% de tu puntaje - {safeValue(newApplications.score)} puntos
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
@@ -338,11 +400,11 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="bg-red-50 border border-red-100 rounded-md p-3">
+              <div className="bg-red-50 border border-red-100 rounded-md p-3 shadow-sm">
                 <div className="text-sm text-muted-foreground">Solicitudes en los últimos 12 meses</div>
                 <div className="text-xl font-semibold text-red-600">{safeValue(newApplications.recent_applications)}</div>
               </div>
-              <div className="bg-amber-50 border border-amber-100 rounded-md p-3">
+              <div className="bg-amber-50 border border-amber-100 rounded-md p-3 shadow-sm">
                 <div className="text-sm text-muted-foreground">Impacto en puntuación</div>
                 <div className="text-xl font-semibold text-amber-600">
                   {safeValue(newApplications.recent_applications) > 2 ? 'Alto' : 
@@ -352,7 +414,7 @@ export const CreditScoreCalculator: React.FC<CreditScoreCalculatorProps> = ({ cr
             </div>
             
             {/* Add info about recent applications impact */}
-            <div className="p-4 border rounded-md bg-blue-50 border-blue-100">
+            <div className="p-4 border rounded-md bg-blue-50 border-blue-100 shadow-sm">
               <p className="text-sm text-blue-800">
                 Cada nueva solicitud de crédito puede reducir temporalmente tu puntuación en aproximadamente 5-10 puntos.
                 Estas solicitudes permanecen en tu historial durante 12 meses, pero solo afectan tu puntuación durante
